@@ -1,0 +1,14 @@
+diff --git a/torch/_prims_common/wrappers.py b/torch/_prims_common/wrappers.py
+index 990fdf60cb1..3f2b135bf3b 100644
+--- a/torch/_prims_common/wrappers.py
++++ b/torch/_prims_common/wrappers.py
+@@ -135,7 +135,8 @@ class elementwise_type_promotion_wrapper:
+ 
+             if isinstance(result, TensorLike):
+                 return _maybe_convert_to_dtype(result, result_dtype)
+-            if isinstance(result, Sequence):
++            if isinstance(result, (Sequence, TensorLike)):
++
+                 return tuple(_maybe_convert_to_dtype(x, result_dtype) for x in result)
+             raise AssertionError(f"Unhandled result type: {type(result)}")
+ 

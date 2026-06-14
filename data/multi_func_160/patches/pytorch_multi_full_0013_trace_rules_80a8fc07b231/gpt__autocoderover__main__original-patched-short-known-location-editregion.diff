@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/trace_rules.py b/torch/_dynamo/trace_rules.py
+index 6be6e4965ce..193d8e025ca 100644
+--- a/torch/_dynamo/trace_rules.py
++++ b/torch/_dynamo/trace_rules.py
+@@ -3091,7 +3091,8 @@ def is_builtin_constant(obj) -> bool:
+ def is_numpy(obj) -> bool:
+     if np is None:
+         return False
+-    return isinstance(obj, (np.ndarray, np.generic)) or id(obj) in _numpy_function_ids
++    return isinstance(obj, (np.ndarray, np.generic, np.dtype, np.iinfo, np.finfo)) or id(obj) in _numpy_function_ids
++
+ 
+ 
+ BUILTIN_SKIPLIST = (

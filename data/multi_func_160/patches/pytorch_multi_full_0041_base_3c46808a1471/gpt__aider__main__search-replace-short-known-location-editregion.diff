@@ -1,0 +1,39 @@
+diff --git a/torch/_dynamo/variables/base.py b/torch/_dynamo/variables/base.py
+index 13a174a0a9a..e3ffb0a1a78 100644
+--- a/torch/_dynamo/variables/base.py
++++ b/torch/_dynamo/variables/base.py
+@@ -498,7 +498,7 @@ class VariableTracker(metaclass=VariableTrackerMeta):
+             # NB : Checking for mutation is necessary because we compare
+             # constant values
+             other = args[0]
+-            if not isinstance(self, type(other)):
++            if not isinstance(self, type(other)) and not isinstance(other, type(self)):
+                 return variables.ConstantVariable.create(NotImplemented)
+             if (
+                 not other.is_python_constant()
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index e216ab93d80..4fbec086ce4 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1029,7 +1029,7 @@ class BuiltinVariable(VariableTracker):
+             # Interaction between ndarray and tensors:
+             #   We prefer the tensor op whenever there are tensors involved
+             if check_numpy_ndarray_args(args, kwargs) and not any(
+-                type(arg) == variables.TensorVariable for arg in args
++                isinstance(arg, variables.TensorVariable) for arg in args
+             ):
+                 proxy = tx.output.create_proxy(
+                     "call_function",
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 14e02625368..3bedf6190e2 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -160,7 +160,7 @@ def fn_var_getattr(tx, fn, source, name):
+     except AttributeError:
+         # function does not have a __getattr__ or __getattribute__ method,
+         # so we can safely assume that this attribute is absent
+-        raise_observed_exception(AttributeError, tx)
++        raise_observed_exception(tx, AttributeError)
+ 
+     # Special handling for known dunder attributes
+     if name in fn_known_dunder_attrs:

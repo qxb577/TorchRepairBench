@@ -1,0 +1,13 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 0155c689249..e93d52dc4fb 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -1982,7 +1982,7 @@ def clamp_min(
+     return torch.clamp(self, min=min)  # type: ignore[arg-type]
+ 
+ 
+-@register_decomposition(aten.clamp_max)
++@register_decomposition(aten.clamp)
+ @out_wrapper()
+ def clamp_max(
+     self: TensorLikeType,

@@ -1,0 +1,38 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 152a9736923..448c419c879 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1435,7 +1435,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+                                 torch.ops.aten.scalar_tensor.default, (res,)
+                             )
+                             self.graph.call_function(
+-                                torch.ops.aten._assert_async.msg,
++                                torch.ops.aten._assert_scalar.default,
+                                 # TODO: use ra.msg here, but it's pretty
+                                 # useless right now
+                                 (
+@@ -1444,6 +1444,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+                                 ),
+                             )
+ 
++
+     def add_output_instructions(self, prefix: List[Instruction]) -> None:
+         """
+         We call this on the creation of a new compiled subgraph that is inserted
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 132996dcc56..f52cdba167d 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -106,6 +106,12 @@ def functional_assert_async_msg_decomp(tensor, msg):
+     return
+ 
+ 
++@register_decomposition([aten._assert_scalar])
++def assert_scalar_decomp(tensor, msg):
++    return
++
++
++
+ @register_decomposition([aten.sym_constrain_range_for_size.default])
+ def sym_constrain_range_for_size(symbol, *, min=None, max=None):
+     return

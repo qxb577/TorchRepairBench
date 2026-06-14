@@ -1,0 +1,16 @@
+diff --git a/torch/cuda/__init__.py b/torch/cuda/__init__.py
+index f735a414ecc..ff054df208d 100644
+--- a/torch/cuda/__init__.py
++++ b/torch/cuda/__init__.py
+@@ -135,8 +135,11 @@ def is_bf16_supported(including_emulation: bool = True):
+     if torch.version.hip:
+         return True
+ 
++    if not torch.cuda.is_available():
++        return False
+     device = torch.cuda.current_device()
+ 
++
+     # Check for CUDA version and device compute capability.
+     # This is a fast way to check for it.
+     cuda_version = torch.version.cuda

@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 78320cbbcdf..68af732d907 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1173,9 +1173,8 @@ Either create the tensor outside the compiled region, or do not set the tensor t
+     def is_tensor_method(self):
+         return (
+             inspect.ismethoddescriptor(self.get_function())
+-            and hasattr(self.get_function(), "__objclass__")
+-            and self.get_function().__objclass__ == torch._C.TensorBase
+-        ) or self.get_function() is torch.Tensor.__contains__
++            and hasattr(self.get_function(), "__objclass__
++
+ 
+     def torch_function_override_enabled(self, tx, args, kwargs):
+         return (

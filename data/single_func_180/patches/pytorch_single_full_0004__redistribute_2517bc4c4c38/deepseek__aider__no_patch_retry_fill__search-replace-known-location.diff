@@ -1,0 +1,35 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index c145c3deb7f..b74d794152a 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -168,7 +168,7 @@ def _get_flattened_mesh_by_layout(
+     mesh: DeviceMesh, mesh_dims: tuple[int, ...]
+ ) -> DeviceMesh | None:
+     """
+-    Query for an explicitly created flattened mesh using layout comparison.
++    Query for an explicitly created flattened mesh using dimension names.
+ 
+     Args:
+         mesh: The DeviceMesh to query
+@@ -186,17 +186,10 @@ def _get_flattened_mesh_by_layout(
+     # Convert mesh dim indices to dim names
+     dim_names = tuple(mesh_dim_names[i] for i in mesh_dims)
+ 
+-    # Get the submesh for these dimensions
+-    submesh = mesh[dim_names]
+-
+-    # Compute expected flattened layout
+-    expected_layout = submesh._layout.coalesce()
+-    if len(expected_layout) > 1:
+-        expected_layout = expected_layout.nest()
+-
+-    # Search existing flattened meshes by comparing layouts
+-    for flattened_mesh in root_mesh._flatten_mapping.values():
+-        if flattened_mesh._layout == expected_layout:
++    # Directly lookup the pre-flattened mesh by dimension names.
++    # This avoids tracing any mesh operations under torch.compile.
++    for key, flattened_mesh in root_mesh._flatten_mapping.items():
++        if key.mesh_dim_names == dim_names:
+             return flattened_mesh
+ 
+     return None

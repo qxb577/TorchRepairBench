@@ -1,0 +1,15 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index d02030d5deb..b384a253d45 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -1725,8 +1725,10 @@ class MetaConverter(Generic[_TensorT]):
+                         callback,
+                         torch._dynamo.source.AttrSource(source, "_base"),
+                         base_symbolic_context,
++                        compute_unbacked_binding=True
+                     )
+ 
++
+                     def is_c_of_r(
+                         complex_dtype: torch.dtype, real_dtype: torch.dtype
+                     ) -> bool:

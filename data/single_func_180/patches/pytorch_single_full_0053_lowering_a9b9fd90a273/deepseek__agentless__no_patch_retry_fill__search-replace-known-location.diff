@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index b520869d632..02e4c3267f2 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2050,6 +2050,11 @@ def index_put_(self, indices, values, accumulate=False):
+         and len(indices) == 1
+         and indices[0].get_dtype() in {torch.bool, torch.uint8}
+     ):
++        if len(self.get_size()) > len(indices[0].get_size()):
++            indices[0] = unsqueeze(
++                indices[0],
++                list(range(len(indices[0].get_size()), len(self.get_size()))),
++            )
+         return index_put_as_masked_fill(self, indices, values, accumulate)
+ 
+     # Fallback if there is a boolean index

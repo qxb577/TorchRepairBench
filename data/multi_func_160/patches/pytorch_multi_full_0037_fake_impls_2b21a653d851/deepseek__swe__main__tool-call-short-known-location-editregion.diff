@@ -1,0 +1,17 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 4a64032347c..6c47354a021 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -224,7 +224,12 @@ def _override_composite_implicit_decomp(cia_ops_to_callable, safe=True):
+                 decomp_callable
+             )
+ 
++        # Register CIA ops to FakeTensorMode directly
++        from torch._subclasses.fake_impls import op_implementations_dict
++        op_implementations_dict[op_overload] = decomp_callable
++
+         for key in _BACKEND_KEYS_TO_OVERRIDE:
++
+             if key not in op_overload.py_kernels:
+                 # [NOTE] Registering old CIA to Backend kernel
+                 # We always register original CIA behavior to the backend keys kernel

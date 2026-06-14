@@ -1,0 +1,13 @@
+diff --git a/torch/testing/_internal/common_utils.py b/torch/testing/_internal/common_utils.py
+index 13a28c5d7eb..9fd55db97a0 100644
+--- a/torch/testing/_internal/common_utils.py
++++ b/torch/testing/_internal/common_utils.py
+@@ -2113,7 +2113,7 @@ class TestCase(expecttest.TestCase):
+         #       tearDown is run unconditionally no matter whether the test
+         #       passes or not. For the same reason, we can't wrap the `method`
+         #       call in try-finally and always do the check.
+-        @wraps(method)
++        @functools.wraps(method)
+         def wrapper(self, *args, **kwargs):
+             with policy():
+                 method(*args, **kwargs)

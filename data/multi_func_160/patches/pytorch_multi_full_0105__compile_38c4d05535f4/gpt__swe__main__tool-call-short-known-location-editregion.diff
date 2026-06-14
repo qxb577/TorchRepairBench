@@ -1,0 +1,14 @@
+diff --git a/torch/_compile.py b/torch/_compile.py
+index 05e63baa7c9..fe4b114734d 100644
+--- a/torch/_compile.py
++++ b/torch/_compile.py
+@@ -45,7 +45,8 @@ def _disable_dynamo(
+             if disable_fn is None:
+                 import torch._dynamo
+ 
+-                disable_fn = torch._dynamo.disable(fn, recursive)
++                disable_fn = torch._dynamo.disable(fn, recursive, reason='precompile')
++
+                 fn.__dynamo_disable = disable_fn  # type: ignore[attr-defined]
+ 
+             return disable_fn(*args, **kwargs)

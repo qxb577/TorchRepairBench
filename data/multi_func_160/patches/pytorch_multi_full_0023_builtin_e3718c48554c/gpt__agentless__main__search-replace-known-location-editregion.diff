@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index a3c38ffb1e7..bb4e645bcd2 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -662,7 +662,7 @@ class ConstDictVariable(VariableTracker):
+             return new_dict_vt
+         elif name == "__ior__":
+             self.call_method(tx, "update", args, kwargs)
+-            return self
++            return self.clone(mutation_type=ValueMutationNew())
+         else:
+             return super().call_method(tx, name, args, kwargs)
+ 

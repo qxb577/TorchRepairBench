@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/pattern_matcher.py b/torch/_inductor/pattern_matcher.py
+index 9c825b1d8aa..89c4abfcb24 100644
+--- a/torch/_inductor/pattern_matcher.py
++++ b/torch/_inductor/pattern_matcher.py
+@@ -1627,6 +1627,12 @@ def get_mutation_region_id(graph: torch.fx.Graph, node: torch.fx.Node) -> int:
+     return mutation_region_id
+ 
+ 
++def same_mutation_regions(
++    node1: torch.fx.Node, node2: torch.fx.Node,
++) -> bool:
++    return get_mutation_region_id(node1.graph, node1) == get_mutation_region_id(node2.graph, node2)
++
++
+ def should_compute_mutation_region_ids(graph: torch.fx.GraphModule) -> bool:
+     return "mutation_region_id" not in next(iter(graph.nodes)).meta
+ 

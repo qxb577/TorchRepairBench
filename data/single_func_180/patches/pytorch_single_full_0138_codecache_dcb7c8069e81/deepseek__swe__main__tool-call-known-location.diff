@@ -1,0 +1,21 @@
+diff --git a/torch/_inductor/codecache.py b/torch/_inductor/codecache.py
+index ea69ba454f4..32657c35a42 100644
+--- a/torch/_inductor/codecache.py
++++ b/torch/_inductor/codecache.py
+@@ -625,7 +625,7 @@ class FxGraphCachePickler(pickle.Pickler):
+         try:
+             self.dump(obj)
+             return self._stream.getvalue()
+-        except (TypeError, AttributeError, pickle.PicklingError, ValueError) as e:
++        except (TypeError, AttributeError, pickle.PicklingError, ValueError, RuntimeError) as e:
+             # Some configs options may not pickle.
+             log.warning("Failed to pickle cache key", exc_info=True)
+             raise BypassFxGraphCache("Failed to pickle cache key") from e
+@@ -634,6 +634,7 @@ class FxGraphCachePickler(pickle.Pickler):
+             self._stream.seek(0)
+             self._stream.truncate(0)
+ 
++
+     def get_hash(self, obj: Any) -> str:
+         """
+         Serialize an object and return a hash of the bytes.

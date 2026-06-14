@@ -1,0 +1,13 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 6feec49148d..0b3025e08c5 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -2331,6 +2331,8 @@ def _index_copy(
+         lambda: f"Index should have dimension 1 or 0 (got {index.ndim})",
+     )
+     # Treat scalars as elements of \R^1
++    if index.ndim == 0:
++        index = index.unsqueeze(0)
+     zero_dim = x.ndim == 0
+     x1 = x.unsqueeze(0) if zero_dim else x
+     idx = (None,) * dim + (index,)

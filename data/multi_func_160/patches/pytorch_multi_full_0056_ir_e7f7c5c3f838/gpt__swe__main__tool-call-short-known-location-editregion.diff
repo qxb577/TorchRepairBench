@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 946c06fa9a2..643673a816d 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -1717,10 +1717,11 @@ class Scan(Loops):
+             # Fallback for split-scan on ROCm
+             return [None] * len(dtypes)
+ 
+-        if num_splits > 1 and len(dtypes) > 1:
++        if num_splits > 1 and len(dtypes) > 1 and not V.graph.has_feature(device, BackendFeature.TUPLE_REDUCTION):
+             # Fallback for split-scans for multiple inputs
+             return [None] * len(dtypes)
+ 
++
+         def reindex(index, scan_index):
+             assert len(scan_index) == len(scan_ranges)
+             assert len(index) == len(pointwise_ranges)

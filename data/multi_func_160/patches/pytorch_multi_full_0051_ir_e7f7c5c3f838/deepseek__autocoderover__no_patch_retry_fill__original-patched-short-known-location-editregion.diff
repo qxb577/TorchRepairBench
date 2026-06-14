@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 946c06fa9a2..8724a0b1968 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -1717,9 +1717,6 @@ class Scan(Loops):
+             # Fallback for split-scan on ROCm
+             return [None] * len(dtypes)
+ 
+-        if num_splits > 1 and len(dtypes) > 1:
+-            # Fallback for split-scans for multiple inputs
+-            return [None] * len(dtypes)
+ 
+         def reindex(index, scan_index):
+             assert len(scan_index) == len(scan_ranges)

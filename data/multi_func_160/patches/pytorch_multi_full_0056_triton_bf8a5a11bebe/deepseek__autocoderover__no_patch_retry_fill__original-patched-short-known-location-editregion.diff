@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 5b39a0fe435..8543bf790ea 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -101,6 +101,10 @@ class IndexingOptions:
+     def has_tmpmask(self):
+         return "tmp" in self.mask_str
+ 
++    def has_rmask(self):
++        return "rmask" in self.mask_str
++
++
+ 
+ @dataclasses.dataclass
+ class BlockPtrOptions:
+@@ -113,6 +117,10 @@ class BlockPtrOptions:
+     mask_vars: Set[sympy.Symbol]
+     reshape_suffix: List[str]
+ 
++    def has_rmask(self):
++        return False
++
++
+     @staticmethod
+     def create(
+         strides: List[sympy.Expr],

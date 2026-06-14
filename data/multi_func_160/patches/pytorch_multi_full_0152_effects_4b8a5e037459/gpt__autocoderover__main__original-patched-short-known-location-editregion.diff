@@ -1,0 +1,14 @@
+diff --git a/torch/_higher_order_ops/effects.py b/torch/_higher_order_ops/effects.py
+index 826932c8482..1a806e89bb4 100644
+--- a/torch/_higher_order_ops/effects.py
++++ b/torch/_higher_order_ops/effects.py
+@@ -163,7 +163,8 @@ def with_effects_proxy(
+     out_proxy = mode.tracer.create_proxy(
+         "call_function",
+         with_effects,
+-        (proxy_token, op, *proxy_args),
++        (proxy_token, op, *proxy_args), {'has_effect': True},
++
+         proxy_kwargs,
+     )
+     result = track_tensor_tree(out, out_proxy, constant=None, tracer=mode.tracer)

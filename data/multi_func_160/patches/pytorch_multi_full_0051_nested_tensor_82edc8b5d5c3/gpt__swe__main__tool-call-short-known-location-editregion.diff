@@ -1,0 +1,18 @@
+diff --git a/torch/nested/_internal/nested_tensor.py b/torch/nested/_internal/nested_tensor.py
+index 5494633b09b..c17d7d01d99 100644
+--- a/torch/nested/_internal/nested_tensor.py
++++ b/torch/nested/_internal/nested_tensor.py
+@@ -72,9 +72,10 @@ class NestedTensor(torch.Tensor):
+             values.device,
+             False,
+             kwargs.get("requires_grad", False),
+-            "sizes",
+-            False,
+-            True,  # dispatch_layout
++            "symbolic_sizes_strides",
++            True,
++            False,  # dispatch_layout
++
+             ks,
+         )
+         return r

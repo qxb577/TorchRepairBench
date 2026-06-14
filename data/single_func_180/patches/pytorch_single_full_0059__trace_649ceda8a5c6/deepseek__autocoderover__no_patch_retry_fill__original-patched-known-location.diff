@@ -1,0 +1,17 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index fc3f8ed063c..05aa9ab961a 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -1264,9 +1264,12 @@ def _process_export_inputs(
+             UserErrorType.INVALID_INPUT,
+             f"Expecting `args` to be a tuple of example positional inputs, got {type(args)}",
+         )
++    if type(args) is not tuple:
++        args = tuple(args)
+     kwargs = kwargs if kwargs is not None else {}
+     _, original_in_spec = pytree.tree_flatten((args, kwargs))
+ 
++
+     verify_additional_inputs: Callable[[ExportedProgram], None]
+     out_dynamic_shapes: Optional[_DynamicShapesSpec]
+     if isinstance(dynamic_shapes, torch.export.AdditionalInputs):

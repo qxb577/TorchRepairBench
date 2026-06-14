@@ -1,0 +1,17 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..dbe3ef50bd4 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -128,7 +128,11 @@ class PackagingError(Exception):
+                     message.write(f"      Context: {error_context}\n")
+ 
+         # Save the dependency graph so that tooling can get at it.
+-        self.dependency_graph = dependency_graph
++        try:
++    self.dependency_graph = dependency_graph
++except ImportError as e:
++    raise PackagingError(f"Dependency resolution failed: {e}")
++
+         super().__init__(message.getvalue())
+ 
+ 

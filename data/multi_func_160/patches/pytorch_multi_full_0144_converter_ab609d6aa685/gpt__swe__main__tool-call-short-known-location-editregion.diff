@@ -1,0 +1,14 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index a8a5b216f84..5f8b74691dc 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -414,7 +414,8 @@ class TS2FXGraphConverter:
+         for k in kwargs:
+             if k == "requires_grad":
+                 kwargs[k] = bool(kwargs[k])  # 0 -> False, 1 -> True
+-        tensor = torch.tensor(*args, **kwargs)
++        tensor = torch.ops.aten.tensor(*args, **kwargs)
++
+ 
+         output_name = node.output().debugName()
+         alias_name = f"lifted_tensor_{output_name}"

@@ -1,0 +1,19 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 2f1a88461e4..ac2a47a11d4 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7769,7 +7769,14 @@ def meta__jagged_to_padded_dense_forward(
+     return values.new_empty(output_shape)
+ 
+ 
++@register_meta(torch._native_multi_head_attention)
++@out_wrapper()
++def _native_multi_head_attention_meta(q, k, v, embed_dim, num_heads, qkv_weight, qkv_bias, proj_weight, proj_bias, key_padding_mask, need_weights, average_attn_weights, mask_type):
++    B, S, _ = q.shape
++    return q.new_empty((B, S, embed_dim))
++
+ def _create_unary_float_meta_func(func):
++
+     @register_meta(func)
+     @out_wrapper()
+     def _f(x):

@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index 3f91ee87b3a..46e50fc9c12 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -2150,16 +2150,12 @@ def set_tracing_context_output_strides(example_inputs, compiled_graph):
+             if exprs is None:
+                 context.output_strides.append(None)
+             else:
+-                context.output_strides.append(
+-                    tuple(
+-                        (
+-                            shape_env.evaluate_symexpr(e)
+-                            if shape_env is not None
+-                            else int(e)
+-                        )
+-                        for e in exprs
++                if shape_env is not None:
++                    context.output_strides.append(None)
++                else:
++                    context.output_strides.append(
++                        tuple(int(e) for e in exprs)
+                     )
+-                )
+ 
+ 
+ def should_use_remote_fx_graph_cache():

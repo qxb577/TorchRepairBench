@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/subgraph_lowering.py b/torch/_inductor/subgraph_lowering.py
+index 3c8116d402c..b258536dbf8 100644
+--- a/torch/_inductor/subgraph_lowering.py
++++ b/torch/_inductor/subgraph_lowering.py
+@@ -76,7 +76,7 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+         )
+ 
+     def mark_buffer_mutated(self, name: str) -> None:
+-        if self._approved_mutator():
++        if self._approved_mutator() or isinstance(buffer, ir.Buffer):
+             self.mutated_buffers.add(name)
+         else:
+             raise SubgraphLoweringException(

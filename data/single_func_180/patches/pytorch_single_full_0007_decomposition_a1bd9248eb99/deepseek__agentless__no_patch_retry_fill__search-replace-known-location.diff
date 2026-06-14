@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 18ce7c4da43..14f402de8d6 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -460,6 +460,10 @@ def add(
+     if not x_is_complex_tensor or not y_is_complex_tensor:
+         return NotImplemented
+ 
++    # Fallback to extern kernel if inputs are strided (non-contiguous)
++    if not x.is_contiguous() or not y.is_contiguous():
++        return NotImplemented
++
+     output_size_zero = False
+     if x.ndim == 0 and y.ndim == 0:
+         output_size_zero = True

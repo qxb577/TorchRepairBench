@@ -1,0 +1,14 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 4a64032347c..3293e83f9fa 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -25,7 +25,8 @@ from typing import (
+ 
+ from torch._higher_order_ops.utils import autograd_not_implemented
+ from torch._library.fake_class_registry import FakeScriptObject, maybe_to_fake_obj
+-from torch._subclasses.fake_tensor import FakeTensorMode
++from torch._subclasses.fake_impls import register_op_impl
++
+ from torch.fx._utils import first_call_function_nn_module_stack
+ from torch.fx.graph import _PyTreeCodeGen, _PyTreeInfo
+ from torch.fx.immutable_collections import immutable_dict, immutable_list

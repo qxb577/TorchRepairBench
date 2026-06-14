@@ -1,0 +1,19 @@
+diff --git a/torch/distributed/tensor/_dtensor_spec.py b/torch/distributed/tensor/_dtensor_spec.py
+index bffb399b2bc..af755c6c128 100644
+--- a/torch/distributed/tensor/_dtensor_spec.py
++++ b/torch/distributed/tensor/_dtensor_spec.py
+@@ -94,10 +94,14 @@ class DTensorSpec:
+             and self.tensor_meta.dtype == other.tensor_meta.dtype  # type: ignore[union-attr]
+         )
+ 
++    def __metadata_guard__(self):
++        return (self.mesh, self.placements)
++
+     def __str__(self) -> str:
+         """
+         human readable representation of the DTensorSpec
+         """
++
+         if len(self.placements) == 1:
+             placement_str = str(self.placements[0])
+         else:

@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/optim/named_optimizer.py b/torch/distributed/optim/named_optimizer.py
+index 79de2316781..0e0acb89e52 100644
+--- a/torch/distributed/optim/named_optimizer.py
++++ b/torch/distributed/optim/named_optimizer.py
+@@ -73,7 +73,7 @@ class _NamedOptimizer(optim.Optimizer):
+         self._param_groups_check()
+         self.named_parameters = dict(named_parameters)
+         params_for_optimizer = (
+-            self.named_parameters.values() if param_groups is None else param_groups
++            [{"params": self.named_parameters.values()}] if param_groups is None else param_groups
+         )
+         self._optimizer = optimizer_class(  # type: ignore[operator]
+             params_for_optimizer,

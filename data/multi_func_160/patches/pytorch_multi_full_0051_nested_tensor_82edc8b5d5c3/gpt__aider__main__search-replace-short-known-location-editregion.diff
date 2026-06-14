@@ -1,0 +1,29 @@
+diff --git a/torch/nested/_internal/nested_tensor.py b/torch/nested/_internal/nested_tensor.py
+index 5494633b09b..9a93d07ffe1 100644
+--- a/torch/nested/_internal/nested_tensor.py
++++ b/torch/nested/_internal/nested_tensor.py
+@@ -98,9 +98,9 @@ class NestedTensor(torch.Tensor):
+ 
+         # subtract 1 to convert to values dim space
+         r = self._ragged_idx - 1
+-        self._size = (B, *values.shape[:r], ragged_size, *values.shape[r + 1 :])
++        self._size = (B, *values.shape[:r], ragged_size, *values.shape[r + 1:])
+         stride = values.stride()
+-        self._strides = (ragged_size * stride[r], *stride)
++        self._strides = (*stride[:r], ragged_size * stride[r], *stride[r + 1:])
+ 
+         self._values = values
+         self._offsets = offsets
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index d4c79241f4a..3c74a79e700 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -351,7 +351,7 @@ def tensor_attr_supported_getter(func, *args, **kwargs):
+         return args[0]._values.numel()
+ 
+     if func == torch.ops.aten.sym_stride.default:
+-        return args[0]._strides
++        return (*args[0]._strides[:args[0]._ragged_idx], *args[0]._strides[args[0]._ragged_idx + 1:])
+ 
+     if func == torch.ops.aten.sym_storage_offset.default:
+         return args[0]._values.storage_offset()

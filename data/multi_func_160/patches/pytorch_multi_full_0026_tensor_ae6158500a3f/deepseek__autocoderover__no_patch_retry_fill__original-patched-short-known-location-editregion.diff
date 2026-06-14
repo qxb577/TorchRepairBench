@@ -1,0 +1,20 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 304daf3dc53..bc2d19ae6c9 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1454,14 +1454,8 @@ class TensorSubclassVariable(VariableTracker):
+         kwargs: dict[str, VariableTracker],
+     ) -> VariableTracker:
+         if len(args) == 1 and isinstance(args[0], TensorVariable):
+-            from .torch_function import TensorWithTFOverrideVariable
+-
+-            source = AttrSource(self.source, "__torch_function__")
+-            torch_fn = VariableTracker.build(tx, self.value.__torch_function__, source)
++            return args[0].method_as_subclass(self)
+ 
+-            return TensorWithTFOverrideVariable.from_tensor_var(
+-                tx, args[0], self.value, torch_fn
+-            )
+ 
+         return super().call_function(tx, args, kwargs)
+ 

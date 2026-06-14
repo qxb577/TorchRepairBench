@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index d2d00c18ebf..1acca73a37a 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2234,7 +2234,10 @@ class BuiltinVariable(VariableTracker):
+         obj: VariableTracker,
+         name_var: VariableTracker,
+     ):
+-        return self.call_setattr(tx, obj, name_var, variables.DeletedVariable())
++        if hasattr(obj.value, '__delattr__'):
++            return tx.inline_user_function_return(obj, "__delattr__", [name_var])
++        else:
++            return self.call_setattr(tx, obj, name_var, variables.DeletedVariable())
+ 
+     def call_type(self, tx: "InstructionTranslator", obj: VariableTracker):
+         try:

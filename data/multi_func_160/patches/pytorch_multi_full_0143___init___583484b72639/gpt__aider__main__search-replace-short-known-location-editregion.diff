@@ -1,0 +1,35 @@
+diff --git a/torch/_dynamo/polyfills/__init__.py b/torch/_dynamo/polyfills/__init__.py
+index fc30d5a759e..effb62fc22a 100644
+--- a/torch/_dynamo/polyfills/__init__.py
++++ b/torch/_dynamo/polyfills/__init__.py
+@@ -99,11 +99,10 @@ def set_intersection(set1, set2):
+     return intersection_set
+ 
+ 
+-def set_union(set1, set2):
+-    union_set = set1.copy()
+-    for x in set2:
+-        if x not in union_set:
+-            union_set.add(x)
++def set_union(*sets):
++    union_set = set()
++    for s in sets:
++        union_set.update(s)
+     return union_set
+ 
+ 
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index ce60951c2f9..3306b1d170e 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -553,7 +553,9 @@ class SetVariable(ConstDictVariable):
+                 arg = SetVariable(args[0].unpack_var_sequence(tx))
+             else:
+                 arg = args[0]
+-            return super().call_method(tx, "update", (arg,), kwargs)
++            return variables.UserFunctionVariable(polyfills.set_union).call_function(
++                tx, [self, arg], {}
++            )
+         elif name == "remove":
+             assert not kwargs
+             assert len(args) == 1

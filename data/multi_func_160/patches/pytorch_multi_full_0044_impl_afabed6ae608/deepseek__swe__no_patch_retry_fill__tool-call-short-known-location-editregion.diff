@@ -1,0 +1,41 @@
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index a36c2e32e3f..83df98140e2 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -663,6 +663,25 @@ class GraphLowering(torch.fx.Interpreter):
+         self.add_device_info(example.device)
+         return tensor
+ 
++    def get_custom_op_layout_constraints(self, target):
++        # Check if the custom op has a fixed layout tag and return a layout
++        # constraint function that preserves stride order.
++        if not isinstance(target, torch._ops.OpOverload):
++            return None
++        if not hasattr(target, "_overloadpacket"):
++            return None
++        packet = target._overloadpacket
++        if hasattr(packet, "_fixed_layout_") and packet._fixed_layout_:
++            # Enforce layout of first input on output.
++            def constraint_(inputs, outputs):
++                for out in outputs:
++                    out.set_(inputs[0].get_size(),
++                             inputs[0].get_stride(),
++                             inputs[0].get_storage_offset())
++                return True
++            return constraint_
++        return None
++
+     def call_function(self, target, args, kwargs):
+         if target is operator.getitem and isinstance(args[0], (list, tuple, dict)):
+             return super().call_function(target, args, kwargs)
+@@ -678,7 +697,10 @@ class GraphLowering(torch.fx.Interpreter):
+             base_name = target.name().split(".")[0]
+             if base_name in FALLBACK_ALLOW_LIST:
+                 make_fallback(target)
++            elif (layout_constraint := self.get_custom_op_layout_constraints(target)) is not None:
++                make_fallback(target, layout_constraint)
+             elif config.implicit_fallbacks:
++
+                 error = (
+                     MissingOperatorWithDecomp
+                     if get_decompositions([target])

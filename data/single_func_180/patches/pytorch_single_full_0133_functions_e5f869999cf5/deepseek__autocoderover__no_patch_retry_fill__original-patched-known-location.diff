@@ -1,0 +1,15 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index 23d0bc24bf1..2adbcc56020 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -364,8 +364,8 @@ class ModularIndexing(sympy.Function):
+         return fuzzy_eq(p.is_nonnegative, q.is_nonnegative)  # type: ignore[attr-defined]
+ 
+     def _eval_is_positive(self) -> Optional[bool]:
+-        p, q = self.args[:2]
+-        return fuzzy_eq(p.is_positive, q.is_positive)  # type: ignore[attr-defined]
++        return None
++
+ 
+ 
+ class Where(sympy.Function):

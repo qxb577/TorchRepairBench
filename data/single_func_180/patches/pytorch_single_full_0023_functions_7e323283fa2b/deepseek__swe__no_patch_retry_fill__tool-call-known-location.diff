@@ -1,0 +1,48 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 38186fd49f2..d972452089e 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -217,7 +217,7 @@ def bind_args_cached(
+             ba[name] = wrap_bound_arg(tx, rem_kw.pop(name))
+         elif name not in ba:
+             raise_observed_exception(
+-                TypeError,
++                exc.Unsupported,
+                 tx,
+                 args=[
+                     ConstantVariable.create(
+@@ -232,7 +232,7 @@ def bind_args_cached(
+         ba[spec.varargs_name] = wrap_bound_arg(tx, tuple(extra))
+     elif extra:
+         raise_observed_exception(
+-            TypeError,
++            exc.Unsupported,
+             tx,
+             args=[
+                 ConstantVariable.create(
+@@ -252,7 +252,7 @@ def bind_args_cached(
+             ba[name] = wrap_bound_arg(tx, spec.kwdefaults[name], kwdefault_source)
+         else:
+             raise_observed_exception(
+-                TypeError,
++                exc.Unsupported,
+                 tx,
+                 args=[
+                     ConstantVariable.create(
+@@ -266,7 +266,7 @@ def bind_args_cached(
+         ba[spec.varkw_name] = wrap_bound_arg(tx, rem_kw)
+     elif rem_kw:
+         raise_observed_exception(
+-            TypeError,
++            exc.Unsupported,
+             tx,
+             args=[
+                 ConstantVariable.create(f"Unexpected keyword arguments: {list(rem_kw)}")
+@@ -276,6 +276,7 @@ def bind_args_cached(
+     return ba
+ 
+ 
++
+ def wrap_bound_arg(
+     tx: "InstructionTranslator", val: Any, source: Source | None = None
+ ) -> VariableTracker:

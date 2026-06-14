@@ -1,0 +1,16 @@
+diff --git a/torch/_subclasses/fake_tensor.py b/torch/_subclasses/fake_tensor.py
+index 9d2b38f40fe..dabb7ae6228 100644
+--- a/torch/_subclasses/fake_tensor.py
++++ b/torch/_subclasses/fake_tensor.py
+@@ -960,6 +960,11 @@ class FakeTensorMode(TorchDispatchMode):
+         Create a cache key given the dispatch args. Raises _BypassDispatchCache
+         for any situation that precludes caching.
+         """
++        # Inference mode changes dispatch behavior (e.g., disable autograd),
++        # which is not reflected in the cache key. Bypass caching when it's on.
++        if torch.is_inference_mode_enabled():
++            raise _BypassDispatchCache("inference mode")
++
+         # Avoid caching for any ops that would require a more sophisticated
+         # caching implementation, e.g., data dependent ops or ops that modify
+         # the inputs.

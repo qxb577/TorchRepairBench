@@ -1,0 +1,14 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index 5d6fa25a49e..41c6d7551e7 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -910,7 +910,8 @@ class _NonStrictTorchFunctionHandler(torch.overrides.TorchFunctionMode):
+                     if "op" in kwargs:
+                         kwargs["op"] = REDUCE_OP_TO_STR[kwargs["op"]]
+                 return mapped_func, args, kwargs
+-        if func is torch.tensor:
++        if func is torch.tensor and not isinstance(args[0], (float, bool)):
++
+             # Redirect to Python implementation of torch.tensor for data with symints.
+             # NOTE(avik): We don't unconditionally redirect to this implementation
+             # because it has some known incompletenesses, e.g., it doesn't support

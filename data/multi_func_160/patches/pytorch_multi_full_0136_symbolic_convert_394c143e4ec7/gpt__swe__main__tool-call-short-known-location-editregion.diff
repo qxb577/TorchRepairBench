@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 33c56e69933..e6907286978 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -574,7 +574,8 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+                     raise RuntimeError(
+                         f"Couldn't find {name} in the symbolic_locals of the inline interpreter stack"
+                     )
+-                result[name] = cand.symbolic_locals[name]
++                result[name] = cand.symbolic_locals.get(name, InlinedClosureVariable(name=name))
++
+             else:
+                 closure_cells[name] = self.closure.items[idx]
+ 

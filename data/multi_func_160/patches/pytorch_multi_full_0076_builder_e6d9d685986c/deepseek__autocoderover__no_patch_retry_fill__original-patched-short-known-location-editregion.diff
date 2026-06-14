@@ -1,0 +1,43 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 86e40908f46..8f510cd4bf8 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -2881,6 +2881,8 @@ def handle_traced_output(example_value, tx, proxy, options, subclass_type, targe
+     import torch._utils
+ 
+     if isinstance(example_value, torch.Tensor):
++        if example_value.is_sparse:
++            return variables.UnspecializedPythonVariable(example_value)
+         var = construct_tensor_variable(
+             target_cls, tx, proxy, example_value, subclass_type, options
+         )
+@@ -2892,6 +2894,7 @@ def handle_traced_output(example_value, tx, proxy, options, subclass_type, targe
+         # attribute mutations on this tensor.
+         #
+         # NOTE we pass a dummy object as the `item` argument to avoid
++
+         # constructing a dummy _tensor_ object. The object isn't used for
+         # newly constructed VTs anyways.
+         tx.output.side_effects._track_obj(
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 7001fe6a66d..08e26ffe3a0 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2133,6 +2133,9 @@ def _warn_complex_not_supported():
+ # output.
+ def unsupported_input_tensor(t: torch.Tensor, node=None):
+     "Do not support reading or writing to this tensor"
++    if t.is_sparse:
++        return True
++
+     if t.is_complex():
+         # Complex views are supported with IR ComplexView
+         _warn_complex_not_supported()
+@@ -2152,6 +2155,7 @@ def unsupported_input_tensor(t: torch.Tensor, node=None):
+             and node.target
+             in (
+                 aten.view.dtype,
++
+                 aten.cat.default,
+                 aten.clone.default,
+                 aten._scaled_mm.default,

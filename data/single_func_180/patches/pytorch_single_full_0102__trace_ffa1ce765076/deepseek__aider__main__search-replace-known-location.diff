@@ -1,0 +1,18 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..df4d8964b4b 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -384,9 +384,11 @@ def _get_param_buffer_mapping(
+     param_lookup: dict[int, str] = {}
+     buffer_lookup: dict[int, str] = {}
+     for name, param in original_module.named_parameters(remove_duplicate=False):
+-        param_lookup[id(param)] = name
++        if id(param) not in param_lookup:
++            param_lookup[id(param)] = name
+     for name, buffer in original_module.named_buffers(remove_duplicate=False):
+-        buffer_lookup[id(buffer)] = name
++        if id(buffer) not in buffer_lookup:
++            buffer_lookup[id(buffer)] = name
+ 
+     param_buffer_table: dict[str, str] = {}
+     for dynamo_name, dynamo_param in traced_module.named_parameters(

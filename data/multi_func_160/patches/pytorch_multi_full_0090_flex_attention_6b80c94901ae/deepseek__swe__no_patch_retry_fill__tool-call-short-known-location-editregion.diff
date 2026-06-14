@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/kernel/flex/flex_flash_attention.py b/torch/_inductor/kernel/flex/flex_flash_attention.py
+index bcb235bd29d..95e85145a85 100644
+--- a/torch/_inductor/kernel/flex/flex_flash_attention.py
++++ b/torch/_inductor/kernel/flex/flex_flash_attention.py
+@@ -66,7 +66,12 @@ def is_trivial_graph(graph_module: GraphModule, is_score_graph: bool):
+     if is_score_graph:
+         if input_buffers_require_grads(graph_module):
+             return False
+-        return True  # party on garth
++        # Check for dynamic shapes, which are not supported by Flash Attention
++        for n in placeholders:
++            if not all(isinstance(s, int) for s in n.meta["tensor_meta"].shape):
++                return False
++        return True
++
+     # mask mod graph is empty if we have 4 inputs and full_default output
+     return len(placeholders) == 4 and output_val.target == torch.ops.aten.full.default
+ 

@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+index 20bd13c3800..11da3304d8e 100644
+--- a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
++++ b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+@@ -418,6 +418,9 @@ class FSDPParam:
+         # Clamp `param_dtype` to `None` if no casting is required
+         if param_dtype == self.orig_dtype:
+             param_dtype = None
++        # Clamp `reduce_dtype` to `None` if no casting is required
++        if reduce_dtype == self.orig_dtype:
++            reduce_dtype = None
+         self.param_dtype = param_dtype
+         self.reduce_dtype = reduce_dtype
+         # None indicates that the mixed precision is not enabled

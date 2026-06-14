@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index 654bf2e756c..e07ea9e4849 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -1173,9 +1173,13 @@ class NamedTupleVariable(TupleVariable):
+     def as_python_constant(self):
+         if self.is_structseq():
+             # StructSequenceType(iterable)
+-            return self.python_type()([x.as_python_constant() for x in self.items])
+-        # NamedTupleType(*iterable)
+-        return self.python_type()(*[x.as_python_constant() for x in self.items])
++            obj = self.python_type()([x.as_python_constant() for x in self.items])
++        else:
++            # NamedTupleType(*iterable)
++            obj = self.python_type()(*[x.as_python_constant() for x in self.items])
++        for name, value in getattr(self, "extra_attrs", {}).items():
++            setattr(obj, name, value.as_python_constant())
++        return obj
+ 
+     def as_proxy(self):
+         assert self.python_type() is not SizeVariable

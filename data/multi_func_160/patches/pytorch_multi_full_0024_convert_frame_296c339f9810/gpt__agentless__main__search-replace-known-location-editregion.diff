@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 96dbbf9265a..0c0e455fc35 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1128,7 +1128,7 @@ class OutputGraph:
+ 
+             stored_graph_output_var = False
+             output = []
+-            if count_calls(self.graph) != 0 or len(pass2.graph_outputs) != 0:
++            if count_calls(self.graph) != 0 or len(pass2.graph_outputs) != 0 or self.run_compiler_collective:
+                 output.extend(
+                     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+                 )

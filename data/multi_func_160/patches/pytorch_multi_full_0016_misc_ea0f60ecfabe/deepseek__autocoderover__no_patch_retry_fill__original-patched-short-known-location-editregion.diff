@@ -1,0 +1,22 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index bf5e7ddfbea..7d80b46376c 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -273,16 +273,12 @@ class TensorVariable(VariableTracker):
+             raise NotImplementedError
+ 
+         real_value = getattr(_input_associated_real_value, name)
+-        if callable(real_value):
+-            # Callables have more nuanced handling, and we should let the existing system delegate here.
+-            # Raising was past behavior and so should always be sound to fall back.
+-            # Note - at a certain point we may want to handle
+-            raise NotImplementedError
+ 
+         attr_source = AttrSource(self.source, name)
+         install_guard(attr_source.make_guard(GuardBuilder.HASATTR))
+         return VariableTracker.build(tx, real_value, attr_source)
+ 
++
+     def method_attr_ndim(self, tx):
+         if self.ndim is not None:
+             return ConstantVariable.create(self.ndim)

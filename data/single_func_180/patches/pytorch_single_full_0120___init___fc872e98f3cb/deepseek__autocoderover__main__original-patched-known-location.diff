@@ -1,0 +1,17 @@
+diff --git a/torch/_prims/__init__.py b/torch/_prims/__init__.py
+index 603658ea615..b54f74a6d21 100644
+--- a/torch/_prims/__init__.py
++++ b/torch/_prims/__init__.py
+@@ -327,8 +327,11 @@ def _make_prim(
+ 
+     _prim_packet = getattr(torch._ops.ops.prims, name)
+     _prim = _prim_packet.default
+-    if tags:
++    if tags is not None:
+         _prim._tags = tags
++    else:
++        _prim._tags = impl_aten.tags
++
+ 
+     from torch._subclasses.fake_tensor import contains_tensor_types
+ 

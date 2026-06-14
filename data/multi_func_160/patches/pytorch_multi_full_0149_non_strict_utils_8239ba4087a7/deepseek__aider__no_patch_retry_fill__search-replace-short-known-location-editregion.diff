@@ -1,0 +1,36 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index fffe85beb46..6f02d767c53 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -206,30 +206,7 @@ def fakify(
+         if i in getattr(t, "_dynamo_weak_dynamic_indices", {}):
+             dynamic_sizes.append(DimDynamic.DYNAMIC)
+         elif i in getattr(t, "_dynamo_dynamic_indices", {}):
+-            # bit annoying, but we need to replicate process in _dynamo/variables/builder.py
+-            # where a RelaxedUnspecConstraint is created for Dim.DYNAMIC, so constraint violations
+-            # are raised when specializing.
+-            dynamic_sizes.append(DimDynamic.DYNAMIC)
+-            constraint_sizes[i] = RelaxedUnspecConstraint(warn_only=False)  # type: ignore[call-overload]
+-        else:
+-            dynamic_sizes.append(DimDynamic.STATIC)
+-    symbolic_context: StatelessSymbolicContext = (  # make mypy happy
+-        StatelessSymbolicContext(
+-            dynamic_sizes=dynamic_sizes,
+-            constraint_sizes=constraint_sizes,  # type: ignore[arg-type]
+-        )
+-    )
+-    t_id = id(t)
+-    assert mode.shape_env is not None
+-    if t_id in t_constraints:
+-        for i, constraint in t_constraints[t_id].items():
+-            src = TensorPropertySource(base=source, prop=TensorProperty.SIZE, idx=i)
+-            sources[(t_id, i)].append(src)
+-            if isinstance(constraint, _RelaxedConstraint):
+-                continue
+-            symbolic_context.constraint_sizes[i] = constraint.constraint_range
+-            mode.shape_env.source_name_to_debug_name[src.name()] = constraint.name  # type: ignore[assignment]
+-    fake = mode.from_tensor(t, source=source, symbolic_context=symbolic_context)
++            #
+     mode.shape_env.tracked_fakes.append(TrackedFake(fake, source, symbolic_context))  # type: ignore[union-attr]
+     return fake
+ 

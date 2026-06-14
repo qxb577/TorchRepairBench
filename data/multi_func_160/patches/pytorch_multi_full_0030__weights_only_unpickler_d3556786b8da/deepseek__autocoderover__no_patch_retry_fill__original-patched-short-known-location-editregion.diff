@@ -1,0 +1,53 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 90926105db7..8ae4869af5e 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -84,6 +84,9 @@ def _get_safe_globals() -> List[Any]:
+     global _marked_safe_globals_list
+     return _marked_safe_globals_list
+ 
++_BLOCKLISTED_MODULES = {"posix", "nt", "os", "sys", "pwd", "grp", "subprocess", "objc", "operator", "builtins", "functools", "collections", "socket", "io"}
++
++
+ 
+ def _clear_safe_globals():
+     global _marked_safe_globals_list
+@@ -213,6 +216,8 @@ class Unpickler:
+             if key[0] == GLOBAL[0]:
+                 module = readline()[:-1].decode("utf-8")
+                 name = readline()[:-1].decode("utf-8")
++                if module in _BLOCKLISTED_MODULES:
++                    raise UnpicklingError(f"unsupported GLOBAL {module}.{name} whose module {module} is blocked")
+                 # Patch since torch.save default protocol is 2
+                 # users will be running this code in python > 3
+                 if self.proto == 2:
+@@ -232,6 +237,7 @@ class Unpickler:
+                         "this global if you trust this class/function."
+                     )
+             elif key[0] == NEWOBJ[0]:
++
+                 args = self.stack.pop()
+                 cls = self.stack.pop()
+                 if cls is torch.nn.Parameter:
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 587895b6864..f96f3dc46b5 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -1145,6 +1145,9 @@ def load(
+     )
+ 
+     def _get_wo_message(message: str) -> str:
++        # Check for blocked module error and return the message unchanged
++        if re.search(r"unsupported GLOBAL \S+ whose module \S+ is blocked", message):
++            return message
+         pattern = r"GLOBAL (\S+) was not an allowed global by default."
+         has_unsafe_global = re.search(pattern, message) is not None
+         if has_unsafe_global:
+@@ -1162,6 +1165,7 @@ def load(
+             )
+         return updated_message + DOCS_MESSAGE
+ 
++
+     if weights_only is None:
+         weights_only, warn_weights_only = False, True
+     else:

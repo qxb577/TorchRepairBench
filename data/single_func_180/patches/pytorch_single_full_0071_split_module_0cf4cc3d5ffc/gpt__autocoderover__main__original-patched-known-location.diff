@@ -1,0 +1,14 @@
+diff --git a/torch/fx/passes/split_module.py b/torch/fx/passes/split_module.py
+index 7df05aac83f..3647bef8669 100644
+--- a/torch/fx/passes/split_module.py
++++ b/torch/fx/passes/split_module.py
+@@ -353,7 +353,8 @@ def split_module(
+         # rather they're added to the graphs where they are used down below
+         if node.op in ["placeholder", "get_attr"]:
+             continue
+-        if node.op == "output":
++        if node.op == "output" or node.op == "call_function" and node.target == torch.ops.aten.add_:
++
+             torch.fx.graph.map_arg(
+                 node.args[0], lambda n: record_cross_partition_use(n, None)
+             )

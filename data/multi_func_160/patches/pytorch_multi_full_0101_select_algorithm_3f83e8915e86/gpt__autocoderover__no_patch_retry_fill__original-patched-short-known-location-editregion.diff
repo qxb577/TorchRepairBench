@@ -1,0 +1,33 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index 24de4ae373a..f7b9fd2c150 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -3676,11 +3676,14 @@ class AlgorithmSelectorCache(PersistentCache):
+             *sizevars.size_hints(
+                 node.get_size(),
+                 fallback=config.unbacked_symint_fallback,
++                hint_override=hint_override,
+             ),
+             *sizevars.size_hints(
+                 node.get_stride(),
+                 fallback=config.unbacked_symint_fallback,
++                hint_override=hint_override,
+             ),
++
+             sizevars.size_hint(
+                 node.get_layout().offset,
+                 fallback=config.unbacked_symint_fallback,
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 44689734d80..840f30523be 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -927,7 +927,9 @@ class SizeVarAllocator:
+         size_dict = {
+             symbol: V.graph.sizevars.size_hint(symbol, fallback=fallback)
+             for symbol in free_symbols
++            if not has_free_unbacked_symbols(symbol)
+         }
++
+         return expr.subs(size_dict)
+ 
+     def offset_var(self, index: Expr, vars: Sequence[sympy.Symbol]) -> Expr:

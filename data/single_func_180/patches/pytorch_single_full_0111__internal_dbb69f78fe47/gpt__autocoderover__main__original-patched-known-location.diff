@@ -1,0 +1,47 @@
+diff --git a/torch/_logging/_internal.py b/torch/_logging/_internal.py
+index 24e8cc3a14d..4610fbd1e27 100644
+--- a/torch/_logging/_internal.py
++++ b/torch/_logging/_internal.py
+@@ -128,23 +128,28 @@ def set_logs(
+     dynamic: Optional[int] = None,
+     inductor: Optional[int] = None,
+     distributed: Optional[int] = None,
+-    bytecode: bool = False,
+-    aot_graphs: bool = False,
+-    aot_joint_graph: bool = False,
+-    ddp_graphs: bool = False,
+-    graph: bool = False,
+-    graph_code: bool = False,
+-    graph_breaks: bool = False,
+-    graph_sizes: bool = False,
+-    guards: bool = False,
+-    recompiles: bool = False,
+-    trace_source: bool = False,
+-    output_code: bool = False,
+-    schedule: bool = False,
+-    perf_hints: bool = False,
++    bytecode: Union[bool, int] = False,
++    aot_graphs: Union[bool, int] = False,
++    aot_joint_graph: Union[bool, int] = False,
++    ddp_graphs: Union[bool, int] = False,
++    graph: Union[bool, int] = False,
++    graph_code: Union[bool, int] = False,
++    graph_breaks: Union[bool, int] = False,
++    graph_sizes: Union[bool, int] = False,
++    guards: Union[bool, int] = False,
++    recompiles: Union[bool, int] = False,
++    trace_source: Union[bool, int] = False,
++    output_code: Union[bool, int] = False,
++    schedule: Union[bool, int] = False,
++    perf_hints: Union[bool, int] = False,
++
+     modules: Optional[Dict[str, Union[int, bool]]] = None,
+ ):
++    for name, value in locals().items():
++        if isinstance(value, (bool, int)) and not isinstance(value, bool):
++            raise ValueError(f"Invalid value for {name}: {value}. Expected a boolean.")
+     """
++
+     Sets the log level for individual components and toggles individual log
+     artifact types.
+ 

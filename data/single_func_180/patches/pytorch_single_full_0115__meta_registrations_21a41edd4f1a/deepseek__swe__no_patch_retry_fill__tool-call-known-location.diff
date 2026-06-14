@@ -1,0 +1,48 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 8435b80f34c..089e530c5cf 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7779,6 +7779,35 @@ def meta__jagged_to_padded_dense_forward(
+     return values.new_empty(output_shape)
+ 
+ 
++@register_meta(torch._native_multi_head_attention)
++def meta_native_multi_head_attention(
++    query,
++    key,
++    value,
++    embed_dim,
++    num_heads,
++    q_proj_weight,
++    q_proj_bias,
++    k_proj_weight,
++    k_proj_bias,
++    v_proj_weight,
++    v_proj_bias,
++    out_proj_weight,
++    out_proj_bias,
++    key_padding_mask=None,
++    need_weights=True,
++    average_attn_weights=True,
++    mask_type=None,
++):
++    B, L, E = query.shape
++    S = key.shape[1]
++    output = query.new_empty((B, L, E))
++    if need_weights:
++        attn_weights = query.new_empty((B, num_heads, L, S))
++        return output, attn_weights
++    return output
++
++
+ def _create_unary_float_meta_func(func):
+     @register_meta(func)
+     @out_wrapper()
+@@ -7790,6 +7819,7 @@ def _create_unary_float_meta_func(func):
+     return _f
+ 
+ 
++
+ def _create_binary_float_meta_func(func):
+     @register_meta(func)
+     @out_wrapper()

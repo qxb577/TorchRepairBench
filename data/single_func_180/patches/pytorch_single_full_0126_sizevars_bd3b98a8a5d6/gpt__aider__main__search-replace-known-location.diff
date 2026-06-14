@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index ea7bb6baea3..ee25f746ac9 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -78,7 +78,7 @@ class SizeVarAllocator:
+         self.var_to_val = self.shape_env.var_to_val
+         self.var_to_hint_override = self.shape_env.var_to_hint_override
+         self.replacements: dict[sympy.Symbol, Expr] = self.shape_env.replacements
+-        self.unbacked_replacements: Optional[dict[Expr, Expr]] = None
++        self.unbacked_replacements: dict[Expr, Expr] = {}
+         # Maps of dynamic sizes that have to be precomputed on the host to the kernel args.
+         # The basic idea is if we have some complicated sympy expression
+         # f(s0), we may choose to precompute it on the host and then replace

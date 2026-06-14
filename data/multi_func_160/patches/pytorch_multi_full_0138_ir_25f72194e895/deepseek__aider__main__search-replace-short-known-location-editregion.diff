@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 97af0731f1d..047f078fd7e 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -4415,6 +4415,7 @@ class DynamicScalar(ExternKernel):
+ 
+     # TODO: handle bools carefully
+     def __init__(self, sym, data):
++        data = data.realize()
+         super().__init__(None, NoneLayout(torch.device("cpu")), self.unwrap_storage([data]))  # type: ignore[arg-type]
+         if isinstance(sym, sympy.Symbol):
+             self.sym = sym

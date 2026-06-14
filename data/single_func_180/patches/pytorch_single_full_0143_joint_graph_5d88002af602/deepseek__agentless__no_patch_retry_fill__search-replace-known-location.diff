@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index 0f1b6179410..4a0f5c1fdd2 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -286,6 +286,15 @@ class UniformValueConstantFolder(ConstantFolder):
+             and node.target == aten.full.default
+             and len(node.args) == 2
+         ):
++            # do not constant-fold a full() that is filled with a symbolic value,
++            # since that would bake the current concrete size into the graph
++            fill_value_node = node.args[1]
++            if (
++                isinstance(fill_value_node, torch.fx.Node)
++                and "val" in fill_value_node.meta
++                and isinstance(fill_value_node.meta["val"], torch.SymInt)
++            ):
++                return self.unknown_value
+             args, kwargs = self.fetch_args_kwargs_from_env(node)
+             new_args = [[1], args[1]]
+             return aten.full.default(*new_args, **node.kwargs)

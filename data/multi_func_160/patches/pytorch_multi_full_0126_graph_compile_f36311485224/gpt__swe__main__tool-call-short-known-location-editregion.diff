@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9e9fbb77c3d..a98ae3dc2c8 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3011,7 +3011,8 @@ class SqueezeView(BaseView):
+                 if dim is None:
+                     if size != 1:
+                         new_size.append(size)
+-                        new_stride.append(stride)
++                        new_stride.append(0 if size == 1 else stride)
++
+                 else:
+                     if i != dim:
+                         new_size.append(size)

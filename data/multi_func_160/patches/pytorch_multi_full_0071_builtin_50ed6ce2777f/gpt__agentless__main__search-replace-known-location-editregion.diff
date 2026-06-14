@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 8f9859e80c5..8efc52458c9 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -324,7 +324,9 @@ class BuiltinVariable(VariableTracker):
+                 # other cases to reason about and add exceptions for.
+                 if isinstance(a, UserDefinedVariable):
+                     return a.call_method(tx, forward_name, [b], {})
+-                else:
++                elif len(args) == 1 and isinstance(args[0], variables.TensorVariable):
++            tensor_variable = args[0]
++            return variables.ConstantVariable.create(id(tensor_variable.proxy.node))
+                     return b.call_method(tx, reverse_name, [a], {})
+ 
+             op_handlers[op].append(

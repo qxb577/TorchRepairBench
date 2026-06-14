@@ -1,0 +1,17 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index a6c731cd2c1..c7fed3d2671 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -514,8 +514,12 @@ class SymInt:
+             # Force specialization
+             return hash(builtins.int(self))
+ 
++    def _sympy_(self):
++        return self.node.expr
++
+ 
+ class SymFloat:
++
+     """
+     Like an float (including magic methods), but redirects all operations on the
+     wrapped node. This is used in particular to symbolically record operations

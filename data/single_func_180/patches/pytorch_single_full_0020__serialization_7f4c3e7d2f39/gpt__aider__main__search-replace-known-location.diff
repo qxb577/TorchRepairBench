@@ -1,0 +1,22 @@
+diff --git a/torch/distributed/_serialization.py b/torch/distributed/_serialization.py
+index 2aa9786c0e4..d9c3bfe6b8d 100644
+--- a/torch/distributed/_serialization.py
++++ b/torch/distributed/_serialization.py
+@@ -57,10 +57,13 @@ class _PseudoZipFile:
+         for entry in entries:
+             data = f.read(entry.length)
+             if entry.is_storage:
+-                storage = torch.frombuffer(
+-                    data,
+-                    dtype=torch.uint8,
+-                ).untyped_storage()
++                if entry.length == 0:
++                    storage = torch.UntypedStorage(0)
++                else:
++                    storage = torch.frombuffer(
++                        data,
++                        dtype=torch.uint8,
++                    ).untyped_storage()
+ 
+                 self.records[entry.key] = (
+                     storage,

@@ -1,0 +1,15 @@
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index 8cec2634a30..a340508599a 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -436,6 +436,10 @@ def jagged_torch_function(func, *args, **kwargs):
+         with torch._C.DisableTorchFunctionSubclass():
+             return func(*args, **kwargs)
+ 
++    if func.__name__ == "share_memory_":
++        args[0]._values.share_memory_()
++        return args[0]
++
+     raise NotImplementedError(func)
+ 
+ 

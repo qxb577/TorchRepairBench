@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 18ce7c4da43..88cd57eeacc 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -474,6 +474,9 @@ def add(
+         z = alpha * y
+     complex_type = torch.promote_types(x.dtype, y.dtype)
+ 
++    if not x.is_contiguous() or not y.is_contiguous():
++        return NotImplemented
++
+     # For complex typed `x`, `x.view(x.real.dtype)` doubles the last dimension and can cause problem
+     # when broadcasting the add.
+     def reshape_tensor_complex(tensor: torch.Tensor) -> torch.Tensor:

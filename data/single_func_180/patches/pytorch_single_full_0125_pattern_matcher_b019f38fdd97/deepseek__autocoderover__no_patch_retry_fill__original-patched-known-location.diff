@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/pattern_matcher.py b/torch/_inductor/pattern_matcher.py
+index db96c45c4a8..089aa4b20e2 100644
+--- a/torch/_inductor/pattern_matcher.py
++++ b/torch/_inductor/pattern_matcher.py
+@@ -202,9 +202,10 @@ class Match:
+ 
+     def erase_nodes(self, graph: torch.fx.Graph) -> None:
+         for n in reversed(self.nodes):
+-            if not n._erased:
++            if not n._erased and len(n.users) == 0:
+                 graph.erase_node(n)
+ 
++
+     def output_nodes(self) -> List[Optional[torch.fx.Node]]:
+         return [
+             (self.ctx.pattern_to_node[p] if p is not None else None)

@@ -1,0 +1,25 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index d02030d5deb..a2813a2021d 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -1725,6 +1725,7 @@ class MetaConverter(Generic[_TensorT]):
+                         callback,
+                         torch._dynamo.source.AttrSource(source, "_base"),
+                         base_symbolic_context,
++                        compute_unbacked_bindings=True
+                     )
+ 
+                     def is_c_of_r(
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index 3f94216b9e3..767b04501a4 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -1399,7 +1399,7 @@ def compute_unbacked_bindings(
+         fresh_sym.clear()
+         ign_sym.clear()
+ 
+-    if not pending:
++    if not pending and not compute_unbacked_bindings:
+         return None
+ 
+     symbol_to_path = _free_unbacked_symbols_with_path(

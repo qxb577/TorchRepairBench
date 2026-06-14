@@ -1,0 +1,21 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 452b3164c22..751b2f635ee 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -2360,9 +2360,13 @@ class TMACompatibilityChecker:
+                     innermost_block_symt = block_symt
+                     break
+ 
+-        assert innermost_block_type and innermost_block_symt, (
+-            f"{innermost_block_shape} expr must contain a single block type from {TritonSymbols.block_types}"
+-        )
++        if not innermost_block_type or not innermost_block_symt:
++            log.debug(
++                "Cannot determine innermost block type for %s. Skipping compatibility check.",
++                innermost_block_shape,
++            )
++            return False
++
+ 
+         # For persistent reductions, the reduction block sizes are fixed at compile time
+         if self.kernel.persistent_reduction and not self.for_store:

@@ -1,0 +1,13 @@
+diff --git a/torch/utils/_sympy/solve.py b/torch/utils/_sympy/solve.py
+index cdc722d20fa..775d78c6517 100644
+--- a/torch/utils/_sympy/solve.py
++++ b/torch/utils/_sympy/solve.py
+@@ -111,7 +111,7 @@ def _try_isolate_lhs(
+     # Divide both sides by the factors that don't contain thing.
+     if isinstance(e, sympy.Rel) and isinstance(e.lhs, sympy.Mul):
+         lhs, rhs = e.args
+-        other = sympy.Mul(*[a for a in lhs.args if not a.has(thing)])
++        other = sympy.Mul(*[a for a in lhs.args if not a.has(thing)]) or sympy.Integer(1)
+ 
+         # If we can't tell whether 'other' is negative or positive, we do nothing.
+         # That is because we don't know whether we have mirror the operation or not.

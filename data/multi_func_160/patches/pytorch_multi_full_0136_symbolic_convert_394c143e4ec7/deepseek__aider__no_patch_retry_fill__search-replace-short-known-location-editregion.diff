@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 33c56e69933..cf7dc0de27f 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -570,11 +570,19 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+                 cand = parent
+                 while cand and name not in cand.symbolic_locals:
+                     cand = cand.parent
++                if cand is None:
++                    # Fallback to looking in the parent's symbolic_globals
++                    cand = parent
++                    while cand and name not in cand.symbolic_globals:
++                        cand = cand.parent
+                 if cand is None:
+                     raise RuntimeError(
+-                        f"Couldn't find {name} in the symbolic_locals of the inline interpreter stack"
++                        f"Couldn't find {name} in the symbolic_locals or symbolic_globals of the inline interpreter stack"
+                     )
+-                result[name] = cand.symbolic_locals[name]
++                if name in cand.symbolic_locals:
++                    result[name] = cand.symbolic_locals[name]
++                else:
++                    result[name] = cand.symbolic_globals[name]
+             else:
+                 closure_cells[name] = self.closure.items[idx]
+ 

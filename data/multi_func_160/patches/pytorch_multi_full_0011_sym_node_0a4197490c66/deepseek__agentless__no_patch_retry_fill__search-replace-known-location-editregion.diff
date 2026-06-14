@@ -1,0 +1,27 @@
+diff --git a/torch/fx/experimental/sym_node.py b/torch/fx/experimental/sym_node.py
+index 268f56e3214..28161fb3088 100644
+--- a/torch/fx/experimental/sym_node.py
++++ b/torch/fx/experimental/sym_node.py
+@@ -1095,7 +1095,8 @@ def _make_node_magic(method, func):
+         except Exception:
+             log.warning("failed to eval %s(%s, %s)", method, self.expr, other.expr)
+             raise
+-        out = safe_expand(out)
++        if method not in ("mul", "rmul", "pow", "rpow"):
++            out = safe_expand(out)
+         sym_node_log.debug("%s %s %s -> %s", method, self.expr, other.expr, out)
+         pytype: Type
+         # This is not strictly correct. In Python, a**b may return complex when
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index 2b1992fbecb..427b8a89835 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -1794,7 +1794,7 @@ def _fast_expand(expr: _SympyT) -> _SympyT:
+ 
+ @lru_cache(256)
+ def safe_expand(r: _SympyT) -> _SympyT:
+-    if hasattr(r, "expand"):
++    if hasattr(r, "expand") and not (r.is_Mul or r.is_Pow):
+         try:
+             return _fast_expand(r)
+         except RecursionError:

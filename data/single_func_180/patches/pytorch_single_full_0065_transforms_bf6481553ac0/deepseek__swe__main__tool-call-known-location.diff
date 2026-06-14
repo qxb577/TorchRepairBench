@@ -1,0 +1,22 @@
+diff --git a/torch/distributions/transforms.py b/torch/distributions/transforms.py
+index 05e91a6feea..89ace6a057c 100644
+--- a/torch/distributions/transforms.py
++++ b/torch/distributions/transforms.py
+@@ -96,6 +96,17 @@ class Transform(object):
+             raise ValueError('cache_size must be 0 or 1')
+         super(Transform, self).__init__()
+ 
++    def __getstate__(self):
++        state = self.__dict__.copy()
++        # Remove weakref because it cannot be pickled.
++        del state['_inv']
++        return state
++
++    def __setstate__(self, state):
++        self.__dict__.update(state)
++        self._inv = None
++
++
+     @property
+     def event_dim(self):
+         if self.domain.event_dim == self.codomain.event_dim:

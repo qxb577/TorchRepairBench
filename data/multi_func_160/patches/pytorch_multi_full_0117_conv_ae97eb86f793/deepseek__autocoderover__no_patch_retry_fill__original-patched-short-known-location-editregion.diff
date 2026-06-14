@@ -1,0 +1,45 @@
+diff --git a/torch/_inductor/kernel/conv.py b/torch/_inductor/kernel/conv.py
+index d6e802d00aa..0fcd4ad33a8 100644
+--- a/torch/_inductor/kernel/conv.py
++++ b/torch/_inductor/kernel/conv.py
+@@ -607,6 +607,24 @@ def convolution(
+                     STRIDE_W=stride[1],
+                     PADDING_H=padding[0],
+                     PADDING_W=padding[1],
++                )
++            elif ndim == 3:
++                conv3d_template.maybe_append_choice(
++                    choices,
++                    input_nodes=(x, weight),
++                    layout=layout,
++                    KERNEL_D=kernel_shape[0],
++                    KERNEL_H=kernel_shape[1],
++                    KERNEL_W=kernel_shape[2],
++                    STRIDE_D=stride[0],
++                    STRIDE_H=stride[1],
++                    STRIDE_W=stride[2],
++                    PADDING_D=padding[0],
++                    PADDING_H=padding[1],
++                    PADDING_W=padding[2],
++                )
++
++                    PADDING_W=padding[1],
+                     GROUPS=groups,
+                     # TODO(jansel): try unroll for bigger kernels once fixed:
+                     #               https://github.com/triton-lang/triton/issues/1254
+diff --git a/torch/_inductor/template_heuristics/triton.py b/torch/_inductor/template_heuristics/triton.py
+index f4c836247df..abd7aee96f8 100644
+--- a/torch/_inductor/template_heuristics/triton.py
++++ b/torch/_inductor/template_heuristics/triton.py
+@@ -1156,6 +1156,11 @@ class ROCmConfigHeuristic(BaseConfigHeuristic):
+             c.num_stages = self.default_num_stages
+         return super()._filter_configs(configs)
+ 
++    def _prune_exhaustive_configs(self, configs: list[BaseConfig], n: int, k: int, k_in: int) -> list[BaseConfig]:
++        # Prune convolution exhaustive configs based on problem size
++        return [c for c in configs if c.block_m <= n and c.block_n <= k and c.block_k <= k_in]
++
++
+     def _finalize_mm_configs(
+         self,
+         configs: list[BaseConfig],

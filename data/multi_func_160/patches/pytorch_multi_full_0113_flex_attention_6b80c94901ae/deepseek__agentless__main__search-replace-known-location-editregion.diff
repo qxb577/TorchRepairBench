@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/kernel/flex/flex_flash_attention.py b/torch/_inductor/kernel/flex/flex_flash_attention.py
+index bcb235bd29d..aa180d68754 100644
+--- a/torch/_inductor/kernel/flex/flex_flash_attention.py
++++ b/torch/_inductor/kernel/flex/flex_flash_attention.py
+@@ -49,7 +49,7 @@ def input_buffers_require_grads(graph_module):
+     if len(inputs) <= 5:
+         return False
+     for n in inputs[5:]:
+-        if n.meta["tensor_meta"].requires_grad:
++        if "tensor_meta" in n.meta and n.meta["tensor_meta"].requires_grad:
+             return True
+     return False
+ 

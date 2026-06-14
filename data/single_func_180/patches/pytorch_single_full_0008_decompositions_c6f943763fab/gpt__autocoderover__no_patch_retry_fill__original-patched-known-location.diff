@@ -1,0 +1,14 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 753047bbdcf..5e3e1e24fe0 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5406,7 +5406,8 @@ def bernoulli(
+ def isin_default(elements, test_elements, *, invert=False):
+     if elements.numel() == 0:
+         return torch.empty_like(elements, dtype=torch.bool)
+-    expanded_elem_shape = elements.shape + (1,) * test_elements.ndim
++    expanded_elem_shape = elements.shape + (1,) * max(test_elements.ndim, 1)
++
+     x = elements.view(expanded_elem_shape)
+     dim = tuple(range(-1, -test_elements.ndim - 1, -1))
+     res = (x == test_elements).any(dim=dim)

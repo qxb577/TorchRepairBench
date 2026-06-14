@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index b3879b19d2d..153cbcba442 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -798,7 +798,8 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+                 and hasattr(args[0], "value")
+             ):
+                 return ConstantVariable(
+-                    (self.value is args[0].value) is (method is object.__eq__)
++                    (self.value == args[0].value) if method is object.__eq__ else (self.value != args[0].value)
++
+                 )
+ 
+             # check for methods implemented in C++

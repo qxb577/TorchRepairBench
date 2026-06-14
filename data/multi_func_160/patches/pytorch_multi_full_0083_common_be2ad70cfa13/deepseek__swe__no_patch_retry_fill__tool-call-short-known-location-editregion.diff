@@ -1,0 +1,26 @@
+diff --git a/torch/_functorch/_aot_autograd/autograd_cache.py b/torch/_functorch/_aot_autograd/autograd_cache.py
+index 68759cbaaab..7373af8f303 100644
+--- a/torch/_functorch/_aot_autograd/autograd_cache.py
++++ b/torch/_functorch/_aot_autograd/autograd_cache.py
+@@ -589,6 +589,10 @@ class CompiledBackward(GenericCompiledBackward[CompiledFxGraph], FxGraphCacheLoa
+     def _is_backward(self) -> bool:
+         return True
+ 
++    def post_compile(self, compiled_fn):
++        return torch._dynamo.disable(compiled_fn)
++
++
+ 
+ # Forward types don't have any extra parameters, so this is just a TypeAlias, in essence
+ class BundledCompiledForward(CompiledFxGraphLoadable):
+@@ -599,7 +603,9 @@ class BundledCompiledForward(CompiledFxGraphLoadable):
+ class BundledCompiledBackward(
+     GenericCompiledBackward[CompiledFxGraph], CompiledFxGraphLoadable
+ ):
+-    pass
++    def post_compile(self, compiled_fn):
++        return torch._dynamo.disable(compiled_fn)
++
+ 
+ 
+ TForward = TypeVar("TForward", bound=InductorOutput)

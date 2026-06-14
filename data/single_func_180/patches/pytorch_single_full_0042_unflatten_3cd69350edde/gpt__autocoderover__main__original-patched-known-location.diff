@@ -1,0 +1,14 @@
+diff --git a/torch/export/unflatten.py b/torch/export/unflatten.py
+index e95ba9e7b8c..47686123574 100644
+--- a/torch/export/unflatten.py
++++ b/torch/export/unflatten.py
+@@ -1024,7 +1024,9 @@ class _ModuleFrame:
+                     self.module,
+                     (tuple(arg_nodes), kwarg_nodes),
+                     signature.in_spec,
++                    filter_none=True,
+                 )
++
+                 for idx, arg in enumerate(signature.inputs):
+                     flat_arg_node = self.graph.create_node(
+                         op="call_function",

@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 386734212f3..e526170d10b 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3006,7 +3006,8 @@ class SliceView(View):
+         if any(free_unbacked_symbols(x) for x in (start, end, dim_size)):
+ 
+             def clamp(x, lower, upper):  # type: ignore[no-untyped-def]
+-                return sympy.Min(sympy.Max(x, lower), upper)
++                return sympy.Min(sympy.Max(sympy.Integer(x), lower), upper)
++
+ 
+         else:
+ 

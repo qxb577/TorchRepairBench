@@ -1,0 +1,28 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 97af0731f1d..6b2b546ddbf 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -4415,7 +4415,8 @@ class DynamicScalar(ExternKernel):
+ 
+     # TODO: handle bools carefully
+     def __init__(self, sym, data):
+-        super().__init__(None, NoneLayout(torch.device("cpu")), self.unwrap_storage([data]))  # type: ignore[arg-type]
++        super().__init__(None, NoneLayout(torch.device("cpu")), self.unwrap_storage([ir.RealizedInput(data)]))  # type: ignore[arg-type]
++
+         if isinstance(sym, sympy.Symbol):
+             self.sym = sym
+             self.is_bool = False
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index e5cf98b1637..5c08bed8226 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2612,7 +2612,8 @@ def tensor_constructor(fill_value):
+         dtype = dtype or torch.get_default_dtype()
+         if len(size) == 1 and isinstance(size[0], (list, tuple, torch.Size)):
+             size = tuple(size[0])
+-        size = [sympy.expand(s) for s in size]
++        size = [sympy.expand(ir.RealizedInput(s)) for s in size]
++
+         return _full(fill_value, device, dtype, size)
+ 
+     return inner

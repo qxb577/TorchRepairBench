@@ -1,0 +1,34 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 2d30d42dafa..5e99a1ea810 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -2295,6 +2295,29 @@ def index_copy(x: TensorLike, dim: int, index: TensorLike, tensor: TensorLike):
+     return _index_copy(x, dim, index, tensor, inplace=False)
+ 
+ 
++@register_decomposition(aten.pad_sequence)
++def pad_sequence(sequences, batch_first=False, padding_value=0.0):
++    max_size = sequences[0].size()
++    trailing_dims = max_size[1:]
++    max_len = max([s.size(0) for s in sequences])
++    if batch_first:
++        out_dims = (len(sequences), max_len) + trailing_dims
++    else:
++        out_dims = (max_len, len(sequences)) + trailing_dims
++
++    out_tensor = sequences[0].new_full(out_dims, padding_value)
++    for i, tensor in enumerate(sequences):
++        length = tensor.size(0)
++        # use index_copy to copy each tensor into the output tensor
++        if batch_first:
++            out_tensor[i, :length, ...] = tensor
++        else:
++            out_tensor[:length, i, ...] = tensor
++
++    return out_tensor
++
++
++
+ def _index_copy(
+     x: TensorLike, dim: int, index: TensorLike, tensor: TensorLike, *, inplace: bool
+ ):

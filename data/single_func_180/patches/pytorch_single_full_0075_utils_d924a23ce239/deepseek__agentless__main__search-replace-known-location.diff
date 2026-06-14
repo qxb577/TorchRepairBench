@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/tensor/_ops/utils.py b/torch/distributed/tensor/_ops/utils.py
+index 6a20a2fb398..9f4d71d4b50 100644
+--- a/torch/distributed/tensor/_ops/utils.py
++++ b/torch/distributed/tensor/_ops/utils.py
+@@ -446,7 +446,7 @@ def expand_to_full_mesh_op_strategy(
+                 f"input_specs({len(input_specs)}) != strategies({len(input_args_strategy)}: "
+                 f"{len(args_strategy)} args + {len(kwargs_strategy)} kwargs)"
+             )
+-        self_spec = input_args_strategy[0].strategies[0].output_spec
++        self_spec = input_args_strategy[0].strategies[0].input_specs[0]
+ 
+         if inplace_op and self_spec.placements != input_specs[0].placements:
+             # if it's inplace op, we would only allow the OpSpec to be added when the

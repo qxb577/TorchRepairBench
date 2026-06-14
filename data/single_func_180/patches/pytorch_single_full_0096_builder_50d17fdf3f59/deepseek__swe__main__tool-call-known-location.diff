@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index a7a40549c06..28577faa2f9 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -4142,8 +4142,11 @@ class SourcelessBuilder:
+         ):
+             proxy = tx.output.bound_symbols[value.node.expr]
+             return SymNodeVariable.create(tx, proxy)
++        elif isinstance(value, inspect.Parameter):
++            return ConstantVariable(value)
+         elif istype(value, object):
+             return ObjectVariable(value)
++
+         unimplemented(
+             gb_type="Unexpected type in sourceless builder",
+             context=f"{value_type.__module__}.{value_type.__qualname__}",

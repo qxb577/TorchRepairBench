@@ -1,0 +1,34 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index d331f1238b3..27d09085775 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1112,9 +1112,7 @@ class TensorVariable(VariableTracker):
+             with torch._dynamo.utils._disable_saved_tensors_hooks_during_tracing():
+                 get_fake_value(proxy.node, tx, allow_non_graph_fake=False)
+ 
+-            vt = value
+-            if isinstance(vt, variables.lazy.LazyVariableTracker):
+-                vt = variables.lazy.LazyVariableTracker.realize_all(vt)
++            vt = value.realize()
+ 
+             self.synchronize_attributes(tx, type(vt))
+ 
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 6df8f06cc02..f5a0fc36961 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1956,13 +1956,7 @@ def select(x, dim, idx):
+             # Additionally, we want to avoid accidental unbacked unsqueeze semantics. To resolve this,
+             # we use as_strided instead.
+             # Removing this branch will cause test_unbacked_select_index_with_check to fail.
+-            new_size = x.get_size()
+-            new_stride = x.get_stride()
+-            new_storage_offset = x.get_layout().offset + new_stride[dim] * actual_index
+-
+-            del new_size[dim]
+-            del new_stride[dim]
+-            return as_strided(x, new_size, new_stride, new_storage_offset)
++            return dynamic_as_strided(x, dim, actual_index)
+         else:
+             # no need to clamp, this function handles negative indexing itself
+             slice_result = slice_(x, dim, actual_index, actual_index + 1, clamp=False)

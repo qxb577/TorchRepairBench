@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index ea7bb6baea3..18a484a208e 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -182,9 +182,11 @@ class SizeVarAllocator:
+                 expr,
+                 axioms=axioms,
+                 var_to_range=var_to_range_tuple,
++                size_oblivious=True,
+             )
+             return bool(evaluated)
+ 
++
+         def remove_zero_terms(base, divisor):
+             """Symbols smaller than the divisor are zero"""
+             if not statically_known(base >= 0):

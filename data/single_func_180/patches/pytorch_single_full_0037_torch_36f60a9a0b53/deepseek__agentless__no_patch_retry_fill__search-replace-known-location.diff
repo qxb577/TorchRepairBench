@@ -1,0 +1,12 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 3d0541dacfd..1ed8430c03b 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -37,6 +37,7 @@ from collections.abc import Callable, Sequence
+ from typing import Any, Optional, TYPE_CHECKING
+ 
+ import torch._C
++import torch._prims_common
+ import torch._refs
+ import torch.fx
+ import torch.nn

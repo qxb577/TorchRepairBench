@@ -1,0 +1,17 @@
+diff --git a/torch/nn/modules/rnn.py b/torch/nn/modules/rnn.py
+index 5d705e293a3..f79a9b7a1cf 100644
+--- a/torch/nn/modules/rnn.py
++++ b/torch/nn/modules/rnn.py
+@@ -208,10 +208,10 @@ class RNNBase(Module):
+         _impl = _rnn_impls[self.mode]
+         if batch_sizes is None:
+             result = _impl(input, hx, self._get_flat_weights(), self.bias, self.num_layers,
+-                           self.dropout, self.training, self.bidirectional, self.batch_first)
++                           float(self.dropout), self.training, self.bidirectional, self.batch_first)
+         else:
+             result = _impl(input, batch_sizes, hx, self._get_flat_weights(), self.bias,
+-                           self.num_layers, self.dropout, self.training, self.bidirectional)
++                           self.num_layers, float(self.dropout), self.training, self.bidirectional)
+         output = result[0]
+         hidden = result[1]
+ 

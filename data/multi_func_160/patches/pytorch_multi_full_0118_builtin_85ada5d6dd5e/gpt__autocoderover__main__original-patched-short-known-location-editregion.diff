@@ -1,0 +1,31 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 5a19e707689..355f4bf2138 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2271,7 +2271,8 @@ class BuiltinVariable(VariableTracker):
+                 sym_num=None,
+             )
+         if hasattr(a, "set_items") and hasattr(b, "set_items"):
+-            return SetVariable(list(a.set_items | b.set_items))
++            return ConstDictVariable(dict(a.items | b.items))
++
+         # None no-ops this handler and lets the driving function proceed
+         return None
+ 
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 2703d8c4eb7..e4594230a79 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -501,8 +501,12 @@ class ConstDictVariable(VariableTracker):
+                     }
+                     self.items.update(kwargs)
+                 return ConstantVariable.create(None)
++            else:
++                if name == "__or__" and isinstance(args[0], ConstDictVariable):
++                return ConstDictVariable(dict(self.items | args[0].items))
+             else:
+                 return super().call_method(tx, name, args, kwargs)
++
+         elif name in ("get", "__getattr__") and args[0] in self:
+             # Key guarding - Nothing to do.
+             return self.getitem_const(tx, args[0])

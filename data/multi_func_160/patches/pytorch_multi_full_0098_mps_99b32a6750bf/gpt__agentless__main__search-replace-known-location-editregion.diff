@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index c24cde56358..2d0172a0357 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -737,7 +737,7 @@ class TritonPrinter(PythonPrinter):
+ 
+     def _print_Float(self, expr: sympy.Expr) -> str:
+         if config.is_fbcode() and torch.version.hip:
+-            ret = f"{expr}"
++            ret = f"{expr:.1f}" if expr == 0 else f"{expr}"
+         else:
+             ret = f"tl.full([], {expr}, tl.float64)"
+         return ret

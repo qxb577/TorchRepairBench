@@ -1,0 +1,17 @@
+diff --git a/torch/optim/lr_scheduler.py b/torch/optim/lr_scheduler.py
+index 06ae24ef08d..fb8c255f01e 100644
+--- a/torch/optim/lr_scheduler.py
++++ b/torch/optim/lr_scheduler.py
+@@ -300,6 +300,12 @@ class LambdaLR(LRScheduler):
+                     f"Expected {len(optimizer.param_groups)} lr_lambdas, but got {len(lr_lambda)}"
+                 )
+             self.lr_lambdas = list(lr_lambda)
++
++        for fn in self.lr_lambdas:
++            if not callable(fn):
++                raise ValueError(
++                    "lr_lambda must be callable or a list/tuple of callable functions."
++                )
+         super().__init__(optimizer, last_epoch)
+ 
+     @override

@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 93fe130c708..ad1665764c4 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -555,8 +555,8 @@ def is_function(value):
+ 
+ 
+ def unwrap_if_wrapper(fn):
+-    if isinstance(fn, functools._lru_cache_wrapper):
+-        fn = inspect.getattr_static(fn, "__wrapped__")
++    if isinstance(fn, functools._lru_cache_wrapper) or hasattr(fn, "__wrapped__"):
++        fn = inspect.getattr_static(fn, "__wrapped__", fn)
+     # unpack @torch._dynamo.optimize()(fn) wrapped function
+     fn = inspect.getattr_static(fn, "_torchdynamo_inline", fn)
+     # unpack torch.jit.script_if_tracing

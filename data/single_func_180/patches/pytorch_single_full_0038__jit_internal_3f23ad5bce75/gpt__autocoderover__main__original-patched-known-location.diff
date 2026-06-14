@@ -1,0 +1,14 @@
+diff --git a/torch/_jit_internal.py b/torch/_jit_internal.py
+index f4dabcbf97d..48677502061 100644
+--- a/torch/_jit_internal.py
++++ b/torch/_jit_internal.py
+@@ -595,7 +595,8 @@ def ignore(drop=False, **kwargs):
+ 
+ 
+ def _copy_to_script_wrapper(fn):
+-    fn._torchscript_modifier = FunctionModifiers.COPY_TO_SCRIPT_WRAPPER
++    fn._torchscript_modifier = FunctionModifiers.COPY_TO_SCRIPT_WRAPPER if hasattr(fn, '_torchscript_modifier') else None
++
+     return fn
+ 
+ def module_has_exports(mod):

@@ -1,0 +1,11 @@
+stage,description,count,artifact_in_release
+keyword_commit_collection,PyTorch commits whose messages match bug-fix keywords,89746,raw_commit_index.csv
+detailed_commit_backup,"GitHub API commit details with files, patches, and parent metadata",55650,raw_backup_batch_stats.csv
+single_function_python_candidates,Python single-source repair candidates before final manual/task filtering,3138,
+recent_single_function_candidates,Single-function candidates after environment/date-oriented filtering,5562,
+multi_function_python_candidates,Python multi-source repair candidates before final manual/task filtering,2772,
+recent_multi_function_candidates,Multi-function candidates after environment/date-oriented filtering,1276,
+validated_single_function_candidates,Validated/filterable single-function candidate pool,291,
+validated_multi_function_candidates,Validated/filterable multi-function candidate pool,243,
+final_single_function_tasks,Final single-function benchmark tasks,180,data/single_func_180/tasks.jsonl
+final_multi_function_tasks,Final multi-function benchmark tasks,160,data/multi_func_160/tasks.jsonl

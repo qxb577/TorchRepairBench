@@ -1,0 +1,35 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 8435b80f34c..31f9e8c3c52 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7813,6 +7813,30 @@ _create_unary_float_meta_func(aten.special_scaled_modified_bessel_k1)
+ 
+ 
+ _create_binary_float_meta_func(aten.special_chebyshev_polynomial_t)
++
++@register_meta(aten._native_multi_head_attention.default)
++def meta__native_multi_head_attention(
++    query,
++    key,
++    value,
++    embed_dim_to_check,
++    num_heads,
++    attn_mask=None,
++    bias_k=None,
++    bias_v=None,
++    add_zero_attn=False,
++    dropout_p=0.0,
++    need_weights=True,
++    average_attn_weights=True,
++    is_causal=False,
++):
++    batch_size, seq_len, embed_dim = query.shape
++    output = query.new_empty(batch_size, seq_len, embed_dim)
++    if need_weights:
++        attn_weight = query.new_empty(batch_size, num_heads, seq_len, seq_len)
++        return output, attn_weight
++    else:
++        return output, None
+ _create_binary_float_meta_func(aten.special_chebyshev_polynomial_u)
+ _create_binary_float_meta_func(aten.special_chebyshev_polynomial_v)
+ _create_binary_float_meta_func(aten.special_chebyshev_polynomial_w)

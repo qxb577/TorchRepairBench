@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 37279cd1030..ae7090d79aa 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1325,7 +1325,7 @@ def select(x, dim, idx):
+ @register_lowering(aten.split, type_promotion_kind=None)
+ def split(x, sizes, dim=0, clamp=True):
+     dim = _validate_dim(x, dim, 0)
+-    x_size = V.graph.sizevars.evaluate_static_shape(x.get_size()[dim])
++    x_size = V.graph.sizevars.evaluate_static_shape(x.get_size()[dim].item())
+     if isinstance(sizes, sympy.Expr):
+         # TODO: We don't have to guard on sizes per se, but the number
+         # of splits must stay constant
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index 70e4dcc5d7e..271e7ffccd5 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -3616,7 +3616,7 @@ class ShapeEnv:
+             # well)
+             s = sympy.Symbol(f"shape_{idx}", positive=True, integer=True)
+             offset = lower - 1
+-            new_shape_env[k] = s + offset
++            new_shape_env[k] = sympy.Add(s, offset, evaluate=False)
+             new_range_env[s] = SymPyValueRangeAnalysis.add(vr, -offset)
+ 
+         def replace(expr, repl):

@@ -1,0 +1,29 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index d7d861ba515..13a43d83638 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -750,8 +750,8 @@ def set_default_tensor_type(t):
+ def set_default_dtype(d):
+     r"""
+ 
+-    Sets the default floating point dtype to :attr:`d`. Supports torch.float32
+-    and torch.float64 as inputs. Other dtypes may be accepted without complaint
++    Sets the default floating point dtype to :attr:`d`. Supports torch.float16,
++    torch.float32, and torch.float64 as inputs. Other dtypes may be accepted without complaint
+     but are not supported and are unlikely to work as expected.
+ 
+     When PyTorch is initialized its default floating point dtype is torch.float32,
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index fa571489bd7..92dd2013b81 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -429,7 +429,8 @@ def _maybe_broadcast(*args, preserve_cpu_scalar_tensors=True):
+                 return x.expand(common_shape)
+ 
+             return x
+-        else:
++        elif default_dtype is torch.half:
++            return torch.chalf
+             raise RuntimeError(
+                 "Unexpected type when broadcasting: " + str(type(x)) + "!"
+             )

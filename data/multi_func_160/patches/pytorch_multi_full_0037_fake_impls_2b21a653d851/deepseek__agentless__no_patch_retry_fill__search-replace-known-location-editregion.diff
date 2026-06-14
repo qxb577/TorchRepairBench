@@ -1,0 +1,12 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 4a64032347c..9727e2b1742 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -223,6 +223,7 @@ def _override_composite_implicit_decomp(cia_ops_to_callable, safe=True):
+             op_overload.py_impl(torch._C.DispatchKey.CompositeImplicitAutograd)(
+                 decomp_callable
+             )
++            fake_mode.op_implementations_dict[op_overload] = decomp_callable
+ 
+         for key in _BACKEND_KEYS_TO_OVERRIDE:
+             if key not in op_overload.py_kernels:

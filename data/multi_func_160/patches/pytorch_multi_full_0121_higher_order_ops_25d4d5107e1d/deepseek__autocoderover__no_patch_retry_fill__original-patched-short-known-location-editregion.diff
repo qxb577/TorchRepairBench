@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index 5a7d06734da..895db6c7579 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -3585,6 +3585,21 @@ class LocalMapWrappedHigherOrderVariable(WrapHigherOrderVariable):
+         ) = self.create_wrapped_node(
+             tx, user_func, user_args, kwargs, self.value._name, subgraph_name="subgraph"
+         )
++        # The subgraph operates on local shards, so its output example_value has
++        # local shapes.  Replace with the global shapes from the user_args so
++        # that the outer call node carries correct shape metadata.
++        if out_placements is not None and len(user_args) > 0:
++            try:
++                num_outputs = len(example_value)
++                example_value = tuple(
++                    user_args[i % len(user_args)]
++                    .as_proxy()
++                    .node.meta["val"]
++                    for i in range(num_outputs)
++                )
++            except Exception:
++                pass
++
+ 
+         # Validate
+         expected_num_inputs = len(in_placements.value)

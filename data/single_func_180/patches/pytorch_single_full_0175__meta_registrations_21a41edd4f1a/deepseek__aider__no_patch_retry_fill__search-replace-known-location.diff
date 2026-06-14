@@ -1,0 +1,37 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 8435b80f34c..4545f5d6938 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7801,6 +7801,32 @@ def _create_binary_float_meta_func(func):
+     return _f
+ 
+ 
++@register_meta(torch._native_multi_head_attention)
++def meta__native_multi_head_attention(
++    query,
++    key,
++    value,
++    embed_dim,
++    num_heads,
++    qkv_weight,
++    qkv_bias,
++    proj_weight,
++    proj_bias,
++    mask=None,
++    need_weights=True,
++    average_attn_weights=True,
++    mask_type=0,
++    dropout_p=0.0,
++):
++    output = query.new_empty(query.shape)
++    if need_weights:
++        attn_output_weights = query.new_empty(
++            (query.shape[0], num_heads, query.shape[1], key.shape[1])
++        )
++        return output, attn_output_weights
++    return output
++
++
+ _create_unary_float_meta_func(aten.special_airy_ai)
+ _create_unary_float_meta_func(aten.special_bessel_y0)
+ _create_unary_float_meta_func(aten.special_bessel_y1)

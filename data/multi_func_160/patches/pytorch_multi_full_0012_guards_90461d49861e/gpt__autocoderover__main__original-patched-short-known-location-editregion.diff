@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 0e714cb1a54..1d03b82700d 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -1126,7 +1126,8 @@ class GuardBuilder(GuardBuilderBase):
+ 
+     def TYPE_MATCH(self, guard: Guard) -> None:
+         # ___check_type_id is same as `id(type(x)) == y`
+-        t = type(self.get(guard.name))
++        t = type(self.get(guard.name, allow_nn_module=True))
++
+         obj_id = self.id_ref(t)
+         code = f"___check_type_id({self.arg_ref(guard)}, {obj_id})"
+         self._set_guard_export_info(guard, [code])

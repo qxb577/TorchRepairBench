@@ -1,0 +1,17 @@
+diff --git a/torch/utils/cpp_extension.py b/torch/utils/cpp_extension.py
+index d3d264d6172..ba8e5d40369 100644
+--- a/torch/utils/cpp_extension.py
++++ b/torch/utils/cpp_extension.py
+@@ -2187,8 +2187,10 @@ def _write_ninja_file_to_build_library(path,
+ 
+     common_cflags += [f"{x}" for x in _get_pybind11_abi_build_flags()]
+ 
+-    common_cflags += [f'-I{include}' for include in user_includes]
+-    common_cflags += [f'-isystem {include}' for include in system_includes]
++    # Escape $ in include paths to avoid Ninja variable expansion
++    common_cflags += [f'-I{include.replace("$", "$$")}' for include in user_includes]
++    common_cflags += [f'-isystem {include.replace("$", "$$")}' for include in system_includes]
++
+ 
+     common_cflags += [f"{x}" for x in _get_glibcxx_abi_build_flags()]
+ 

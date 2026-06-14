@@ -1,0 +1,34 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index b8c48d0296f..3a1b7986920 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -2667,11 +2667,11 @@ def _automatic_dynamic(
+ 
+         stride = [None] * dim
+         while any(x is None for x in stride):
+-            candidates = {
+-                ex_size[i] * ex_stride[i]: InferStride(i)
+-                for i in range(dim)
+-                if stride[i] is not None and ex_stride[i] >= 0
+-            }
++            candidates = {}
++            for i in range(dim):
++                if stride[i] is not None and ex_stride[i] >= 0:
++                    if ex_stride[i] not in candidates:
++                        candidates[ex_stride[i]] = InferStride(i)
+             val_list = sorted(
+                 [(ex_stride[i], i) for i in range(dim) if stride[i] is None],
+                 key=_nested_int_aware_sort,
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index d0a83f45aaf..71b11e32431 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -3972,7 +3972,7 @@ class ShapeEnv:
+         val_list.sort(key=_nested_int_aware_sort)
+ 
+         for val, i in val_list:
+-            if val in (0, 1):
++            if val == 0:
+                 out_stride = sympy.Integer(val)
+             else:
+                 dynamic_stride = dynamic_strides[i]

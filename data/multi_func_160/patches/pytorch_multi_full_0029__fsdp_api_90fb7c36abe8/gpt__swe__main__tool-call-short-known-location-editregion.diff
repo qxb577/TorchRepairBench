@@ -1,0 +1,17 @@
+diff --git a/torch/distributed/fsdp/_fully_shard/_fsdp_api.py b/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
+index af5a3624764..c7a5c1109b7 100644
+--- a/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
++++ b/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
+@@ -50,9 +50,10 @@ class MixedPrecisionPolicy:
+         # Clamp `reduce_dtype` to `None` if no casting is required: since
+         # gradients are computed in `param_dtype`, if `reduce_dtype` matches,
+         # then we do not need extra casting
+-        if self.param_dtype == self.reduce_dtype:
++        if self.param_dtype == self.reduce_dtype or self.reduce_dtype is None:
+             # Bypass the frozen dataclass checks
+-            object.__setattr__(self, "reduce_dtype", None)
++            object.__setattr__(self, "reduce_dtype", self.param_dtype)
++
+ 
+ 
+ @dataclass

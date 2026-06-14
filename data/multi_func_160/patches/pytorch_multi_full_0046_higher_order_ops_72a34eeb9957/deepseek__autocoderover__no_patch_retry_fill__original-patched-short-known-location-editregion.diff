@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index b750501f1f2..380341b8e24 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -148,7 +148,8 @@ def validate_args_and_maybe_create_graph_inputs(
+             flat_args.unpack_var_sequence(tx),
+             tracer,
+             tx,
+-            set_subgraph_inputs="manual",
++            set_subgraph_inputs="automatic",
++
+             description=description,
+         )
+ 

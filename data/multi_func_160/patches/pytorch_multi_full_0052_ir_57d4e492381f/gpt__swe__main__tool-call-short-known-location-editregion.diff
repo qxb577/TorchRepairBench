@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index d13182e7174..3deb872d294 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7439,7 +7439,8 @@ class DeviceCopy(ExternKernelOut):
+         assert x_device is not None
+         V.graph.add_device_info(x_device)
+ 
+-        developer_warning("DeviceCopy in input program")
++        return cls(x, device, non_blocking)
++
+         constant_args = (non_blocking,)
+         # Device Copy should keep the same layout as input
+         x = ExternKernel.require_contiguous(x)

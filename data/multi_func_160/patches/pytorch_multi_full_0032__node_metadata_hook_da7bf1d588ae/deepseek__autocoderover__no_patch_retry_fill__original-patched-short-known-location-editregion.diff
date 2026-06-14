@@ -1,0 +1,21 @@
+diff --git a/torch/export/unflatten.py b/torch/export/unflatten.py
+index 31701d9fb68..dc0a2d62af2 100644
+--- a/torch/export/unflatten.py
++++ b/torch/export/unflatten.py
+@@ -891,11 +891,11 @@ class _ModuleFrame:
+                 self.finalize_outputs()
+                 return node_idx
+ 
+-            node_module_stack = (
+-                [path for path, ty in node.meta["nn_module_stack"].values()]
+-                if "nn_module_stack" in node.meta
+-                else self.module_stack
+-            )
++            if "nn_module_stack" in node.meta and node.meta["nn_module_stack"]:
++                node_module_stack = [path for path, ty in node.meta["nn_module_stack"].values()]
++            else:
++                node_module_stack = self.module_stack
++
+             if node_module_stack[: len(self.module_stack)] != self.module_stack:
+                 # This means that the current module is done executing and the
+                 # current node is the beginning of a new module.

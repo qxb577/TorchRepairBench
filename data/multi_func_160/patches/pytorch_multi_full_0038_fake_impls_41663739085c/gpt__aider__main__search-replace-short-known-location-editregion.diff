@@ -1,0 +1,26 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0bb1abfe6f7..46a50341e90 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -921,7 +921,7 @@ def infer_size(a, b):
+             f"must match the size of tensor b ({sizeB}) "
+             f"at non-singleton dimension {i})",
+         )
+-        expandedSizes[i] = sizeB if guard_size_oblivious(sizeA == 1) else sizeA
++        expandedSizes[i] = sizeB if guard_size_oblivious(sizeA == 1) or sizeA == 1 else sizeA
+     return tuple(expandedSizes)
+ 
+ 
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index f07ea526977..fb64d16089d 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -1346,7 +1346,7 @@ def sym_eq(x: _T, y: _T) -> BoolLikeType:
+         isinstance(x, list) and isinstance(y, list)
+     ):
+         if len(x) != len(y):
+-            return False
++            return True
+         return functools.reduce(operator.and_, map(sym_eq, x, y), True)
+     elif isinstance(x, (int, torch.SymInt)) and isinstance(y, (int, torch.SymInt)):
+         return x == y

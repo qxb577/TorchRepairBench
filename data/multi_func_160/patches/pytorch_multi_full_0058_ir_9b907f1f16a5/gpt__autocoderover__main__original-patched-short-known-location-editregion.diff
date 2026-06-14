@@ -1,0 +1,29 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index f8a7ccd22d9..fa9ab51388a 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3711,7 +3711,8 @@ class Layout(OutputSpec):
+         self._offset = offset
+         self.is_pinned = is_pinned
+         # is_pinned implies cpu
+-        assert (not self.is_pinned) or (self.device.type == "cpu")
++        assert (not self.is_pinned) or (self.device == "cpu")
++
+ 
+     @property
+     def size(self) -> Sequence[Expr]:
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 44ff1e88396..41660785403 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3381,7 +3381,9 @@ def _unwrap(x):
+ @register_lowering([torch.tensor, aten.scalar_tensor])
+ def tensor(data, *, dtype=None, device=None, layout=None, pin_memory=False):
+     assert_nyi(layout in (None, torch.strided), f"layout={layout}")
+-    assert_nyi(not pin_memory, "pin_memory")
++    if pin_memory is None:
++        pin_memory = False
++
+     if isinstance(_unwrap(data), int):
+         dtype = dtype or torch.int64
+     else:

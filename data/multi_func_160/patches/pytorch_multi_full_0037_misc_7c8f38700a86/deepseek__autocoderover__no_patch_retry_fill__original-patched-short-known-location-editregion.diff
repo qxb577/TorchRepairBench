@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index f541e20aa60..f2ba7b73896 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -848,6 +848,11 @@ class NumpyVariable(VariableTracker):
+         from .tensor import NumpyNdarrayVariable
+ 
+         # lookup method name in tnp. Things like np.dtype(float) are not supported yet.
++    if self.value == "issubdtype":
++        if all(isinstance(arg, ConstantVariable) for arg in args) and not kwargs:
++            return ConstantVariable(np.issubdtype(*[a.value for a in args]))
++        unimplemented(f"numpy.{self.value}() with non-constant arguments")
++
+         if self.value.__name__ == "dtype":
+             unimplemented(
+                 f"numpy dtype function is not supported yet. Got type {type(self.value)}."

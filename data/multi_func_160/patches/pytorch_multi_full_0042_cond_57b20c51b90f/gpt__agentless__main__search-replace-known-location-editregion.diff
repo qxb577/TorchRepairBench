@@ -1,0 +1,30 @@
+diff --git a/torch/_higher_order_ops/cond.py b/torch/_higher_order_ops/cond.py
+index ae4dba02bac..3f233062bb3 100644
+--- a/torch/_higher_order_ops/cond.py
++++ b/torch/_higher_order_ops/cond.py
+@@ -133,9 +133,10 @@ def cond(pred, true_fn, false_fn, operands):
+ 
+     with _set_compilation_env():
+         with torch._dynamo.utils.disable_cache_limit():
+-            return torch.compile(cond_op, backend="eager", fullgraph=True)(
+-                pred, true_fn, false_fn, operands
+-            )
++            with torch._C.DisableTorchFunction():
++                return torch.compile(cond_op, backend="eager", fullgraph=True)(
++                    pred, true_fn, false_fn, operands
++                )
+ 
+ 
+ """
+diff --git a/torch/fx/experimental/proxy_tensor.py b/torch/fx/experimental/proxy_tensor.py
+index 7e4eceeb4f2..8d5a78207bd 100644
+--- a/torch/fx/experimental/proxy_tensor.py
++++ b/torch/fx/experimental/proxy_tensor.py
+@@ -533,6 +533,7 @@ class PythonKeyTracer(Tracer):
+ 
+ 
+ @torch._disable_dynamo
++@torch._C.DisableTorchFunction()
+ def dispatch_trace(
+         root: Union[torch.nn.Module, Callable],
+         tracer: Tracer,

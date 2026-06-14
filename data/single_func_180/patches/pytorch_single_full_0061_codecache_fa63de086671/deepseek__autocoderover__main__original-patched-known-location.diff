@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codecache.py b/torch/_inductor/codecache.py
+index a28ca5b19aa..733567c2e8e 100644
+--- a/torch/_inductor/codecache.py
++++ b/torch/_inductor/codecache.py
+@@ -3225,7 +3225,8 @@ class PyCodeCache:
+ 
+         # unzip into separate lines/nodes lists
+         if in_toplevel:
+-            cls.linemaps[path] = list(zip(*linemap))
++            cls.linemaps[path] = list(zip(*linemap)) if linemap else ([], [])
++
+ 
+         if attrs is not None:
+             for k, v in attrs.items():

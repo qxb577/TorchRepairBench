@@ -1,0 +1,31 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index d2606aeea18..9a641273fcc 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -4726,6 +4726,7 @@ class CppScheduling(BaseScheduling):
+                 node_to_recomp.recompute_size_and_body(
+                     extra_indexing_constraints=ref_indexing_constraints
+                 )
++                node_to_recomp.node.freeze_layout()
+ 
+                 _, (vars1, _) = node1.group
+                 _, (vars2, _) = node2.group
+@@ -4741,6 +4742,7 @@ class CppScheduling(BaseScheduling):
+                     ref_node.recompute_size_and_body(
+                         extra_indexing_constraints=node_to_recomp_indexing_constraints
+                     )
++                    ref_node.node.freeze_layout()
+                 else:
+                     assert isinstance(ref_node, FusedSchedulerNode)
+                     for snode in ref_node.snodes:
+@@ -4748,7 +4750,9 @@ class CppScheduling(BaseScheduling):
+                         snode.recompute_size_and_body(
+                             extra_indexing_constraints=node_to_recomp_indexing_constraints
+                         )
+-                    ref_node = FusedSchedulerNode(ref_node.scheduler, ref_node.snodes)
++                        snode.node.freeze_layout()
++                    ref_node = FusedSchedulerNod
++e(ref_node.scheduler, ref_node.snodes)
+ 
+                 _, (vars1, _) = node1.group
+                 _, (vars2, _) = node2.group

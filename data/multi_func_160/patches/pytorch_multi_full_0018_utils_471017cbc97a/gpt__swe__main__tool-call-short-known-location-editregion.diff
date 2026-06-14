@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index 3f91ee87b3a..d32b358c139 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -2153,7 +2153,8 @@ def set_tracing_context_output_strides(example_inputs, compiled_graph):
+                 context.output_strides.append(
+                     tuple(
+                         (
+-                            shape_env.evaluate_symexpr(e)
++                            shape_env.evaluate_symexpr(e, allow_specialization=False)
++
+                             if shape_env is not None
+                             else int(e)
+                         )

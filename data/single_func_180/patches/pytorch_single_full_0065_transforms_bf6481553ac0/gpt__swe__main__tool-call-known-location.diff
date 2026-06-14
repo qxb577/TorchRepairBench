@@ -1,0 +1,26 @@
+diff --git a/torch/distributions/transforms.py b/torch/distributions/transforms.py
+index 05e91a6feea..439f3f6e456 100644
+--- a/torch/distributions/transforms.py
++++ b/torch/distributions/transforms.py
+@@ -131,12 +131,16 @@ class Transform(object):
+             return type(self)(cache_size=cache_size)
+         raise NotImplementedError("{}.with_cache is not implemented".format(type(self)))
+ 
+-    def __eq__(self, other):
+-        return self is other
++    def __getstate__(self):
++        state = self.__dict__.copy()
++        state['_inv'] = None if self._inv is None else self._inv()
++        return state
++
++    def __setstate__(self, state):
++        self.__dict__.update(state)
++        if self._inv is not None:
++            self._inv = weakref.ref(self._inv)
+ 
+-    def __ne__(self, other):
+-        # Necessary for Python2
+-        return not self.__eq__(other)
+ 
+     def __call__(self, x):
+         """

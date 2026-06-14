@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index e73272c655f..e15faeec4c6 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -68,7 +68,12 @@ class TypedExpr:
+             expr = self.expr
+             if isinstance(expr, sympy.Expr):
+                 expr = expr.expand(identity=True)
+-            self.expr = dtype_to_type(self.dtype)(expr)
++            expr = dtype_to_type(self.dtype)(expr)
++            # Follow integer overflow rules for unsigned integral types
++            if isinstance(self.dtype, torch.dtype) and not self.dtype.is_signed:
++                expr = expr % (torch.iinfo(self.dtype).max + 1)
++            self.expr = expr
++
+ 
+ 
+ class SymPyOps:

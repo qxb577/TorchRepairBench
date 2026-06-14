@@ -1,0 +1,16 @@
+diff --git a/torch/export/_unlift.py b/torch/export/_unlift.py
+index ae4c09b7c8c..dae97acd8f7 100644
+--- a/torch/export/_unlift.py
++++ b/torch/export/_unlift.py
+@@ -51,7 +51,10 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+             return True
+         if _normalize_type(a.type) != _normalize_type(b.type):
+             return False
+-        if a.context != b.context:
++        if _normalize_type(a.type) == str(dict) and _normalize_type(b.type) == str(dict):
++            if sorted(a.context) != sorted(b.context):
++                return False
++        elif a.context != b.context:
+             return False
+         if len(a.children_specs) != len(b.children_specs):
+             return False

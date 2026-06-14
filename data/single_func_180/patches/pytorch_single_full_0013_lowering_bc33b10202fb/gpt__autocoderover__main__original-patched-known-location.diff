@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 3ab0a30a402..e47c0365003 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -82,6 +82,8 @@ from .utils import (
+     decode_device,
+     is_dynamic,
+     is_gpu,
++    convert_shape_to_inductor,
++
+     is_pointwise_use,
+     is_view,
+     needs_fallback_due_to_atomic_add_limitations,

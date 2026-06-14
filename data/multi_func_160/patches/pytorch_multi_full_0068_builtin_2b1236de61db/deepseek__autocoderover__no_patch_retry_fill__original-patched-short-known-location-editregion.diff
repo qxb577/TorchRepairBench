@@ -1,0 +1,20 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 1bf8af7e5ed..869fe6054bf 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -989,8 +989,15 @@ class BuiltinVariable(VariableTracker):
+                         hints=[*graph_break_hints.SUPPORTABLE],
+                     )
+ 
++                if kwargs:
++                    unimplemented_v2(
++                        gb_type="exception with kwargs",
++                        context=str(kwargs),
++                        explanation="Dynamo does not support keyword arguments for exception constructors.",
++                    )
+                 return variables.ExceptionVariable(fn, args, **kwargs)
+ 
++
+             return create_exception_class_object
+ 
+         if obj.can_insert_in_graph() and not (

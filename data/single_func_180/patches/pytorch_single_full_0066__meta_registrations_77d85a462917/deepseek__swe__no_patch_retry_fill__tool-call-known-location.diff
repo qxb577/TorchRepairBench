@@ -1,0 +1,13 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index c590e4d0dfb..2c48e4e7943 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -2174,6 +2174,8 @@ def meta_baddbmm(self, batch1, batch2, *, beta=1, alpha=1):
+         self = self.expand((dim1, dim2, dim3))
+     torch._check(batch1.dim() == 3, lambda: "batch1 must be a 3D tensor")
+     torch._check(batch2.dim() == 3, lambda: "batch2 must be a 3D tensor")
++    return self
++
+     if not exp_config.skip_dtype_check_in_meta_registrations:
+         torch._check(
+             self.dtype == batch1.dtype == batch2.dtype,

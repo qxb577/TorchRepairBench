@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/convert_frame.py b/torch/_dynamo/convert_frame.py
+index 856e399a6d8..f71c16618a8 100644
+--- a/torch/_dynamo/convert_frame.py
++++ b/torch/_dynamo/convert_frame.py
+@@ -865,7 +865,8 @@ def _compile(
+     ):
+         restart_reasons: set[str] = set()
+         # This is shared across restarts
+-        mutated_closure_cell_contents: Set[str] = set()
++        mutated_closure_cell_contents: Dict[str, int] = defaultdict(int)
++
+         speculation_log = SpeculationLog()
+         if compile_pg := get_compile_pg():
+             distributed_state = DistributedState(compile_pg, LocalState())

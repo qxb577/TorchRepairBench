@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index 5a7d06734da..742a98f9b77 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -3591,7 +3591,8 @@ class LocalMapWrappedHigherOrderVariable(WrapHigherOrderVariable):
+         actual_num_inputs = len(body_gmod.graph.find_nodes(op="placeholder"))
+         expected_num_outputs = len(out_placements.value)
+         assert len(body_gmod.graph.find_nodes(op="output")) == 1
+-        actual_num_outputs = len(body_gmod.graph.find_nodes(op="output")[0].args[0])
++        actual_num_outputs = len(body_gmod.graph.find_nodes(op="output")[0].args)
++
+ 
+         template = (
+             "Expecting {expected} {inputs_or_outputs} to local_map function based on placements"

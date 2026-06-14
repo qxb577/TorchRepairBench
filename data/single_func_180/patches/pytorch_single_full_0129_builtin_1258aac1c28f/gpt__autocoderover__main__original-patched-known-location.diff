@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 39d6213d558..e9fbfeafbb3 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -184,7 +184,8 @@ class BuiltinVariable(VariableTracker):
+             operator.floordiv,
+             operator.truediv,
+             operator.mod,
+-            operator.add,
++            (lambda x, y: torch.Size(x) + torch.Size(y) if isinstance(x, torch.Size) and isinstance(y, tuple) else operator.add),
++
+             operator.sub,
+             operator.getitem,
+             operator.length_hint,

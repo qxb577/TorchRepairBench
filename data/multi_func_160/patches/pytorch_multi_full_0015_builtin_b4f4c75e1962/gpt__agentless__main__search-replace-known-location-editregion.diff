@@ -1,0 +1,50 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index c6b90d3de2b..849b97ce943 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1407,7 +1407,7 @@ class BuiltinVariable(VariableTracker):
+                         )
+ 
+                     new_dict = dict(arg.value.items())
+-                    return VariableTracker.build(tx, new_dict)
++                    return ConstDictVariable(new_dict, user_cls, mutation_type=ValueMutationNew())
+                 else:
+                     func_var = arg.var_getattr(tx, "items")
+                     if not isinstance(func_var, variables.UserFunctionVariable):
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index a846612e1a5..187bf48cb3a 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -88,8 +88,8 @@ class ConstDictVariable(VariableTracker):
+             elif isinstance(self.vt, variables.TupleVariable):
+                 Hashable = ConstDictVariable._HashableTracker
+                 x = tuple(Hashable(e).underlying_value for e in self.vt.items)
+-            elif isinstance(self.vt, variables.NNModuleVariable):
+-                return self.vt.module
++            elif isinstance(self.vt, variables.NNModuleVariable) or isinstance(self.vt, variables.UnspecializedNNModuleVariable):
++                return self.vt.module if isinstance(self.vt, variables.NNModuleVariable) else self.vt.value
+             elif isinstance(self.vt, variables.UnspecializedNNModuleVariable):
+                 return self.vt.value
+             elif isinstance(self.vt, variables.UserFunctionVariable):
+@@ -295,7 +295,7 @@ class ConstDictVariable(VariableTracker):
+             return self.getitem_const_raise_exception_if_absent(tx, args[0])
+         elif name == "items":
+             assert not (args or kwargs)
+-            if self.source:
++            if self.source and isinstance(self.source, variables.UserFunctionVariable):
+                 tx.output.guard_on_key_order.add(self.source.name())
+             return TupleVariable(
+                 [TupleVariable([k.vt, v]) for k, v in self.items.items()]
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 5a54031849c..f2b09a81b75 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -143,7 +143,7 @@ class NNModuleVariable(VariableTracker):
+         self.module_type = module_type
+         self.module_key = module_key
+         self.module = module
+-        assert self.source
++        self.nn_module_stack_source = self.source if self.source else None
+         self.nn_module_stack_source = self.source
+ 
+     def get_nn_module_stack_source(self):

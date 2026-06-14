@@ -1,0 +1,22 @@
+diff --git a/torch/_functorch/compile_utils.py b/torch/_functorch/compile_utils.py
+index 1ce1f1baf65..2e1c9cc5d8e 100644
+--- a/torch/_functorch/compile_utils.py
++++ b/torch/_functorch/compile_utils.py
+@@ -80,6 +80,9 @@ def fx_graph_cse(fx_g: torch.fx.graph.Graph):
+                 "kwargs_spec": kwargs_spec,
+             }
+ 
++            # update token to respect mutation barriers
++            token = n.meta.get("mutation_region_id", token)
++
+             # hash substituted args to a number, do not hash specs because specs are not hashable
+             # We need to add type into hash to avoid situations like:
+             # hash((primals_2, 1.0)) == hash((primals_2, 1))
+@@ -104,6 +107,7 @@ def fx_graph_cse(fx_g: torch.fx.graph.Graph):
+ 
+ 
+ def strip_overloads(gm):
++
+     """
+     Modifies the target of graph nodes in :attr:`gm` to strip overloads.
+ 

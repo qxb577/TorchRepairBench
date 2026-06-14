@@ -1,0 +1,40 @@
+diff --git a/torch/_inductor/kernel/flex/common.py b/torch/_inductor/kernel/flex/common.py
+index 6cc197a35b9..4ae221d61c5 100644
+--- a/torch/_inductor/kernel/flex/common.py
++++ b/torch/_inductor/kernel/flex/common.py
+@@ -127,9 +127,8 @@ def build_subgraph_module_buffer(
+ 
+     # Since we are allowing mutations/buffer creation, we need to register any fresh buffers
+     # creating during the pointwise subgraph lowering
+-    if len(pw_subgraph.buffers) > 0:
+-        for buffer in pw_subgraph.buffers:
+-            V.graph.register_buffer(buffer)
++    for buffer in pw_subgraph.buffers:
++        V.graph.register_buffer(buffer)
+ 
+     def convert_output_node_to_buffer(output_buffer) -> Optional[ComputedBuffer]:
+         if output_buffer is None:
+diff --git a/torch/_inductor/subgraph_lowering.py b/torch/_inductor/subgraph_lowering.py
+index 3c8116d402c..b37af7d34ac 100644
+--- a/torch/_inductor/subgraph_lowering.py
++++ b/torch/_inductor/subgraph_lowering.py
+@@ -86,16 +86,9 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+             )
+ 
+     def register_buffer(self, buffer: ir.Buffer, *, set_name: bool = False) -> str:
+-        if self._approved_mutator():
+-            name = self.qualify_name(f"buf{len(self.buffers)}")
+-            self.buffers.append(buffer)
+-            return name
+-        else:
+-            raise SubgraphLoweringException(
+-                "Buffers cannot be created while lowering a pointwise subgraph. "
+-                "This could be for a good reason (e.g. you're calling an op we can't codegen as a pointwise op), "
+-                "but it could also be a bug. Please file a bug report if you think this should be supportable."
+-            )
++        name = self.qualify_name(f"buf{len(self.buffers)}")
++        self.buffers.append(buffer)
++        return name
+ 
+     def __getattr__(self, name: str) -> Any:
+         return getattr(self.root_graph, name)

@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 59500f0338a..8fc7e0a7227 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1906,7 +1906,9 @@ def run_node(tracer, node, args, kwargs, nnmodule):
+                 assert nnmodule is not None
+                 return nnmodule(*args, **kwargs)
+             elif op == "get_attr":
+-                return tracer.get_submodule(node.target)
++                from operator import attrgetter
++                return attrgetter(node.target)(tracer.root)
++
+             elif op == "placeholder":
+                 assert "example_value" in node.meta
+                 return node.meta["example_value"]

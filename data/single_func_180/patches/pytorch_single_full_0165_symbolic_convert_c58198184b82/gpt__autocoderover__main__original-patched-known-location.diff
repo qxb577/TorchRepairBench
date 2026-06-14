@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index fac68fa5242..a92b5c3213c 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -574,7 +574,8 @@ def generic_jump(truth_fn: typing.Callable[[object], bool], push: bool):
+             return
+ 
+         if value.is_python_constant():
+-            if truth_fn(value.as_python_constant()):
++            if truth_fn(value.as_python_constant()) or isinstance(value.as_python_constant(), dict):
++
+                 if push:
+                     self.push(value)
+                 self.jump(inst)

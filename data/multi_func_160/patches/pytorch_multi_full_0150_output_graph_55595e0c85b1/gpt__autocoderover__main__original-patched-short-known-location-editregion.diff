@@ -1,0 +1,17 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 24417fa508a..076b47e0283 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1751,9 +1751,9 @@ class OutputGraph:
+             if symbol is not None:
+                 if symbol not in used_symbols:
+                     remove_unused(node)
+-                else:
+-                    # Make sure we delete later occurrences of the same symbol
+-                    used_symbols.remove(symbol)
++                # Make sure we delete later occurrences of the same symbol
++                used_symbols.discard(symbol)
++
+ 
+     def remove_tensorify_specialized_graphargs(self) -> None:
+         # This is a pretty interesting function. Basically we have this problem

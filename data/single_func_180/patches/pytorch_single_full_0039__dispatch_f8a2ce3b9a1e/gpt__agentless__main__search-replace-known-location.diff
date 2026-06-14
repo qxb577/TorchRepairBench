@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/tensor/_dispatch.py b/torch/distributed/tensor/_dispatch.py
+index 83d0550e7f7..2b6dcfbd10b 100644
+--- a/torch/distributed/tensor/_dispatch.py
++++ b/torch/distributed/tensor/_dispatch.py
+@@ -215,6 +215,8 @@ class OpDispatcher:
+                     output_sharding.use_val_from_redistribute_schema,
+                 )
+ 
++            if any(isinstance(arg, DTensor) and arg.placements[0].is_partial() for arg in args):
++                raise RuntimeError("in-place operations that require placement changes are not supported")
+             local_tensor_args = (
+                 pytree.tree_unflatten(
+                     cast(list[object], op_info.local_args),

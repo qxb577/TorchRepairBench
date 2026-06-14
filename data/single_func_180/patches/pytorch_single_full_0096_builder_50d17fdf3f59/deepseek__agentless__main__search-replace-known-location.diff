@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index a7a40549c06..865a0de5881 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -4142,6 +4142,8 @@ class SourcelessBuilder:
+         ):
+             proxy = tx.output.bound_symbols[value.node.expr]
+             return SymNodeVariable.create(tx, proxy)
++        elif isinstance(value, inspect.Parameter):
++            return UserDefinedObjectVariable(value)
+         elif istype(value, object):
+             return ObjectVariable(value)
+         unimplemented(

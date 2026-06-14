@@ -1,0 +1,14 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index fffe85beb46..9556e4a4c40 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -190,7 +190,8 @@ def fakify(
+         else:
+             return t.val
+ 
+-    if not isinstance(t, torch.Tensor):
++    if not isinstance(t, (torch.Tensor, torch._subclasses.FakeTensor)):
++
+         raise ValueError(
+             f"Unsupported input type {type(t)}. "
+             "Export only supports pytree containers of basic types (Tensor, int, float, ...) as input. "

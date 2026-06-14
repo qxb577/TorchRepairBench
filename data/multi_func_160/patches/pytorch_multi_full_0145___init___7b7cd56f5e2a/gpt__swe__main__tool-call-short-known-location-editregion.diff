@@ -1,0 +1,14 @@
+diff --git a/torch/_prims_common/__init__.py b/torch/_prims_common/__init__.py
+index b2721129cff..4c6d871d60a 100644
+--- a/torch/_prims_common/__init__.py
++++ b/torch/_prims_common/__init__.py
+@@ -452,7 +452,8 @@ def is_non_overlapping_and_dense(a: Tensor) -> bool:
+         return False
+ 
+     # Short-circuits if the tensor is already contiguous or channels-last contiguous
+-    if is_contiguous(a) or is_channels_last_contiguous(a):
++    if a.is_contiguous() or a.is_contiguous(memory_format=torch.channels_last):
++
+         return True
+ 
+     # The following is equivalent to compute_non_overlapping_and_dense in TensorImpl.cpp

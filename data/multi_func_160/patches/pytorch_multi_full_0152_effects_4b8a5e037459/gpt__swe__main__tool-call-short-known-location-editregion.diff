@@ -1,0 +1,14 @@
+diff --git a/torch/export/_remove_effect_tokens_pass.py b/torch/export/_remove_effect_tokens_pass.py
+index b85912246c0..382d046e666 100644
+--- a/torch/export/_remove_effect_tokens_pass.py
++++ b/torch/export/_remove_effect_tokens_pass.py
+@@ -114,7 +114,8 @@ def _remove_effect_tokens_from_graph_helper(
+         assert inp_token.name in input_token_names
+         ep.graph.erase_node(inp_token)
+ 
+-    ep.graph.eliminate_dead_code()
++    ep.graph.eliminate_dead_code(keep_effects=True)
++
+ 
+ 
+ def _remove_effect_tokens(ep: ExportedProgram) -> ExportedProgram:

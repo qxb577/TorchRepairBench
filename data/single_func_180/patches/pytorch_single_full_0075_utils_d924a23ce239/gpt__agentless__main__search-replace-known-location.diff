@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/tensor/_ops/utils.py b/torch/distributed/tensor/_ops/utils.py
+index 6a20a2fb398..7b8fad11bb1 100644
+--- a/torch/distributed/tensor/_ops/utils.py
++++ b/torch/distributed/tensor/_ops/utils.py
+@@ -398,6 +398,8 @@ def expand_to_full_mesh_op_strategy(
+     kwargs_strategy = op_schema.kwargs_strategy
+     input_args_strategy = args_strategy + kwargs_strategy
+     all_strategies = []
++    if inplace_op and not any(single_mesh_dim_strategies):
++        raise RuntimeError("in-place operations that require placement changes are not supported")
+     for strategy_comb in strategy_combs:
+         spec_list: list[DTensorSpec | None] = []
+         # Track how many non-None output specs we've seen (for output_tensor_meta indexing).

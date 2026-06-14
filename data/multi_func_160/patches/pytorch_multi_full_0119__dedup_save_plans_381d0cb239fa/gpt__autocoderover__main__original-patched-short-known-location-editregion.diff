@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/checkpoint/_dedup_save_plans.py b/torch/distributed/checkpoint/_dedup_save_plans.py
+index e416030a816..acec5e708cc 100644
+--- a/torch/distributed/checkpoint/_dedup_save_plans.py
++++ b/torch/distributed/checkpoint/_dedup_save_plans.py
+@@ -55,6 +55,7 @@ def dedup_save_plans(
+             for write_item in all_plans[plan_idx].items
+             if write_item.index not in remove_set
+         ]
+-        all_plans[plan_idx] = dataclasses.replace(all_plans[plan_idx], items=new_items)
++        all_plans[plan_idx] = dataclasses.replace(all_plans[plan_idx], items=new_items, planner_data=None, storage_data=None)
++
+ 
+     return all_plans

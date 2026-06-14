@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 5db712372a1..5eaf387c9b0 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -5075,7 +5075,7 @@ def _fractional_pooling_offsets(samples, in_sz, out_sz, kernel_sz, dim, ndims):
+     samples_loader = samples.make_loader()
+ 
+     def load(prefix, i):
+-        sample = samples_loader([*prefix, ndims - 1 - dim])
++        sample = samples_loader([*prefix, dim])
+         i_expr = ops.index_expr(i, samples.get_dtype())
+         diff = ops.index_expr(in_sz - kernel_sz, torch.int64)
+         out_sz_expr = ops.index_expr(out_sz - 1, torch.int64)

@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/autotune_process.py b/torch/_inductor/autotune_process.py
+index 1a417117f4a..a868741bed2 100644
+--- a/torch/_inductor/autotune_process.py
++++ b/torch/_inductor/autotune_process.py
+@@ -585,7 +585,7 @@ class TritonBenchmarkRequest(BenchmarkRequest):
+         kpack: int = 0,  # ROCm specific gemm paramete
+         workspace_arg: Optional[WorkspaceArg] = None,
+     ) -> None:
+-        super().__init__(kernel_name, input_tensor_meta, output_tensor_meta, extra_args)
++        super().__init__(kernel_name, input_tensor_meta, output_tensor_meta, extra_args, workspace_arg)
+         self.module_path = module_path
+         self.module_cache_key = module_cache_key
+         self.num_stages = num_stages
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index a5dc828135d..d2009f8114f 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -1156,7 +1156,7 @@ class TritonTemplate(KernelTemplate):
+             return self.kernel_type(
+                 kernel_name=kernel_name,
+                 output_node=fake_out,
+-                workspace_arg=workspace_arg,
++                workspace_arg=workspace_arg if workspace_arg is not None else None,
+                 use_jit=False,
+                 **kernel_options,
+             )

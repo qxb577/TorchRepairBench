@@ -1,0 +1,62 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index e49eef37077..ea3c7411feb 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -705,10 +705,19 @@ class VariableBuilder:
+                 )
+                 for name in namedtuple_fields(type(value))
+             ]
++            if hasattr(value, '__dict__'):
++                extra_attrs = {
++                    k: LazyVariableTracker.create(v, source=AttrSource(self.source, k))
++                    for k, v in value.__dict__.items()
++                }
++            else:
++                extra_attrs = {}
+             result = NamedTupleVariable(
+-                output, tuple_cls=type(value), source=self.source
++                output, tuple_cls=type(value), source=self.source,
++                extra_attrs=extra_attrs,
+             )
+             return result
++
+         elif istype(value, (dict, collections.defaultdict, collections.OrderedDict)):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+             all_const = all(ConstantVariable.is_literal(k) for k in value.keys())
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index 654bf2e756c..b636b93f8b4 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -1172,10 +1172,14 @@ class NamedTupleVariable(TupleVariable):
+ 
+     def as_python_constant(self):
+         if self.is_structseq():
+-            # StructSequenceType(iterable)
+-            return self.python_type()([x.as_python_constant() for x in self.items])
+-        # NamedTupleType(*iterable)
+-        return self.python_type()(*[x.as_python_constant() for x in self.items])
++            result = self.python_type()([x.as_python_constant() for x in self.items])
++        else:
++            result = self.python_type()(*[x.as_python_constant() for x in self.items])
++        if hasattr(self, 'extra_attrs'):
++            for attr, val in self.extra_attrs.items():
++                setattr(result, attr, val.as_python_constant())
++        return result
++
+ 
+     def as_proxy(self):
+         assert self.python_type() is not SizeVariable
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 9c28ceb762b..22b11a306f2 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -716,7 +716,8 @@ class UserDefinedClassVariable(UserDefinedVariable):
+ 
+                 assert all(x is not None for x in items)
+ 
+-            return variables.NamedTupleVariable(items, self.value)
++            return variables.NamedTupleVariable(items, self.value, extra_attrs={})
++
+         elif self.value is torch.Size:
+             # This simulates `THPSize_pynew`, the C impl for `Size.__new__`.
+             tup = variables.BuiltinVariable(tuple).call_function(tx, args, kwargs)

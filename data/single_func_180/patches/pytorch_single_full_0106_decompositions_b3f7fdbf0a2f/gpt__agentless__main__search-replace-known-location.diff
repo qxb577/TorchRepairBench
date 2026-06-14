@@ -1,0 +1,12 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 2d30d42dafa..936de4d818b 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -163,6 +163,7 @@ def fill_tensor(self, value: Tensor):
+ 
+ 
+ @register_decomposition(aten.hardsigmoid)
++@register_decomposition(aten.pad_sequence)
+ @out_wrapper()
+ @pw_cast_for_opmath
+ def hardsigmoid(self: Tensor) -> Tensor:

@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index da63d88313c..6f3f68704a2 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -118,6 +118,8 @@ from .types import (  # noqa: F401
+     GuardFn,
+ )
+ from .utils import (
++    range_iterator_getitem,
++    range_iterator_len,
+     common_constant_types,
+     dict_keys_repr,
+     get_custom_getattr,
+@@ -420,7 +422,8 @@ def _get_closure_vars():
+             "___dict_contains": lambda a, b: a in b,
+             "___tuple_iterator_len": tuple_iterator_len,
+             "___tuple_iterator_getitem": tuple_iterator_getitem,
+-            "___get_torch_function_mode_stack_at": get_torch_function_mode_stack_at,
++            "___range_iterator_len": range_iterator_len,
++            "___range_iterator_getitem": range_iterator_getitem,
+             "__math_isnan": math.isnan,
+             "__numpy_isnan": None if np is None else np.isnan,
+             "inf": float("inf"),
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 303f0b028b5..e54922d090b 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1823,6 +1823,15 @@ def tuple_iterator_getitem(it, index):
+     return obj[start + index]
+ 
+ 
++def range_iterator_getitem(it, index):
++    start, step, length = it.__reduce__()[1]
++    return start + step * index
++
++
++def range_iterator_len(it):
++    return it.__reduce__()[1][2]
++
++
+ iter_next = next
+ 
+ 
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 4b37ed87226..c1404ec8c37 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -485,7 +485,7 @@ class VariableBuilder:
+         return RegexPatternVariable(value)
+ 
+     def wrap_weakref(self, value: weakref.ReferenceType):
+-        self.install_guards(GuardBuilder.TYPE_MATCH)
++        self.install_guards(GuardBuilder.RANGE_ITERATOR_MATCH)
+         return WeakRefVariable.build(self.tx, value, source=self.source)
+ 
+     def wrap_removable_handle(self, value):

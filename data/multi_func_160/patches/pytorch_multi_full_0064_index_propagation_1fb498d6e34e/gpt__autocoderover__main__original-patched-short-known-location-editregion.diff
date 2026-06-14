@@ -1,0 +1,27 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index 16d5770a36a..82670a5abe7 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -324,12 +324,16 @@ class IndexPropagation:
+                 for k, v in self.indirect_var_ranges.items()
+             ),
+         )
+-        evaluated = self.shape_env._maybe_evaluate_static(
+-            e,
+-            axioms=self.axioms,
+-            var_to_range=var_to_range,
+-        )
+-        return bool(evaluated)
++        try:
++            evaluated = self.shape_env._maybe_evaluate_static(
++                e,
++                axioms=self.axioms,
++                var_to_range=var_to_range,
++            )
++            return bool(evaluated)
++        except Exception:
++            return False
++
+ 
+     def indirect_indexing(
+         self,

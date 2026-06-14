@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index dd3610bb9db..1a3dff35cf4 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -306,7 +306,7 @@ class UniformValueConstantFolder(ConstantFolder):
+     def _deduce_value(self, node: torch.fx.Node):
+         # deduce value for full-like nodes
+         # 1. for constructors, substitute value is a tensor of size [1]
+-        # 2. for view ops/indexing, substitute value is the same as the input
++        # 2. for view ops/indexing, substitute value is the same as the input, except for 0-d complex tensors
+         # 3. for pointwise ops, run node to get the substitute value
+         # 4. deal with some special ops
+         # otherwise, stop deduce value and return unknown value

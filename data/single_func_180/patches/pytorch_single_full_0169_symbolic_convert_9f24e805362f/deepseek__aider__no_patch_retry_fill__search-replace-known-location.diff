@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 580bc77d4cc..cce47aef904 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1207,6 +1207,8 @@ class InstructionTranslatorBase(
+ 
+     def prune_dead_locals(self) -> None:
+         # keep cell and freevar references alive
++        if self.is_child_tracer_active:
++            return
+         self.post_prune_cell_and_freevars = {
+             k: v
+             for k, v in self.symbolic_locals.items()

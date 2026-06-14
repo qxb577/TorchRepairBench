@@ -1,0 +1,36 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2d59a111db9..f05efd9efd8 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -761,15 +761,6 @@ def _export_to_aten_ir(
+         input_specs=input_specs, output_specs=output_specs
+     )
+ 
+-    if pre_dispatch:
+-        from torch._export.passes.replace_set_grad_with_hop_pass import (
+-            replace_set_grad_with_hop_pass,
+-        )
+-
+-        gm, export_graph_signature = replace_set_grad_with_hop_pass(
+-            gm, export_graph_signature
+-        )
+-
+     # Remove nn_module_stack, stack_trace metadata from all placeholders/inputs nodes.
+     for _mod in gm.modules():
+         if not isinstance(_mod, torch.fx.GraphModule):
+@@ -782,6 +773,15 @@ def _export_to_aten_ir(
+     constants = rewrite_script_object_meta(gm)
+     constants.update(lift_constants_pass(gm, export_graph_signature, constant_attrs))
+ 
++    if pre_dispatch:
++        from torch._export.passes.replace_set_grad_with_hop_pass import (
++            replace_set_grad_with_hop_pass,
++        )
++
++        gm, export_graph_signature = replace_set_grad_with_hop_pass(
++            gm, export_graph_signature
++        )
++
+     # Prettify names for placeholder nodes.
+     placeholder_naming_pass(
+         gm,

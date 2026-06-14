@@ -1,0 +1,17 @@
+diff --git a/torch/profiler/profiler.py b/torch/profiler/profiler.py
+index ecc848c20e7..8f2e0cf9b2e 100644
+--- a/torch/profiler/profiler.py
++++ b/torch/profiler/profiler.py
+@@ -224,8 +224,10 @@ class _KinetoProfile:
+                 import torch._inductor.config as inductor_config
+ 
+                 if inductor_config.triton.cudagraphs:
+-                    os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
+-                    self.add_metadata_json("DISABLE_CUPTI_LAZY_REINIT", "1")
++                    if torch.version.cuda < "12.6":
++                        os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
++                        self.add_metadata_json("DISABLE_CUPTI_LAZY_REINIT", "1")
++
+                     # FIXME: CUDA Graph does not work well with CUPTI teardown.
+                     #   1) crashes on 1st lazy CUPTI re-init after teardown (CUDA 11)
+                     #   2) crashes on 2nd non-lazy CUPTI re-init after teardown (CUDA 12)

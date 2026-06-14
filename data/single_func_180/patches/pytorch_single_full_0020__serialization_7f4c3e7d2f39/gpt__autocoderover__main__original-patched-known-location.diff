@@ -1,0 +1,32 @@
+diff --git a/torch/distributed/_serialization.py b/torch/distributed/_serialization.py
+index 2aa9786c0e4..0d82d3d4127 100644
+--- a/torch/distributed/_serialization.py
++++ b/torch/distributed/_serialization.py
+@@ -55,8 +55,8 @@ class _PseudoZipFile:
+         entries = _weights_only_unpickler.load(f)
+ 
+         for entry in entries:
+-            data = f.read(entry.length)
+-            if entry.is_storage:
++            if entry.is_storage and entry.length > 0:
++                data = f.read(entry.length)
+                 storage = torch.frombuffer(
+                     data,
+                     dtype=torch.uint8,
+@@ -66,9 +66,16 @@ class _PseudoZipFile:
+                     storage,
+                     entry.length,
+                 )
++            elif entry.is_storage and entry.length == 0:
++                self.records[entry.key] = (
++                    torch.UntypedStorage(0),
++                    entry.length,
++                )
+             else:
++                data = f.read(entry.length)
+                 self.records[entry.key] = (data, entry.length)
+ 
++
+     def has_record(self, key: str) -> bool:
+         return key in self.records
+ 

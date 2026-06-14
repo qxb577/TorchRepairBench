@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/source.py b/torch/_dynamo/source.py
+index b5b73c0c684..e6f2338289e 100644
+--- a/torch/_dynamo/source.py
++++ b/torch/_dynamo/source.py
+@@ -859,7 +859,8 @@ class BackwardStateSource(Source):
+         return GuardSource.BACKWARD_STATE
+ 
+ 
+-def is_from_local_source(source: Source, *, only_allow_input=False):
++def is_from_local_source(source: Source, *, only_allow_input=False, allow_local_scope=False):
++
+     if isinstance(source, ChainedSource):
+         return is_from_local_source(source.base, only_allow_input=only_allow_input)
+     if not isinstance(source, LocalSource):

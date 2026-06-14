@@ -1,0 +1,13 @@
+diff --git a/torch/_logging/_internal.py b/torch/_logging/_internal.py
+index 24e8cc3a14d..6797f8d5ad4 100644
+--- a/torch/_logging/_internal.py
++++ b/torch/_logging/_internal.py
+@@ -142,6 +142,8 @@ def set_logs(
+     output_code: bool = False,
+     schedule: bool = False,
+     perf_hints: bool = False,
++    assert isinstance(aot_graphs, bool), "aot_graphs must be a boolean value"
++
+     modules: Optional[Dict[str, Union[int, bool]]] = None,
+ ):
+     """

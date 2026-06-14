@@ -1,0 +1,40 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index c6b061f42b1..61ed2de7389 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -3005,13 +3005,9 @@ def handle_traced_output(example_value, tx, proxy, options, subclass_type, targe
+     elif isinstance(example_value, float) or proxy.node.target in ["hex", "__round__"]:
+         set_example_value(proxy.node, example_value)
+         return ConstantVariable.create(example_value, **options)
+-    else:
+-        unimplemented_v2(
+-            gb_type="torch.* op returned non-Tensor",
+-            context=f"example_value type: {typestr(example_value)}; op: {proxy.node.op}; target: {proxy.node.target}",
+-            explanation="torch.* ops that return a non-Tensor cannot be traced into the Dynamo FX graph output",
+-            hints=[],
+-        )
++    elif isinstance(example_value, (tuple, list, dict)):
++        set_example_value(proxy.node, example_value)
++        return ConstantVariable.create(example_value, **options)
+ 
+ 
+ def construct_tensor_variable(
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 72b2e3dc132..181f6219cce 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1360,12 +1360,8 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+             # the call and wrap output into a VariableTracker.
+             proxy = tx.output.create_proxy("call_function", flat_apply, all_args, {})
+             out_vt = wrap_fx_proxy(tx, proxy)
+-            # TODO support more output types
+-            # Q: flat_apply will likely pytree_flatten the output for this, then
+-            # how do we intercept the output before flatten, and wrap those?
+-            # - Maybe we can have `flat_apply` return the output spec, so that
+-            #   Dynamo can unflatten and wrap the result.
+-
++            if isinstance(out_vt, (tuple, list, dict)):
++                out_vt = wrap_fx_proxy(tx, proxy, is_constant=True)
+             return out_vt
+ 
+         if self.torch_function_override_enabled(tx, args, kwargs):

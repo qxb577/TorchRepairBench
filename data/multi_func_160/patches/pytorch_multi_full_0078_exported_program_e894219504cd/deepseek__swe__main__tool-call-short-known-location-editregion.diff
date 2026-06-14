@@ -1,0 +1,21 @@
+diff --git a/torch/export/graph_signature.py b/torch/export/graph_signature.py
+index 4b99dc1b992..fe3065509c1 100644
+--- a/torch/export/graph_signature.py
++++ b/torch/export/graph_signature.py
+@@ -287,7 +287,7 @@ class ExportGraphSignature:
+     def user_outputs(self) -> Collection[Union[int, float, bool, None, str]]:
+         user_outputs: List[Union[int, float, bool, None, str]] = []
+         for s in self.output_specs:
+-            if s.kind != OutputKind.USER_OUTPUT:
++            if s.kind not in (OutputKind.USER_OUTPUT, OutputKind.LOSS_OUTPUT):
+                 continue
+ 
+             if isinstance(s.arg, (TensorArgument, SymIntArgument, SymBoolArgument)):
+@@ -300,6 +300,7 @@ class ExportGraphSignature:
+                 raise RuntimeError(f"{s.arg} is not a valid user output")
+         return tuple(user_outputs)
+ 
++
+     # A dictionary mapping graph input node names to parameters. If a graph input
+     # name is found in this dictionary, it is guranteed to be a lifted parameter.
+     @property

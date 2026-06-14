@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 580bc77d4cc..6181f40140c 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1182,7 +1182,8 @@ class InstructionTranslatorBase(
+         # If any parent tx has a backedge, then return True
+         cur_tx: Optional[InstructionTranslatorBase] = self
+         while cur_tx is not None:
+-            cur_offset = cur_tx.current_instruction.offset
++            cur_offset = cur_tx.current_instruction.offset if cur_tx.current_instruction else -1
++
+             assert cur_tx.instruction_pointer is not None
+             for inst in cur_tx.instructions[cur_tx.instruction_pointer :]:
+                 if inst.opname in ("RETURN_VALUE", "RETURN_CONST"):

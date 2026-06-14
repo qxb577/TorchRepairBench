@@ -1,0 +1,27 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index a417dd0b6b3..49ea7c1e898 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -329,7 +329,7 @@ class SizeVarAllocator:
+         assert self.shape_env.evaluate_expr(sympy.Lt(left, right))
+ 
+     def expect_true(self, expr: Expr, *, msg: str) -> None:
+-        expr = sympy_subs(expr, self.inv_precomputed_replacements)
++        expr = sympy_subs(expr, self.inv_precomputed_replacements) if self.inv_precomputed_replacements else expr
+         self.shape_env.defer_runtime_assert(expr, msg, fx_node=V.graph.current_node)
+ 
+     def expect_equals(self, left: Expr, right: Expr, *, msg: str) -> Expr:
+diff --git a/torch/fx/experimental/recording.py b/torch/fx/experimental/recording.py
+index 9fdc9e1e310..dcb97ea8af2 100644
+--- a/torch/fx/experimental/recording.py
++++ b/torch/fx/experimental/recording.py
+@@ -120,7 +120,8 @@ class ShapeEnvEvent:
+             # we are tracking node names at shape_env.name_to_node.
+             assert hasattr(shape_env, "name_to_node")
+             name_to_node = shape_env.name_to_node  # type: ignore[attr-defined]
+-            assert x.name in name_to_node
++            if x.name not in name_to_node:
++                return x
+             return name_to_node[x.name]
+ 
+         # Replaces the value of an specific argument by the result of fn.

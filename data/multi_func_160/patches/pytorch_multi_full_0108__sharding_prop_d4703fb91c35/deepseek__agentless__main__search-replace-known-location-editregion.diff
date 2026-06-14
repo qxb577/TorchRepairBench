@@ -1,0 +1,21 @@
+diff --git a/torch/distributed/tensor/_sharding_prop.py b/torch/distributed/tensor/_sharding_prop.py
+index 1ccb42c47bf..002a666403b 100644
+--- a/torch/distributed/tensor/_sharding_prop.py
++++ b/torch/distributed/tensor/_sharding_prop.py
+@@ -194,10 +194,15 @@ class ShardingPropagator:
+             # if fake is not a tensor or tuple of tensor, return as none
+             return None
+ 
+-    @lru_cache  # noqa: B019
+     def _propagate_tensor_meta(
+         self, op_schema: OpSchema
+     ) -> Union[None, TensorMeta, Sequence[Optional[TensorMeta]]]:
++        if torch._C._are_we_tracing():
++            return self._propagate_tensor_meta_non_cached(op_schema)
++        return self._cached_propagate_tensor_meta(op_schema)
++
++    @lru_cache
++    def _cached_propagate_tensor_meta(self, op_schema):
+         return self._propagate_tensor_meta_non_cached(op_schema)
+ 
+     def _wrap_output_spec_tensor_meta(

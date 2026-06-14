@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/polyfills/__init__.py b/torch/_dynamo/polyfills/__init__.py
+index 4b3d911e202..9c2dcd45f3b 100644
+--- a/torch/_dynamo/polyfills/__init__.py
++++ b/torch/_dynamo/polyfills/__init__.py
+@@ -227,7 +227,8 @@ def construct_dict(cls, /, *args, **kwargs):
+         src = args[0]
+ 
+         # Ensure that the overridden __iter__ method is invoked
+-        if isinstance(src, (dict, MutableMapping)):
++        if isinstance(src, (dict, MutableMapping, types.MappingProxyType)):
++
+             for key in src:
+                 # This will inline the __getitem__ of the src object
+                 dst[key] = src[key]

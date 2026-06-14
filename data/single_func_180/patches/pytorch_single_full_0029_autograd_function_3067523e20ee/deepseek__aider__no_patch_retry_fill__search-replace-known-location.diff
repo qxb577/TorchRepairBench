@@ -1,0 +1,15 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index ec3a3f528ab..60b104c3d88 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -849,6 +849,10 @@ class AutogradFunctionApply(HigherOrderOperator):
+ 
+                 return output
+ 
++            @staticmethod
++            def setup_context(ctx: Any, inputs: Any, output: Any) -> None:
++                pass
++
+             @staticmethod
+             def backward(ctx: Any, *grad: Any) -> Any:
+                 # The Interpreter here is required to propagate metadata

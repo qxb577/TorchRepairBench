@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/aot_compile.py b/torch/_dynamo/aot_compile.py
+index 142e244067b..dbea6f82381 100644
+--- a/torch/_dynamo/aot_compile.py
++++ b/torch/_dynamo/aot_compile.py
+@@ -279,7 +279,7 @@ def aot_compile_fullgraph(
+             source_info.add_code(traced_code)
+ 
+         artifacts = CompileArtifacts(
+-            signature=inspect.signature(fn),
++            signature=inspect.signature(getattr(fn, '__wrapped__', fn)),
+             bytecode=graph_capture_output.bytecode,
+             guard_manager=check_fn.guard_manager,
+             guards_state=check_fn.guards_state,
+diff --git a/torch/_dynamo/convert_frame.py b/torch/_dynamo/convert_frame.py
+index 0e73948f50b..ab10c8b8544 100644
+--- a/torch/_dynamo/convert_frame.py
++++ b/torch/_dynamo/convert_frame.py
+@@ -966,6 +966,8 @@ def get_traced_fn(mod: Any) -> tuple[FunctionType, Optional[object]]:
+ 
+     if isinstance(mod, torch.nn.Module):
+         mod = mod.forward
++    if hasattr(mod, "__wrapped__"):
++        mod = mod.__wrapped__
+     if hasattr(mod, "__self__"):
+         # pyrefly: ignore  # missing-attribute
+         return mod.__func__, mod.__self__

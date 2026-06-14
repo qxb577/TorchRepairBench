@@ -1,0 +1,39 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 52cb8af69fd..5642b5ac774 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7005,16 +7005,20 @@ class DeviceCopy(ExternKernelOut):
+ 
+         developer_warning("DeviceCopy in input program")
+         constant_args = (non_blocking,)
++        layout = x.get_layout()
+         return DeviceCopy(
+             FlexibleLayout(
+                 device=device,
+                 dtype=x.get_dtype(),
+                 size=x.get_size(),
++                stride=layout.stride,
++                offset=layout.offset,
+             ),
+             [cls.realize_input(x)],
+             constant_args,
+         )
+ 
++
+     def codegen(self, wrapper: PythonWrapperCodegen) -> None:
+         args = self.codegen_args()
+         assert len(args) == 2
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index e33b87895f3..bf81a2c93f0 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7026,7 +7026,8 @@ def _amp_foreach_non_finite_check_and_unscale_(self, found_inf, inv_scale):
+ @out_wrapper()
+ def nan_to_num(self, nan=None, posinf=None, neginf=None):
+     result_size = list(self.size())
+-    return self.new_empty(result_size)
++    return self.new_empty(result_size, stride=self.stride())
++
+ 
+ 
+ @register_meta(torch.ops.aten.transpose_)

@@ -1,0 +1,13 @@
+diff --git a/torch/_export/serde/serialize.py b/torch/_export/serde/serialize.py
+index 26ae80af1c6..8b3ac83548a 100644
+--- a/torch/_export/serde/serialize.py
++++ b/torch/_export/serde/serialize.py
+@@ -1606,7 +1606,7 @@ class GraphModuleDeserializer(metaclass=Final):
+         names_to_symbols: dict[str, sympy.Symbol]
+         state_dict: dict[str, Union[torch.Tensor, torch.nn.Parameter]]
+         constants: dict[str, Union[torch.Tensor, FakeScriptObject, torch.ScriptObject]]
+-        example_inputs: Optional[tuple[tuple[torch.Tensor, ...], dict[str, Any]]]
++        example_inputs: Optional[tuple[tuple[Optional[torch.Tensor], ...], dict[str, Any]]]
+ 
+     def __init__(self) -> None:
+         self.serialized_name_to_node: dict[str, torch.fx.Node] = {}

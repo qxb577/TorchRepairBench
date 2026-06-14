@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/tensor/_ops/_tensor_ops.py b/torch/distributed/tensor/_ops/_tensor_ops.py
+index 63503a222d5..0560768928c 100644
+--- a/torch/distributed/tensor/_ops/_tensor_ops.py
++++ b/torch/distributed/tensor/_ops/_tensor_ops.py
+@@ -32,7 +32,8 @@ from torch.distributed.tensor._ops.utils import (
+     is_tensor_evenly_shardable,
+     is_tensor_partial,
+     normalize_dim,
+-    register_op_strategy,
++    # register_op_strategy,
++
+     register_prop_rule,
+     shift_shard_dims_after_insert,
+     shift_shard_dims_after_remove,

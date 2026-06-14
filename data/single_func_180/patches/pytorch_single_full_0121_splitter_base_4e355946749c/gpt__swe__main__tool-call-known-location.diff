@@ -1,0 +1,15 @@
+diff --git a/torch/fx/passes/splitter_base.py b/torch/fx/passes/splitter_base.py
+index 8a23c73785e..79cb3f4d255 100644
+--- a/torch/fx/passes/splitter_base.py
++++ b/torch/fx/passes/splitter_base.py
+@@ -327,8 +327,9 @@ class FxNetAccNodesFinder:
+         non_tensor_cpu_nodes: NodeList = []
+ 
+         for node in self.module.graph.nodes:
+-            if node.op not in CALLABLE_NODE_OPS:
++            if node.op not in CALLABLE_NODE_OPS and node.op != 'call_function':
+                 continue
++
+             if node in self.acc_nodes:
+                 continue
+             if is_node_output_tensor(node):

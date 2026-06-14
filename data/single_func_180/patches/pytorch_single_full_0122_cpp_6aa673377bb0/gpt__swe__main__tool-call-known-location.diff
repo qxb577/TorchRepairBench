@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index acdb05c9ee8..17cc044bbdd 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -997,7 +997,8 @@ class CppVecOverrides(CppOverrides):
+                     if len(new_args) == 2:
+                         new_args = promote_args(new_args)
+                     elif func == CppVecOverrides.where:
+-                        new_args[1:] = promote_args(new_args[1:])
++                        new_args = promote_args(new_args)
++
+ 
+                 # Broadcast scalar args to vector
+                 if scalars and vectors:

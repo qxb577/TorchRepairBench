@@ -1,0 +1,14 @@
+diff --git a/torch/_export/serde/serialize.py b/torch/_export/serde/serialize.py
+index 26ae80af1c6..4dc3305bf33 100644
+--- a/torch/_export/serde/serialize.py
++++ b/torch/_export/serde/serialize.py
+@@ -1794,6 +1794,9 @@ class GraphModuleDeserializer(metaclass=Final):
+             return output.as_float
+         elif output.type == "as_bool":
+             return output.as_bool
++        elif output.type == "as_none":
++            return None
++
+         elif output.type == "as_none":
+             return None
+         else:

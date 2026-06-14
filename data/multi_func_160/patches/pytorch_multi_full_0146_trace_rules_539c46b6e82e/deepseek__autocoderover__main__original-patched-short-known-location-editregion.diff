@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/trace_rules.py b/torch/_dynamo/trace_rules.py
+index 5aae67640cd..ede8a9f757e 100644
+--- a/torch/_dynamo/trace_rules.py
++++ b/torch/_dynamo/trace_rules.py
+@@ -2927,9 +2927,11 @@ def get_tensor_method():
+ 
+     # mlazos: this is a function which we handle specially in TensorVariable
+     s.add(torch.Tensor.__contains__)  # type: ignore[arg-type]
++    s.add(torch.Tensor.register_hook)  # type: ignore[arg-type]
+     return frozenset(s)
+ 
+ 
++
+ """
+ Return if a torch object is ATen op or torch.Tensor method.
+ """
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 78320cbbcdf..bf0f1ac1a2f 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1175,7 +1175,8 @@ Either create the tensor outside the compiled region, or do not set the tensor t
+             inspect.ismethoddescriptor(self.get_function())
+             and hasattr(self.get_function(), "__objclass__")
+             and self.get_function().__objclass__ == torch._C.TensorBase
+-        ) or self.get_function() is torch.Tensor.__contains__
++        ) or self.get_function() is torch.Tensor.__contains__ or self.get_function() is torch.Tensor.register_hook
++
+ 
+     def torch_function_override_enabled(self, tx, args, kwargs):
+         return (

@@ -1,0 +1,58 @@
+diff --git a/torch/_dynamo/__init__.py b/torch/_dynamo/__init__.py
+index 02b921b30ee..080d378ae21 100644
+--- a/torch/_dynamo/__init__.py
++++ b/torch/_dynamo/__init__.py
+@@ -144,6 +144,7 @@ def reset() -> None:
+         torch._dynamo.utils.warn_once_cache.clear()
+         torch._dynamo.utils.user_obj_id_to_weakref.clear()
+         torch._C._autograd._saved_tensors_hooks_set_tracing(False)
++        torch._dynamo.utils.CreateNestedFnCache.clear()
+ 
+ 
+ def reset_code_caches() -> None:
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 1775dad56d0..841af4b3d09 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4639,7 +4639,22 @@ def does_not_override_dict_iter_methods(user_cls: Any) -> bool:
+ # Helper functions below are to prevent TorchDynamo to prevent tracing of
+ # __torch_function__ calls triggered on tensor properties in the pre graph
+ # bytecode.
+-@torch._disable_dynamo
++class CreateNestedFnCache:
++    _cache = {}
++
++    @classmethod
++    def clear(cls):
++        cls._cache.clear()
++
++    @classmethod
++    def get(cls, key):
++        return cls._cache.get(key)
++
++    @classmethod
++    def set(cls, key, value):
++        cls._cache[key] = value
++
++
+ def call_size(x: Any, i: int) -> int:
+     return x.size(i)
+ 
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 6eb7d0666cd..33f230e457d 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -276,7 +276,13 @@ def _create_nested_fn(
+ ):
+     from types import FunctionType
+ 
++    cache_key = (code, f_globals, name, defaults, closure, kwdefaults, annotations)
++    cached_func = torch._dynamo.utils.CreateNestedFnCache.get(cache_key)
++    if cached_func is not None:
++        return cached_func
++
+     func = FunctionType(code, f_globals, name, defaults, closure)
++    torch._dynamo.utils.CreateNestedFnCache.set(cache_key, func)
+     func.__kwdefaults__ = kwdefaults
+ 
+     if isinstance(annotations, tuple):

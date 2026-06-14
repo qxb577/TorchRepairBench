@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index ef80a55dd02..a64f1b7998f 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2758,12 +2758,17 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+                 self.value.__dict__, AttrSource(self.source, "__dict__")
+             )
+             return self.generic_dict_vt
+-        elif out := self.generic_dict_vt.maybe_getitem_const(
++        # Respect descriptors (e.g. property) defined on the class by performing
++        # a standard attribute lookup first.
++        try:
++            return super().var_getattr(tx, name)
++        except AttributeError:
++            pass
++        if out := self.generic_dict_vt.maybe_getitem_const(
+             variables.ConstantVariable(name)
+         ):
+             return out
+-        else:
+-            return super().var_getattr(tx, name)
++        raise AttributeError(f"{type(self.value).__name__} has no attribute {name!r}")
+ 
+ 
+ class RandomVariable(UserDefinedObjectVariable):

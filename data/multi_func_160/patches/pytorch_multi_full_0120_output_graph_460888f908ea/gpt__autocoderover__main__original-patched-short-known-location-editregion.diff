@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 4276f5c20c2..e866ecaab31 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1117,12 +1117,16 @@ class OutputGraph(OutputGraphGuardsState):
+ 
+         self.cleanup_graph()
+         tx.prune_dead_locals()
++        def realize_stack_values(values):
++            for value in values:
++                if isinstance(value, (list, tuple)):
++                    realize_stack_values(value)
++                else:
++                    value.realize()
++
+         stack_values = list(tx.stack)
++        realize_stack_values(stack_values)
+ 
+-        # realize any unrealized tensor VTs in case they
+-        # need to be added to self.nn_modules as attributes
+-        for value in stack_values:
+-            value.realize()
+ 
+         # Use nn.Module "proxies" in the constructed GraphModule so that
+         # the resulting GM does not hold additional strong references to the original modules.

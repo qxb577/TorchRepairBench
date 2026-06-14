@@ -1,0 +1,20 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index 5d6fa25a49e..571ebe3e16d 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -912,13 +912,8 @@ class _NonStrictTorchFunctionHandler(torch.overrides.TorchFunctionMode):
+                 return mapped_func, args, kwargs
+         if func is torch.tensor:
+             # Redirect to Python implementation of torch.tensor for data with symints.
+-            # NOTE(avik): We don't unconditionally redirect to this implementation
+-            # because it has some known incompletenesses, e.g., it doesn't support
+-            # empty data. See https://github.com/pytorch/pytorch/issues/143216
+-            if any(
+-                isinstance(a, torch.SymInt) for a in pytree.tree_flatten(args[0])[0]
+-            ):
+-                return torch._refs.tensor, args, kwargs
++            # NOTE(avik): We don
++
+         if func.__name__ == "__getitem__" and isinstance(args[0], torch.Tensor):
+ 
+             def rewrite(dim, item):

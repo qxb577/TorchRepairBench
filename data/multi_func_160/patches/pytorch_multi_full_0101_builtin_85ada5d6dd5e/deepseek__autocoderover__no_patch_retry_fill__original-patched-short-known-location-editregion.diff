@@ -1,0 +1,59 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 5a19e707689..287c334a424 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2272,10 +2272,16 @@ class BuiltinVariable(VariableTracker):
+             )
+         if hasattr(a, "set_items") and hasattr(b, "set_items"):
+             return SetVariable(list(a.set_items | b.set_items))
++        if isinstance(a, variables.ConstDictVariable) and isinstance(b, variables.ConstDictVariable):
++            return a.call_method(tx, "__or__", [b])
+         # None no-ops this handler and lets the driving function proceed
+         return None
+ 
+-    call_ior = call_or_
++    def call_ior_(self, tx: "InstructionTranslator", a, b):
++        if isinstance(a, variables.ConstDictVariable) and isinstance(b, variables.ConstDictVariable):
++            return a.call_method(tx, "__ior__", [b])
++        return self.call_or_(tx, a, b)
++
+ 
+     def call_not_(self, tx: "InstructionTranslator", a):
+         if isinstance(a, SymNodeVariable):
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 2703d8c4eb7..581ca868115 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -525,6 +525,24 @@ class ConstDictVariable(VariableTracker):
+                 tx.output.side_effects.mutation(self)
+                 self.items[Hashable(args[0])] = x
+                 return x
++        elif name == "__or__":
++            assert not kwargs and len(args) == 1
++            other = args[0]
++            if not isinstance(other, ConstDictVariable):
++                unimplemented("dict __or__ with non-dict")
++            new_items = self.items.copy()
++            for key, value in other.items.items():
++                new_items[key] = value
++            return ConstDictVariable(new_items, user_cls=self.user_cls)
++        elif name == "__ior__":
++            assert not kwargs and len(args) == 1
++            other = args[0]
++            if not isinstance(other, ConstDictVariable):
++                unimplemented("dict __ior__ with non-dict")
++            tx.output.side_effects.mutation(self)
++            for key, value in other.items.items():
++                self.items[key] = value
++            return self
+         elif name == "move_to_end":
+             self.install_dict_keys_match_guard()
+             assert not kwargs and len(args) == 1
+@@ -537,6 +555,7 @@ class ConstDictVariable(VariableTracker):
+         else:
+             return super().call_method(tx, name, args, kwargs)
+ 
++
+     def unpack_var_sequence(self, tx):
+         self.install_dict_keys_match_guard()
+         return [x.vt for x in self.items.keys()]

@@ -1,0 +1,54 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index 2b879a31740..d14eae1a176 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -2280,14 +2280,16 @@ class _TorchCompileInductorWrapper:
+                 raise RuntimeError(
+                     f"Unexpected optimization option {key}, known options are {list(current_config.keys())}"
+                 )
+-            if type(val) is not type(current_config[attr_name]):
++            expected_type = config.get_type(attr_name)
++            if not isinstance(val, expected_type):
+                 val_type_str = type(val).__name__
+-                expected_type_str = type(current_config[attr_name]).__name__
++                expected_type_str = expected_type.__name__ if expected_type is not Any else "Any"
+                 raise RuntimeError(
+                     f"Unexpected type of attr {key}, got {val_type_str} should be {expected_type_str}"
+                 )
+             self.config[attr_name] = val
+ 
++
+     def __call__(self, model_, inputs_):
+         from torch._inductor.compile_fx import compile_fx
+ 
+diff --git a/torch/utils/_config_module.py b/torch/utils/_config_module.py
+index 41569465d25..e11b0a7d4c8 100644
+--- a/torch/utils/_config_module.py
++++ b/torch/utils/_config_module.py
+@@ -54,6 +54,8 @@ class Config:
+     justknob: Optional[str] = None
+     env_name_default: Optional[str] = None
+     env_name_force: Optional[str] = None
++    type: Any = Any
++
+ 
+     def __init__(
+         self,
+@@ -61,12 +63,17 @@ class Config:
+         justknob: Optional[str] = None,
+         env_name_default: Optional[str] = None,
+         env_name_force: Optional[str] = None,
++        type: Any = Any,
+     ):
+         # python 3.9 does not support kw_only on the dataclass :(.
+         self.default = default
+         self.justknob = justknob
+         self.env_name_default = env_name_default
+         self.env_name_force = env_name_force
++        self.type = type
++
++        self.env_name_default = env_name_default
++        self.env_name_force = env_name_force
+ 
+ 
+ # Types saved/loaded in configs

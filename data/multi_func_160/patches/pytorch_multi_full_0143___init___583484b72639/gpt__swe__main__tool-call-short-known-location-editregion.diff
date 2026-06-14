@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index ce60951c2f9..21d48e24a19 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -553,7 +553,8 @@ class SetVariable(ConstDictVariable):
+                 arg = SetVariable(args[0].unpack_var_sequence(tx))
+             else:
+                 arg = args[0]
+-            return super().call_method(tx, "update", (arg,), kwargs)
++            return variables.UserFunctionVariable(polyfills.set_update).call_function(tx, [self, arg], {})
++
+         elif name == "remove":
+             assert not kwargs
+             assert len(args) == 1

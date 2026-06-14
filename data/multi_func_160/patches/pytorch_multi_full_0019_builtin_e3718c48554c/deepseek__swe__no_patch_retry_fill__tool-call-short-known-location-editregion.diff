@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 96c5e762bc4..4adc11c7adf 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2817,6 +2817,23 @@ class BuiltinVariable(VariableTracker):
+         if isinstance(a, (SymNodeVariable, ConstantVariable)) and isinstance(
+             b, (SymNodeVariable, ConstantVariable)
+         ):
++            return None
++        if isinstance(
++            a,
++            (
++                ConstDictVariable,
++                DictKeysVariable,
++                MutableMappingVariable,
++                SetVariable,
++                UserDefinedDictVariable,
++                UserDefinedObjectVariable,
++            ),
++        ):
++            return a.call_method(tx, "__ior__", [b], {})
++
++        # None no-ops this handler and lets the driving function proceed
++        return None
++:
+             return SymNodeVariable.create(
+                 tx,
+                 tx.output.create_proxy(

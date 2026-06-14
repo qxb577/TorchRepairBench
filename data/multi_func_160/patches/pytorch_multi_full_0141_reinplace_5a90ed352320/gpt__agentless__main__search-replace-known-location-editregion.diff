@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index bae75aae249..a963836aad0 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -406,7 +406,8 @@ def reinplace_inplaceable_ops_core(graph: torch.fx.Graph) -> None:
+             ):
+                 src = src.args[0]
+ 
+-            copy_args_to_copy_nodes[(dst, src)] = node
++            if any(user.op != 'output' for user in node.users):
++                copy_args_to_copy_nodes[(dst, src)] = node
+ 
+             mutated_inputs.add(node.args[0])
+ 

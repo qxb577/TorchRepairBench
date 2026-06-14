@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/aot_compile.py b/torch/_dynamo/aot_compile.py
+index 142e244067b..feec8eac02b 100644
+--- a/torch/_dynamo/aot_compile.py
++++ b/torch/_dynamo/aot_compile.py
+@@ -278,16 +278,17 @@ def aot_compile_fullgraph(
+         for traced_code in graph_capture_output.traced_code:
+             source_info.add_code(traced_code)
+ 
++        unwrapped_fn = inspect.unwrap(fn)
+         artifacts = CompileArtifacts(
+-            signature=inspect.signature(fn),
++            signature=inspect.signature(unwrapped_fn),
+             bytecode=graph_capture_output.bytecode,
+             guard_manager=check_fn.guard_manager,
+             guards_state=check_fn.guards_state,
+             import_sources=graph_capture_output.import_sources,
+             backend_id=backend_input.backend_id,
+             compiled_fn=compiled_fn,
+-            original_code=fn.__code__,
+-            closure=fn.__closure__,
++            original_code=unwrapped_fn.__code__,
++            closure=unwrapped_fn.__closure__,
+             source_info=source_info,
+             device_type=device_type,
+         )

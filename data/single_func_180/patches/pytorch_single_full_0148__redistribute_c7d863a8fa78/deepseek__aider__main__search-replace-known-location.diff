@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index a540a763bb6..c145c3deb7f 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -178,7 +178,7 @@ def _get_flattened_mesh_by_layout(
+         The flattened DeviceMesh if it was explicitly created, None otherwise.
+     """
+     root_mesh = mesh._get_root_mesh()
+-    mesh_dim_names = root_mesh.mesh_dim_names
++    mesh_dim_names = mesh.mesh_dim_names
+ 
+     if mesh_dim_names is None:
+         return None

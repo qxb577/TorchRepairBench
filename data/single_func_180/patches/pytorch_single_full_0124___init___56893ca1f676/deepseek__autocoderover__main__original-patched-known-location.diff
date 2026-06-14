@@ -1,0 +1,33 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 0155c689249..70c16c96212 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -1979,7 +1979,12 @@ def clamp_min(
+     self: TensorLikeType,
+     min: Optional[TensorOrNumberLikeType] = None,
+ ) -> TensorLikeType:
+-    return torch.clamp(self, min=min)  # type: ignore[arg-type]
++    a = self
++    if min is not None:
++        a_isnan = torch.isnan(a)
++        condition = torch.bitwise_or(torch.ge(a, min), a_isnan)  # type: ignore[arg-type]
++        a = torch.where(condition, a, min)  # type: ignore[arg-type]
++    return a
+ 
+ 
+ @register_decomposition(aten.clamp_max)
+@@ -1988,7 +1993,13 @@ def clamp_max(
+     self: TensorLikeType,
+     max: Optional[TensorOrNumberLikeType] = None,
+ ) -> TensorLikeType:
+-    return torch.clamp(self, max=max)  # type: ignore[arg-type]
++    a = self
++    if max is not None:
++        a_isnan = torch.isnan(a)
++        condition = torch.bitwise_or(torch.le(a, max), a_isnan)  # type: ignore[arg-type]
++        a = torch.where(condition, a, max)  # type: ignore[arg-type]
++    return a
++
+ 
+ 
+ #

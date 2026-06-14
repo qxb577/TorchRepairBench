@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 4f125eb617f..1ad36ad80fa 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -811,7 +811,8 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+             subobj = inspect.getattr_static(self.value, name)
+         return subobj
+ 
+-    def has_key_in_generic_dict(self, tx, key):
++    def has_key_in_generic_dict(self, tx, key) -> bool:
++
+         self._check_for_getattribute()
+         if tx.output.side_effects.has_pending_mutation_of_attr(self, key):
+             mutated_attr = tx.output.side_effects.load_attr(self, key, deleted_ok=True)

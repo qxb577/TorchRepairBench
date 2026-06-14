@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 675c4a1cc0d..43f17fdfaaa 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -823,7 +823,7 @@ class CppOverrides(OpOverrides):
+ 
+     @staticmethod
+     def asinh(x):
+-        return f"std::asinh({x})"
++        return f"Sleef_asinhf_u10({x})"
+ 
+     @staticmethod
+     def atan2(x, y):

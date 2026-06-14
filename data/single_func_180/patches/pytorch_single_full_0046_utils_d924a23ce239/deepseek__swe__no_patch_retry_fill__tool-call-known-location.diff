@@ -1,0 +1,19 @@
+diff --git a/torch/distributed/tensor/_ops/utils.py b/torch/distributed/tensor/_ops/utils.py
+index 6a20a2fb398..eda1073d070 100644
+--- a/torch/distributed/tensor/_ops/utils.py
++++ b/torch/distributed/tensor/_ops/utils.py
+@@ -501,9 +501,14 @@ def expand_to_full_mesh_op_strategy(
+             redistribute_cost=redistribute_cost,
+         )
+         all_strategies.append(strategy)
++    if inplace_op and not all_strategies:
++        raise RuntimeError(
++            "in-place operations that require placement changes are not supported"
++        )
+     return OpStrategy(all_strategies)
+ 
+ 
++
+ def shift_shard_dims_after_insert(
+     placements: Sequence[Placement], insert_dim: int = 0
+ ) -> Sequence[Placement]:

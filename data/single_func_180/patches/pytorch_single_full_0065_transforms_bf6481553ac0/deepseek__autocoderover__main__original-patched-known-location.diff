@@ -1,0 +1,23 @@
+diff --git a/torch/distributions/transforms.py b/torch/distributions/transforms.py
+index 05e91a6feea..0c284db9154 100644
+--- a/torch/distributions/transforms.py
++++ b/torch/distributions/transforms.py
+@@ -138,7 +138,18 @@ class Transform(object):
+         # Necessary for Python2
+         return not self.__eq__(other)
+ 
++    def __getstate__(self):
++        state = self.__dict__.copy()
++        # Remove the weakref to allow pickling
++        state.pop('_inv', None)
++        return state
++
++    def __setstate__(self, state):
++        self.__dict__.update(state)
++        self._inv = None
++
+     def __call__(self, x):
++
+         """
+         Computes the transform `x => y`.
+         """

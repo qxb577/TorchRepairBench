@@ -1,0 +1,13 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..53ff35567df 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -14,7 +14,7 @@ from . import _dtypes_impl
+ class generic:
+     @property
+     def name(self):
+-        return self.__class__.__name__
++        return self.__class__.__name__.lower()
+ 
+     def __new__(cls, value):
+         # NumPy scalars are modelled as 0-D arrays

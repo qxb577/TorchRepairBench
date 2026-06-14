@@ -1,0 +1,25 @@
+diff --git a/torch/distributed/checkpoint/default_planner.py b/torch/distributed/checkpoint/default_planner.py
+index 67f3c73bca5..176c621360a 100644
+--- a/torch/distributed/checkpoint/default_planner.py
++++ b/torch/distributed/checkpoint/default_planner.py
+@@ -356,6 +356,12 @@ def create_default_local_load_plan(
+                 continue
+ 
+         md = metadata.state_dict_metadata[fqn]
++        # Check tensor size consistency
++        if isinstance(md, TensorStorageMetadata) and isinstance(obj, torch.Tensor):
++            if obj.size() != md.size:
++                raise RuntimeError(
++                    f"Size mismatch for '{fqn}': checkpoint has size {md.size} but received tensor of size {obj.size()}"
++                )
+         # Since DTensor supports submesh, adding extra check to ensure _create_read_items()
+         # gets called only when the current rank is part of the mesh for the corresponding DTensor.
+         if isinstance(obj, DTensor):
+@@ -364,6 +370,7 @@ def create_default_local_load_plan(
+         else:
+             requests += _create_read_items(fqn, md, obj)
+ 
++
+     return LoadPlan(requests)
+ 
+ 

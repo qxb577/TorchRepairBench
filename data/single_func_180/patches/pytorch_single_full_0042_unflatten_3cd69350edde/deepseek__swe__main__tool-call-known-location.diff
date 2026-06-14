@@ -1,0 +1,17 @@
+diff --git a/torch/export/unflatten.py b/torch/export/unflatten.py
+index e95ba9e7b8c..6fb1481bad1 100644
+--- a/torch/export/unflatten.py
++++ b/torch/export/unflatten.py
+@@ -913,7 +913,11 @@ def _add_submodule(
+ 
+         mod = submod
+ 
+-    mod.add_module(field, module_to_add)
++    if module_to_add is None:
++        setattr(mod, field, None)
++    else:
++        mod.add_module(field, module_to_add)
++
+ 
+ 
+ def _call_name(base: str, n: int) -> str:

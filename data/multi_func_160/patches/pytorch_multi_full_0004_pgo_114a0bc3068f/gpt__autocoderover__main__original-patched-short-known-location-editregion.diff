@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/pgo.py b/torch/_dynamo/pgo.py
+index 23ae3b545e9..ba782bdb9d7 100644
+--- a/torch/_dynamo/pgo.py
++++ b/torch/_dynamo/pgo.py
+@@ -222,8 +222,9 @@ class FrameStateSizeEntry:
+         # If we infer strides should be (DYNAMIC, DYNAMIC, 1).  But this is
+         # silly: we really should have just guarded on dim order.
+         if not (
+-            isinstance(self.size, tuple) and all(type(s) is int for s in self.size)
++            isinstance(self.size, tuple) and all(isinstance(s, (int, torch.SymInt)) for s in self.size)
+         ):
++
+             return False
+         if self.stride is auto_dynamic:
+             return True

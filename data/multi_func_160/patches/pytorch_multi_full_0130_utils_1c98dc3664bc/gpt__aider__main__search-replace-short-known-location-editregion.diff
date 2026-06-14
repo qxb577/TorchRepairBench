@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 653bcaf4ba3..d385bc04994 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1930,7 +1930,7 @@ class BuiltinVariable(VariableTracker):
+                         "mutating requires_grad can introduce a new leaf from non-leaf or vice versa in "
+                         "the middle of the graph, which aot_autograd does not currently know how to handle. "
+                     )
+-                if name == "data":
++                if name in {"data", "real", "imag"}:
+                     # Remove the old reference in tracked fakes - if we don't do this
+                     # new .data value size and shape differences will cause
+                     # tracked fakes to produce incorrect guards. This is sound because the TensorVariable

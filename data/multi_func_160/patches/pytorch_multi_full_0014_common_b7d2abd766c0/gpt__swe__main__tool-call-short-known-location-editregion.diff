@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/codegen/common.py b/torch/_inductor/codegen/common.py
+index 85b85b38be2..3ae19fb562d 100644
+--- a/torch/_inductor/codegen/common.py
++++ b/torch/_inductor/codegen/common.py
+@@ -1741,8 +1741,9 @@ class Kernel(CodeGen):
+         if lower and upper:
+             # The conditions need to be in parens because of Python's operator precedence.
+             # It'd be less error-prone to use and/or/not, which is suported by triton
+-            cond = f"({lower} <= {var}) & ({var} < {upper})"
+-            cond_print = f"{lower} <= {var} < {upper}"
++            cond = f"({lower} <= {var}) && ({var} < {upper})"
++            cond_print = f"{lower} <= {var} < {upper}
++
+         elif lower:
+             cond = f"{lower} <= {var}"
+             cond_print = cond

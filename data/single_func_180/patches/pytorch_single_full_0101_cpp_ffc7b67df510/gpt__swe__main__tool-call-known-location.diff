@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 6dd008958d9..f347d6caf0a 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -4724,7 +4724,8 @@ class CppScheduling(BaseScheduling):
+                             v, exprs = get_indexing_ranges_exprs(snode)
+                             if var_ranges is None:
+                                 var_ranges = v
+-                            assert var_ranges == v, (var_ranges, v, node.snodes)
++                            if var_ranges != v: return None, None
++
+                             indexing_exprs.update(exprs)
+                         return var_ranges, list(indexing_exprs)
+                     else:

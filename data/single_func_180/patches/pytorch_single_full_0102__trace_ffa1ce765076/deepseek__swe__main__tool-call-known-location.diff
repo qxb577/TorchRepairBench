@@ -1,0 +1,45 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..082577270ab 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -381,31 +381,25 @@ def _get_param_buffer_mapping(
+     of a traced module to what the original module contains.
+     """
+ 
+-    param_lookup: dict[int, str] = {}
+-    buffer_lookup: dict[int, str] = {}
+-    for name, param in original_module.named_parameters(remove_duplicate=False):
+-        param_lookup[id(param)] = name
+-    for name, buffer in original_module.named_buffers(remove_duplicate=False):
+-        buffer_lookup[id(buffer)] = name
+-
+     param_buffer_table: dict[str, str] = {}
+-    for dynamo_name, dynamo_param in traced_module.named_parameters(
+-        remove_duplicate=False
++    for (dynamo_name, _), (orig_name, _) in zip(
++        traced_module.named_parameters(remove_duplicate=False),
++        original_module.named_parameters(remove_duplicate=False),
+     ):
+         assert dynamo_name not in param_buffer_table
+-        if id(dynamo_param) in param_lookup:
+-            param_buffer_table[dynamo_name] = param_lookup[id(dynamo_param)]
++        param_buffer_table[dynamo_name] = orig_name
+ 
+-    for dynamo_name, dynamo_buffer in traced_module.named_buffers(
+-        remove_duplicate=False
++    for (dynamo_name, _), (orig_name, _) in zip(
++        traced_module.named_buffers(remove_duplicate=False),
++        original_module.named_buffers(remove_duplicate=False),
+     ):
+         assert dynamo_name not in param_buffer_table
+-        if id(dynamo_buffer) in buffer_lookup:
+-            param_buffer_table[dynamo_name] = buffer_lookup[id(dynamo_buffer)]
++        param_buffer_table[dynamo_name] = orig_name
+ 
+     return param_buffer_table
+ 
+ 
++
+ def _preserve_requires_grad_pass(
+     gm: torch.fx.GraphModule,
+     sig: ExportGraphSignature,

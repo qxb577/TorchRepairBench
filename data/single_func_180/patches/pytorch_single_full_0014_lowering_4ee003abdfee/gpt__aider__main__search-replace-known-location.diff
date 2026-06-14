@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index fcf77cae6e3..6fd37efc37e 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -914,6 +914,7 @@ def repeat(x, repeats):
+             V.graph.sizevars.size_hint(sympy_product(new_size)) // old_size_product
+         )
+ 
++    x = x.clone()
+     x_loader = x.make_loader()
+     return Pointwise.create(
+         device=x.get_device(),

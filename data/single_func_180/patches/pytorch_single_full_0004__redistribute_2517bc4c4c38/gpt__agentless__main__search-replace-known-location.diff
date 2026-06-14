@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index c145c3deb7f..3f6b00b6e4b 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -191,8 +191,7 @@ def _get_flattened_mesh_by_layout(
+ 
+     # Compute expected flattened layout
+     expected_layout = submesh._layout.coalesce()
+-    if len(expected_layout) > 1:
+-        expected_layout = expected_layout.nest()
++    expected_layout = expected_layout.nest()
+ 
+     # Search existing flattened meshes by comparing layouts
+     for flattened_mesh in root_mesh._flatten_mapping.values():

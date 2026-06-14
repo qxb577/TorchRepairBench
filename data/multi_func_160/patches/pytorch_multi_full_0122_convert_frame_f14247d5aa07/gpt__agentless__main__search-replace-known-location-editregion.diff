@@ -1,0 +1,39 @@
+diff --git a/torch/_dynamo/convert_frame.py b/torch/_dynamo/convert_frame.py
+index 856e399a6d8..12a6984053e 100644
+--- a/torch/_dynamo/convert_frame.py
++++ b/torch/_dynamo/convert_frame.py
+@@ -648,7 +648,7 @@ def _compile(
+             one_graph,
+             export,
+             export_constraints,
+-            mutated_closure_cell_contents,
++            mutated_closure_cell_contents.copy(),
+             frame_state=frame_state,
+             speculation_log=speculation_log,
+             distributed_state=distributed_state,
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 40f05e94891..6d20b000c0c 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -2787,7 +2787,7 @@ class InstructionTranslator(InstructionTranslatorBase):
+         one_graph,
+         export,
+         export_constraints,
+-        mutated_closure_cell_contents: Set[str],
++        mutated_closure_cell_contents: Optional[Set[str]],
+         frame_state,
+         speculation_log: SpeculationLog,
+         distributed_state: Optional[DistributedState],
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 1e7d4ab49e0..fb17b7faf9e 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -276,7 +276,7 @@ class UserFunctionVariable(BaseUserFunctionVariable):
+ 
+                         if (
+                             closure_cell_contents.name()
+-                            not in tx.mutated_closure_cell_contents
++                            tx.mutated_closure_cell_contents is None or closure_cell_contents.name() not in tx.mutated_closure_cell_contents
+                         ):
+                             # Optimistically don't allocate the cell, to
+                             # reduce the number of side effects.  This is

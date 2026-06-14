@@ -1,0 +1,12 @@
+diff --git a/torch/_compile.py b/torch/_compile.py
+index 05e63baa7c9..2a7ee5454b7 100644
+--- a/torch/_compile.py
++++ b/torch/_compile.py
+@@ -50,6 +50,7 @@ def _disable_dynamo(
+ 
+             return disable_fn(*args, **kwargs)
+ 
++        inner._torchdynamo_disable = True
+         return inner
+     else:
+         # decorator usage like @_disable_dynamo(recursive=False). The resulting

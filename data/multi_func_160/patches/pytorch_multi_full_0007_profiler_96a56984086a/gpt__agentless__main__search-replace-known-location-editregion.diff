@@ -1,0 +1,13 @@
+diff --git a/torch/profiler/profiler.py b/torch/profiler/profiler.py
+index 81f1d2c2f1e..786d7e937d7 100644
+--- a/torch/profiler/profiler.py
++++ b/torch/profiler/profiler.py
+@@ -159,7 +159,7 @@ class _KinetoProfile:
+             use_kineto=True,
+             experimental_config=self.experimental_config,
+         )
+-        self.profiler._prepare_trace()
++        self.profiler._prepare_trace(self.schedule)
+ 
+     def start_trace(self):
+         if self.execution_trace_observer:

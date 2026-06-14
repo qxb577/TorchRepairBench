@@ -1,0 +1,12 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 9a146632ded..5cb3a325695 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -165,6 +165,7 @@ def _get_allowed_globals():
+         "torch.Size": torch.Size,
+         "torch.Tensor": torch.Tensor,
+         "torch.device": torch.device,
++        "torch.dtype": torch.dtype,
+         "_codecs.encode": encode,  # for bytes
+         "builtins.bytearray": bytearray,  # for bytearray
+         "builtins.set": set,  # for set

@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index a507a9dff36..1972baa7c71 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1005,7 +1005,8 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+             )
+             out_vt = variables.UserFunctionVariable(tree_flatten).call_function(
+                 tx, [packed_input_vt], {}
+-            )
++            ).unpack_var_sequence(tx)
++
+             assert isinstance(out_vt, TupleVariable) and len(out_vt.items) == 2
+             flat_args_vts, input_spec_vt = out_vt.items
+             assert isinstance(flat_args_vts, ListVariable)

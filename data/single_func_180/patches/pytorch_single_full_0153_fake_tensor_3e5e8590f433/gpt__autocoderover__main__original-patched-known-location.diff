@@ -1,0 +1,14 @@
+diff --git a/torch/_subclasses/fake_tensor.py b/torch/_subclasses/fake_tensor.py
+index 9d2b38f40fe..346892ba7a1 100644
+--- a/torch/_subclasses/fake_tensor.py
++++ b/torch/_subclasses/fake_tensor.py
+@@ -859,7 +859,8 @@ class FakeTensorMode(TorchDispatchMode):
+     # to distinguish between our fake tensor and other fake tensors.  That's
+     # what this function does.
+     def is_our_fake(self, t):
+-        return isinstance(t, FakeTensor) and t.fake_mode is self
++        return isinstance(t, FakeTensor) and t.fake_mode is self and t.is_inference() == torch.is_inference_mode_enabled()
++
+ 
+     @count
+     def __torch_dispatch__(self, func, types, args=(), kwargs=None):

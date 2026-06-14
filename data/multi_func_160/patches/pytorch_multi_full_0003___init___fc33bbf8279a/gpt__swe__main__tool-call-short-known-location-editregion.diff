@@ -1,0 +1,18 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index fa571489bd7..6f2a85dff15 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -6292,10 +6292,11 @@ def _infer_scalar_type(obj):
+         return torch.bool
+     if isinstance(obj, complex):
+         default_dtype = torch.get_default_dtype()
+-        if default_dtype is torch.float:
++        if default_dtype is torch.float or default_dtype is torch.float16:
+             return torch.cfloat
+-        elif default_dtype is torch.double:
++        elif default_dtype is torch.double or default_dtype is torch.float64:
+             return torch.cdouble
++
+         else:
+             raise RuntimeError("invalid default scalar type for complex")
+     if isinstance(obj, torch.Tensor):

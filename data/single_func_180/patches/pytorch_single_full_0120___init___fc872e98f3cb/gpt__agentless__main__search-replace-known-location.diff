@@ -1,0 +1,12 @@
+diff --git a/torch/_prims/__init__.py b/torch/_prims/__init__.py
+index 603658ea615..7613773af13 100644
+--- a/torch/_prims/__init__.py
++++ b/torch/_prims/__init__.py
+@@ -322,6 +322,7 @@ def _make_prim(
+             _prim_impl,
+             mutates_args=tuple(mutates_args),
+             schema=schema,
++            tags=tags if tags else (torch.Tag.pt2_compliant_tag,)
+         )
+         prim_def.register_fake(meta)
+ 

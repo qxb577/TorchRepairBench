@@ -1,0 +1,52 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index d331f1238b3..c9f4ed90ac4 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1112,9 +1112,7 @@ class TensorVariable(VariableTracker):
+             with torch._dynamo.utils._disable_saved_tensors_hooks_during_tracing():
+                 get_fake_value(proxy.node, tx, allow_non_graph_fake=False)
+ 
+-            vt = value
+-            if isinstance(vt, variables.lazy.LazyVariableTracker):
+-                vt = variables.lazy.LazyVariableTracker.realize_all(vt)
++            vt = value.realize() if hasattr(value, 'realize') else value
+ 
+             self.synchronize_attributes(tx, type(vt))
+ 
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index 8ba3779b4fd..25e8e595d35 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -17,7 +17,7 @@ from torch._higher_order_ops.triton_kernel_wrap import (
+     triton_kernel_wrapper_functional,
+ )
+ from torch._inductor import config, inductor_prims
+-from torch._inductor.fx_utils import get_node_storage, is_node_realized
++from torch._inductor.fx_utils import get_node_storage, is_node_realized, has_free_unbacked_symbols
+ from torch._inductor.lowering import (
+     inplaceable_foreach_ops as inplaceable_foreach_ops_lowerings,
+ )
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 6df8f06cc02..4faf946d591 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1972,12 +1972,13 @@ def select(x, dim, idx):
+     # When the index idx is unbacked (e.g., u0), we compute the index dynamically
+     # during the lowering of the select operation using DynamicSelectStorageOffset.
+ 
+-    unbacked_bindings = resolve_unbacked_bindings(
+-        V.graph.sizevars.shape_env, V.graph.current_node.meta["unbacked_bindings"]
+-    )
+-    assert unbacked_bindings is not None
+-    assert len(unbacked_bindings) == 1, unbacked_bindings
+-    unbacked_offset_sym, _ = next(iter(unbacked_bindings.items()))
++    if has_free_unbacked_symbols(idx):
++        unbacked_bindings = resolve_unbacked_bindings(
++            V.graph.sizevars.shape_env, V.graph.current_node.meta["unbacked_bindings"]
++        )
++        assert unbacked_bindings is not None
++        assert len(unbacked_bindings) == 1, unbacked_bindings
++        unbacked_offset_sym, _ = next(iter(unbacked_bindings.items()))
+ 
+     new_size = x.get_size()
+     new_stride = x.get_stride()

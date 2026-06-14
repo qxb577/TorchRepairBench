@@ -1,0 +1,16 @@
+diff --git a/torch/jit/_recursive.py b/torch/jit/_recursive.py
+index d88a985edbe..829ef98b4f4 100644
+--- a/torch/jit/_recursive.py
++++ b/torch/jit/_recursive.py
+@@ -499,9 +499,10 @@ def create_script_module_impl(nn_module, concrete_type, stubs_fn):
+                 continue
+             item = getattr(nn_module, name, None)
+             if inspect.ismethod(item) and _jit_internal.is_ignored_fn(item):
+-                unbound_function = getattr(type(nn_module), name)
++                unbound_function = item.__func__
+                 bound_method = unbound_function.__get__(script_module)
+                 setattr(script_module, name, bound_method)
++
+             elif concrete_type.is_ignored_attribute(name):
+                 setattr(script_module, name, item)
+ 

@@ -1,0 +1,13 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 9a146632ded..e1ee9b6c291 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -203,6 +203,8 @@ def _get_allowed_globals():
+     # Handles Tensor Subclasses, Tensor's with attributes.
+     # NOTE: It calls into above rebuild functions for regular Tensor types.
+     rc["torch._tensor._rebuild_from_type_v2"] = torch._tensor._rebuild_from_type_v2
++    rc["torch._utils._rebuild_parameter"] = torch._utils._rebuild_parameter
++    rc["torch._utils._rebuild_parameter_with_state"] = torch._utils._rebuild_parameter_with_state
+     return rc
+ 
+ 

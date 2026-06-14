@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp_gemm_template.py b/torch/_inductor/codegen/cpp_gemm_template.py
+index 9942185d9e2..bc2d2162c74 100644
+--- a/torch/_inductor/codegen/cpp_gemm_template.py
++++ b/torch/_inductor/codegen/cpp_gemm_template.py
+@@ -294,7 +294,8 @@ class CppPackedGemmTemplate(CppTemplate):
+ 
+         # we favor square-sized thread blocks for good data reuse
+         def get_better_blocking(blocking, best_blocking):
+-            if best_blocking is None:
++            if best_blocking is None or config.cpp.template_buffer_has_other_users:
++
+                 best_blocking = blocking
+             else:
+                 block_m_size = blocking.block_m * register_blocking.block_m

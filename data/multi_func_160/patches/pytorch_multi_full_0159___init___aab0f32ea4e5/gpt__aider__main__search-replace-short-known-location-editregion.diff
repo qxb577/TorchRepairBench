@@ -1,0 +1,29 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index b3879b19d2d..2ea935a6d2e 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -791,15 +791,15 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+                 assert self.source  # OrderedDict, dict subtypes must always have source
+                 return self.odict_getitem(tx, args[0])
+ 
+-            if (
+-                method in (object.__ne__, object.__eq__)
+-                and len(args) == 1
+-                and not kwargs
+-                and hasattr(args[0], "value")
+-            ):
+-                return ConstantVariable(
+-                    (self.value is args[0].value) is (method is object.__eq__)
+-                )
++            if method in (object.__ne__, object.__eq__) and len(args) == 1 and not kwargs:
++                if hasattr(args[0], "value"):
++                    return ConstantVariable(
++                        (self.value is args[0].value) is (method is object.__eq__)
++                    )
++                else:
++                    return ConstantVariable(
++                        (self.value != args[0]) if method is object.__ne__ else (self.value == args[0])
++                    )
+ 
+             # check for methods implemented in C++
+             if isinstance(method, types.FunctionType):

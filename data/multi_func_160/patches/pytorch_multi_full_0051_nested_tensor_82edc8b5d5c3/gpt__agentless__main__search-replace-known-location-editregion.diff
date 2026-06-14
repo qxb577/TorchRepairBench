@@ -1,0 +1,13 @@
+diff --git a/torch/nested/_internal/nested_tensor.py b/torch/nested/_internal/nested_tensor.py
+index 5494633b09b..3090f293c8e 100644
+--- a/torch/nested/_internal/nested_tensor.py
++++ b/torch/nested/_internal/nested_tensor.py
+@@ -100,7 +100,7 @@ class NestedTensor(torch.Tensor):
+         r = self._ragged_idx - 1
+         self._size = (B, *values.shape[:r], ragged_size, *values.shape[r + 1 :])
+         stride = values.stride()
+-        self._strides = (ragged_size * stride[r], *stride)
++        self._strides = (ragged_size * stride[r], *stride[:r], *stride[r + 1:])
+ 
+         self._values = values
+         self._offsets = offsets

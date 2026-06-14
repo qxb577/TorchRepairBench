@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp_gemm_template.py b/torch/_inductor/codegen/cpp_gemm_template.py
+index 9942185d9e2..2aede5550c5 100644
+--- a/torch/_inductor/codegen/cpp_gemm_template.py
++++ b/torch/_inductor/codegen/cpp_gemm_template.py
+@@ -246,7 +246,8 @@ class CppPackedGemmTemplate(CppTemplate):
+         _, k = input_nodes[0].get_size()
+         self.m, self.n, self.k = m, n, k
+         self.padded_n = get_padded_n(n, self.register_blocking.block_n)
+-        self.is_dynamic_M = has_free_symbols((m,))
++        self.is_dynamic_M = has_free_symbols((m, n))
++
+ 
+     @cache_on_self
+     def thread_blocking(self) -> GemmBlocking:

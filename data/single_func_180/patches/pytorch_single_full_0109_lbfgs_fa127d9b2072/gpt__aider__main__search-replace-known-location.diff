@@ -1,0 +1,13 @@
+diff --git a/torch/optim/lbfgs.py b/torch/optim/lbfgs.py
+index 674aaaf2688..c587ce5a5a0 100644
+--- a/torch/optim/lbfgs.py
++++ b/torch/optim/lbfgs.py
+@@ -230,7 +230,7 @@ class LBFGS(Optimizer):
+         if not 0.0 <= lr:
+             raise ValueError(f"Invalid learning rate: {lr}")
+         if max_eval is None:
+-            max_eval = max_iter * 5 // 4
++            max_eval = max_iter
+         defaults = {
+             "lr": lr,
+             "max_iter": max_iter,

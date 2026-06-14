@@ -1,0 +1,16 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index 879e0f5f93a..a1172e67255 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -781,9 +781,8 @@ def _safe_copy(dst: torch.Tensor, src: Optional[torch.Tensor]) -> None:
+ 
+ 
+ def _safe_clone(src: torch.Tensor) -> Optional[torch.Tensor]:
+-    if type(src) is not torch.Tensor:
+-        return None
+-    return src.clone()
++    if not isinstance(src, torch.Tensor):
++        return
+ 
+ 
+ # This is a class for converting multiple tensors into meta tensors which

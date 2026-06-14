@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index f20b32b0da9..a042b999098 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -1578,7 +1578,7 @@ class AutogradFunctionApplyVariable(VariableTracker):
+             unimplemented("non-function or method")
+ 
+         with tx.output.subtracer(fwd_fn, fwd_tracer):
+-            (bwd_out, _), bwd_graph, bwd_freevars = speculate_subgraph(
++            (bwd_out, _), bwd_graph, bwd_freevars = speculate_subgraph_with_graph_break(
+                 tx,
+                 bwd_fn,
+                 bwd_args,
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 8c2dab1cedd..2c4d70a506b 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -411,7 +411,7 @@ class AutogradFunctionVariable(VariableTracker):
+             else:
+                 return self.call_apply(tx, args, kwargs)
+         elif name == "backward":
+-            with tx.strict_translation_mode():
++            with tx.strict_translation_mode(graph_break_on_strides=True):
+                 if isinstance(self.fn_cls.backward, types.FunctionType):
+                     backward = UserFunctionVariable(self.fn_cls.backward)
+                 elif isinstance(self.fn_cls.backward, types.MethodType):

@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index a3c38ffb1e7..dacfcba9b4f 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -661,7 +661,19 @@ class ConstDictVariable(VariableTracker):
+             new_dict_vt.items.update(args[0].items)
+             return new_dict_vt
+         elif name == "__ior__":
+-            self.call_method(tx, "update", args, kwargs)
++            assert len(args) == 1
++            if not (
++                istype(self, ConstDictVariable)
++                and istype(args[0], (ConstDictVariable, variables.UserDefinedDictVariable))
++            ):
++                msg = (
++                    f"unsupported operand type(s) for |=: '{self.python_type().__name__}'"
++                    f"and '{args[0].python_type().__name__}'"
++                )
++                raise_observed_exception(TypeError, tx, args=[msg])
++
++            self.install_dict_keys_match_guard()
++            self.items.update(args[0].items)
+             return self
+         else:
+             return super().call_method(tx, name, args, kwargs)

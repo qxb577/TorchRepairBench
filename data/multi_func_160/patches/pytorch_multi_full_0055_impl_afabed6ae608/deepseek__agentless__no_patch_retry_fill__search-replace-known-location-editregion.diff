@@ -1,0 +1,20 @@
+diff --git a/torch/_custom_op/impl.py b/torch/_custom_op/impl.py
+index a826b0246a4..0dea727df15 100644
+--- a/torch/_custom_op/impl.py
++++ b/torch/_custom_op/impl.py
+@@ -958,7 +958,7 @@ def get_abstract_impl(qualname):
+     return custom_op._get_impl("abstract").func
+ 
+ 
+-def _custom_op_with_schema(qualname, schema):
++def _custom_op_with_schema(qualname, schema, fixed_layout=False):
+     ns, name = qualname.split("::")
+     schema_str = f"{name}{schema}"
+     function_schema = FunctionSchema.parse(schema_str)
+@@ -973,4 +973,5 @@ def _custom_op_with_schema(qualname, schema):
+     torch._C._dispatch_set_report_error_callback(
+         ophandle, functools.partial(report_error_callback, weakref.proxy(result))
+     )
+-    return get_op(qualname)
++    op = get_op(qualname)
++    op._

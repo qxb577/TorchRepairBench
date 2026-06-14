@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 24417fa508a..dcd26df0b5d 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1717,7 +1717,7 @@ class OutputGraph:
+                 if not node.users and not isinstance(
+                     node.meta["grapharg"], BackwardStateGraphArg
+                 ):
+-                    remove_unused(node)
++                    continue
+                 else:
+                     # Register the free symbols as uses
+                     arg = node.meta["grapharg"]
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index 383d5158c2b..cc1fdbd8bb7 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -1835,8 +1835,8 @@ class GraphLowering(torch.fx.Interpreter):
+                     fvs = free_unbacked_symbols(ra.expr)
+                     missing = fvs - self.bound_unbacked_symbols
+                     if missing:
+-                        i1 = min(missing, key=str)
+-                        self.ras_by_symbol.setdefault(i1, []).append(ra)
++                        for i1 in missing:
++                            self.ras_by_symbol.setdefault(i1, []).append(ra)
+                     else:
+                         make_assert(ra.expr, f"{ra.expr}")
+ 

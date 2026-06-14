@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 14e02625368..37c58e64794 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -1635,8 +1635,13 @@ class FunctoolsPartialVariable(VariableTracker):
+         if name == "keywords":
+             items = {ConstantVariable.create(k): v for k, v in self.keywords.items()}
+             return variables.ConstDictVariable(items, source=source)
++        if name == "__wrapped__":
++            return self.func
++        if name == "__class__":
++            return variables.ConstantVariable.create(functools.partial)
+         raise_observed_exception(AttributeError, tx)
+ 
++
+     def as_python_constant(self):
+         return functools.partial(
+             self.func.as_python_constant(),

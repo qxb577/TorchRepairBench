@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/tensor/_ops/_tensor_ops.py b/torch/distributed/tensor/_ops/_tensor_ops.py
+index 63503a222d5..ddba94be1f3 100644
+--- a/torch/distributed/tensor/_ops/_tensor_ops.py
++++ b/torch/distributed/tensor/_ops/_tensor_ops.py
+@@ -89,7 +89,8 @@ def propagate_single_input_strategy(op_schema: OpSchema) -> StrategyType:
+     )
+ 
+ 
+-register_op_strategy(
++register_op_strategy(aten._to_copy.default,
++
+     [
+         aten.clone.default,
+         aten.contiguous.default,

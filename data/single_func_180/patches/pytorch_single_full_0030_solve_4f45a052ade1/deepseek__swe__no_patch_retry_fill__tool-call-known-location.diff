@@ -1,0 +1,21 @@
+diff --git a/torch/utils/_sympy/solve.py b/torch/utils/_sympy/solve.py
+index cdc722d20fa..e585015f778 100644
+--- a/torch/utils/_sympy/solve.py
++++ b/torch/utils/_sympy/solve.py
+@@ -115,7 +115,7 @@ def _try_isolate_lhs(
+ 
+         # If we can't tell whether 'other' is negative or positive, we do nothing.
+         # That is because we don't know whether we have mirror the operation or not.
+-        if not (isinstance(e, INEQUALITY_TYPES) and other.is_negative is None):
++        if not (isinstance(e, INEQUALITY_TYPES) and other.is_negative is None) and other.is_zero is False:
+             # Divide both sides by 'other'.
+             lhs = lhs / other
+             rhs = rhs / other
+@@ -128,6 +128,7 @@ def _try_isolate_lhs(
+             assert op is not None
+             e = op(lhs, rhs)
+ 
++
+     ################################################################################
+     # left-hand side is FloorDiv
+     ################################################################################

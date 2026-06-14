@@ -1,0 +1,13 @@
+diff --git a/torch/_logging/_internal.py b/torch/_logging/_internal.py
+index 24e8cc3a14d..3cfc396ee5c 100644
+--- a/torch/_logging/_internal.py
++++ b/torch/_logging/_internal.py
+@@ -144,7 +144,7 @@ def set_logs(
+     perf_hints: bool = False,
+     modules: Optional[Dict[str, Union[int, bool]]] = None,
+ ):
+-    """
++    assert isinstance(aot_graphs, bool), "aot_graphs must be a boolean"
+     Sets the log level for individual components and toggles individual log
+     artifact types.
+ 

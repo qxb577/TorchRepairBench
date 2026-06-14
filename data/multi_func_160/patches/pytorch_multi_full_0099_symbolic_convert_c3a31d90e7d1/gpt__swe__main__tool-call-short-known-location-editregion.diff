@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 80430aa973a..6787b253c75 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3257,7 +3257,8 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+             fglobals_vt = self.output.side_effects.track_object_existing(
+                 fglobals_value, fglobals_vt
+             )
+-            self.output.side_effects.store_attr(fglobals_vt, name, value)
++            self.output.side_effects.store_attr(fglobals_vt, name, value, self)
++
+ 
+ 
+ class InliningGeneratorInstructionTranslator(InliningInstructionTranslator):

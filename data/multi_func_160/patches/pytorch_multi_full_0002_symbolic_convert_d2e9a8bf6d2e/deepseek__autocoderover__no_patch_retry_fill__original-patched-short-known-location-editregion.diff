@@ -1,0 +1,38 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index a15eb092b2b..517bdf0282c 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3257,11 +3257,9 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+             if isinstance(value, RemovableHandleVariable):
+                 unimplemented("Storing handles in globals - NYI")
+             name = inst.argval
+-            fglobals_value, fglobals_vt, _ = self.get_globals_source_and_value(name)
+-            fglobals_vt = self.output.side_effects.track_object_existing(
+-                fglobals_value, fglobals_vt
+-            )
+-            self.output.side_effects.store_attr(fglobals_vt, name, value)
++            global_source = GlobalSource(self.f_globals, name)
++            self.push(VariableBuilder(self, global_source)(value))
++
+ 
+ 
+ class InliningGeneratorInstructionTranslator(InliningInstructionTranslator):
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index cf7ec28a347..23eff5122fb 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -931,11 +931,13 @@ class VariableBuilder:
+         # E.g, type(torch.ops) -> <class 'torch._ops._Ops'>,
+         # type(torch.backends.cudnn) -> <class 'torch.backends.cudnn.CudnnModule'>
+         elif isinstance(value, (types.ModuleType, replay_record.DummyModule)):
+-            self.install_guards(GuardBuilder.FUNCTION_MATCH)
++            if not isinstance(self.source, GlobalSource):
++                self.install_guards(GuardBuilder.FUNCTION_MATCH)
+             return PythonModuleVariable(
+                 value,
+                 source=self.source,
+             )
++
+         elif isinstance(value, types.MethodType) and isinstance(
+             value.__self__, (torch.nn.Module, torch.utils._pytree.TreeSpec)
+         ):

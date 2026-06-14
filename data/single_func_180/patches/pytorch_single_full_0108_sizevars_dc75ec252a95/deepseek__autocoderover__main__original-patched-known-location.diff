@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 3620d4fb401..b963d132113 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -213,9 +213,10 @@ class SizeVarAllocator:
+ 
+         def can_merge_dims(a, b):
+             for k in range(len(strides)):
+-                if self.simplify(strides[k][a] * sizes[a]) == self.simplify(
+-                    strides[k][b]
+-                ):
++                if (
++                    strides[k][a]
++                    and strides[k][b]
++
+                     # approximate test passed, try sound version
+                     va = index_vars[a]
+                     vb = index_vars[b]

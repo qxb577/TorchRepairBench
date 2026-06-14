@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/fx_passes/post_grad.py b/torch/_inductor/fx_passes/post_grad.py
+index e9b762cc665..722defda283 100644
+--- a/torch/_inductor/fx_passes/post_grad.py
++++ b/torch/_inductor/fx_passes/post_grad.py
+@@ -1001,6 +1001,8 @@ def same_meta(node1: torch.fx.Node, node2: torch.fx.Node):
+         and val1.layout == val2.layout
+         and val1.dtype == val2.dtype
+         and val1.device == val2.device
++        and val1.is_conj() == val2.is_conj()
++
+         and (
+             val1.layout != torch.strided
+             or statically_known_true(sym_eq(val1.stride(), val2.stride()))

@@ -1,0 +1,56 @@
+diff --git a/torch/autograd/graph.py b/torch/autograd/graph.py
+index d2312331663..6b5aa6d9311 100644
+--- a/torch/autograd/graph.py
++++ b/torch/autograd/graph.py
+@@ -664,28 +664,30 @@ class _CloneArgBeforeMutateMode(TorchDispatchMode):
+         for idx, arg in enumerate(func._schema.arguments):
+             if arg.alias_info is not None and arg.alias_info.is_write:
+                 t = kwargs["out"] if arg.is_out else args[idx]
+-                tid = _get_tid(t)
+-                sid = _get_sid(t)
++                tensors = t if isinstance(t, list) else [t]
+                 ctx = self.ctx
+-                if sid in ctx.sid_to_tid:
+-                    for tid in ctx.sid_to_tid[sid]:
+-                        if tid not in ctx.tid_to_weakhandle:
+-                            # We know that if tid is in sid_to_tid, then it must also be in
+-                            # tid_to_weakhandle. However, it is possible for the tensor to be
+-                            # saved at one point, but cleared by backward before it is modified
+-                            # in-place. Consider the following example:
+-                            #
+-                            # >>> a = torch.randn(2, 3, requires_grad=True).clone()
+-                            # >>> out = (a**2).sum()
+-                            # >>> out.backward()
+-                            # >>> a.sin_()
+-                            continue
+-                        handle = ctx.tid_to_weakhandle[tid]
+-                        if handle in ctx.cloned:
+-                            # The same exact tensor has been cloned already
+-                            continue
+-                        ctx.cloned[handle] = ctx.original[handle].clone()
+-                        del ctx.original[handle]
++                for t in tensors:
++                    tid = _get_tid(t)
++                    sid = _get_sid(t)
++                    if sid in ctx.sid_to_tid:
++                        for tid in ctx.sid_to_tid[sid]:
++                            if tid not in ctx.tid_to_weakhandle:
++                                # We know that if tid is in sid_to_tid, then it must also be in
++                                # tid_to_weakhandle. However, it is possible for the tensor to be
++                                # saved at one point, but cleared by backward before it is modified
++                                # in-place. Consider the following example:
++                                #
++                                # >>> a = torch.randn(2, 3, requires_grad=True).clone()
++                                # >>> out = (a**2).sum()
++                                # >>> out.backward()
++                                # >>> a.sin_()
++                                continue
++                            handle = ctx.tid_to_weakhandle[tid]
++                            if handle in ctx.cloned:
++                                # The same exact tensor has been cloned already
++                                continue
++                            ctx.cloned[handle] = ctx.original[handle].clone()
++                            del ctx.original[handle]
+ 
+         return func(*args, **kwargs)
+ 

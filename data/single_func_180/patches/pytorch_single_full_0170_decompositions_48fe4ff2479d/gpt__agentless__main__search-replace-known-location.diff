@@ -1,0 +1,13 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 634c4b6b495..340188ef06f 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5066,7 +5066,7 @@ def scaled_dot_product_flash_attention_for_cpu(
+         lambda: "q, k, v should have the same head size",
+     )
+ 
+-    output, attn = aten._scaled_dot_product_attention_math.default(
++    output, attn = aten._scaled_dot_product_attention_math.default(query, key, value, attn_mask=attn_mask, dropout_p=dropout_p, is_causal=is_causal, dropout_mask=None, scale=scale, enable_gqa=True)
+         query,
+         key,
+         value,

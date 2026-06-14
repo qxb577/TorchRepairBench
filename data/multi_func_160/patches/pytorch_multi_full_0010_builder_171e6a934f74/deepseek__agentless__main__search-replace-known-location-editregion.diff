@@ -1,0 +1,13 @@
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index d0a83f45aaf..71b11e32431 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -3972,7 +3972,7 @@ class ShapeEnv:
+         val_list.sort(key=_nested_int_aware_sort)
+ 
+         for val, i in val_list:
+-            if val in (0, 1):
++            if val == 0:
+                 out_stride = sympy.Integer(val)
+             else:
+                 dynamic_stride = dynamic_strides[i]

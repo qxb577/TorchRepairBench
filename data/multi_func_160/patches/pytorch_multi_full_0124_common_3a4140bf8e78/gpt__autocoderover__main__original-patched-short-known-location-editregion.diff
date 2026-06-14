@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/subgraph_lowering.py b/torch/_inductor/subgraph_lowering.py
+index 3c8116d402c..763be8a44e8 100644
+--- a/torch/_inductor/subgraph_lowering.py
++++ b/torch/_inductor/subgraph_lowering.py
+@@ -89,7 +89,9 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+         if self._approved_mutator():
+             name = self.qualify_name(f"buf{len(self.buffers)}")
+             self.buffers.append(buffer)
++            buffer.name = name
+             return name
++
+         else:
+             raise SubgraphLoweringException(
+                 "Buffers cannot be created while lowering a pointwise subgraph. "

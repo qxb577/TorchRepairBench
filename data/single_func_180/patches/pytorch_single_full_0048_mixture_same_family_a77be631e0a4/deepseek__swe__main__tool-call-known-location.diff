@@ -1,0 +1,14 @@
+diff --git a/torch/distributions/mixture_same_family.py b/torch/distributions/mixture_same_family.py
+index b5a853797b4..60b7329b0f8 100644
+--- a/torch/distributions/mixture_same_family.py
++++ b/torch/distributions/mixture_same_family.py
+@@ -197,7 +197,8 @@ class MixtureSameFamily(Distribution):
+     def _pad_mixture_dimensions(self, x):
+         dist_batch_ndims = self.batch_shape.numel()
+         cat_batch_ndims = self.mixture_distribution.batch_shape.numel()
+-        pad_ndims = 0 if cat_batch_ndims == 1 else dist_batch_ndims - cat_batch_ndims
++        pad_ndims = dist_batch_ndims - cat_batch_ndims
++
+         xs = x.shape
+         x = x.reshape(
+             xs[:-1]

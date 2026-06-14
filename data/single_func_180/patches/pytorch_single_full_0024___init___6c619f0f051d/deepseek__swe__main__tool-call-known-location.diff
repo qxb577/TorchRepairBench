@@ -1,0 +1,20 @@
+diff --git a/torch/autograd/__init__.py b/torch/autograd/__init__.py
+index 05f2c2f6c62..756fc08266b 100644
+--- a/torch/autograd/__init__.py
++++ b/torch/autograd/__init__.py
+@@ -250,6 +250,7 @@ def _tensor_or_tensors_to_tuple(
+     return tuple(tensors)
+ 
+ 
++@torch.overrides.handle_torch_function(public_api=True)
+ def backward(
+     tensors: _TensorOrTensorsOrGradEdge,
+     grad_tensors: Optional[_TensorOrTensors] = None,
+@@ -258,6 +259,7 @@ def backward(
+     grad_variables: Optional[_TensorOrTensors] = None,
+     inputs: Optional[_TensorOrTensorsOrGradEdge] = None,
+ ) -> None:
++
+     r"""Compute the sum of gradients of given tensors with respect to graph leaves.
+ 
+     The graph is differentiated using the chain rule. If any of ``tensors``

@@ -1,0 +1,45 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index b8461bc0841..cdb8ba6c670 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1565,7 +1565,11 @@ def ensure_graph_fake(e, tx):
+ 
+ def get_fake_values_from_nodes(tx, nodes):
+     def visit(n: torch.fx.Node):
+-        return n.meta["example_value"]
++        if "example_value" in n.meta:
++            return n.meta["example_value"]
++        if n.op == "call_function":
++            return get_fake_value(n, tx, allow_non_graph_fake=True)
++        raise AssertionError(f"unsupported node {n}")
+ 
+     args_kwargs = torch.fx.node.map_arg(nodes, visit)
+     return tree_map_only(
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 20b8f09a761..badf20d7f3e 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -730,6 +730,9 @@ class FunctoolsPartialVariable(VariableTracker):
+         merged_kwargs = {**self.keywords, **kwargs}
+         return self.func.call_function(tx, merged_args, merged_kwargs)
+ 
++    def get_function(self):
++        return self.func
++
+     def call_hasattr(self, tx, name: str) -> VariableTracker:
+         # functools.partial uses slots, so attributes are constant
+         return variables.ConstantVariable.create(
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index e57e4bde90d..ea2497a0be5 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -564,6 +564,9 @@ class NamedTupleVariable(TupleVariable):
+             create_instruction("BUILD_TUPLE", arg=len(self.items)),
+         ] + create_call_function(1, True)
+ 
++    def as_proxy(self):
++        return super().as_proxy()
++
+     def var_getattr(self, tx, name):
+         def check_and_create_method():
+             method = inspect.getattr_static(self.tuple_cls, name, None)

@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index ea7bb6baea3..2167f61b3d8 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -96,7 +96,11 @@ class SizeVarAllocator:
+         self._simplify_loops = self.make_simplify_loops_cache()
+ 
+     def simplify(self, expr: Expr):
+-        return sympy.expand(expr).xreplace(self.replacements)
++        expr = sympy.expand(expr).xreplace(self.replacements)
++        if torch.fx.experimental._config.backed_size_oblivious:
++            expr = expr.xreplace(self.var_to_val)
++        return expr
++
+ 
+     def make_simplify_with_ranges_cache(self) -> Callable[[Expr, VarRanges], Expr]:
+         """

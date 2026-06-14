@@ -1,0 +1,46 @@
+diff --git a/torch/_dynamo/aot_compile.py b/torch/_dynamo/aot_compile.py
+index 319a5ecd2bd..b9d2bb0873d 100644
+--- a/torch/_dynamo/aot_compile.py
++++ b/torch/_dynamo/aot_compile.py
+@@ -44,6 +44,7 @@ class CompileArtifacts:
+     backend_id: str
+     compiled_fn: SerializableCallable
+     original_code: types.CodeType
++    closure: Optional[tuple] = None
+ 
+     def compiled_function(self) -> Any:
+         import_sources = {
+@@ -51,7 +52,12 @@ class CompileArtifacts:
+             for alias, module_name in self.import_sources.items()
+         }
+         f_globals = {**import_sources, self.backend_id: self.compiled_fn}
+-        core = types.FunctionType(self.bytecode, f_globals)
++        closure_cells = None
++        if self.closure is not None:
++            def _make_cell(val=None):
++                return (lambda: val).__closure__[0]
++            closure_cells = tuple(_make_cell(c) for c in self.closure)
++        core = types.FunctionType(self.bytecode, f_globals, closure=closure_cells)
+ 
+         def optimized_call(*args: Any, **kwargs: Any) -> Any:
+             f_locals = bind_locals(self.signature, *args, **kwargs)
+diff --git a/torch/_dynamo/convert_frame.py b/torch/_dynamo/convert_frame.py
+index ee99aef399f..64b7acfcefc 100644
+--- a/torch/_dynamo/convert_frame.py
++++ b/torch/_dynamo/convert_frame.py
+@@ -856,6 +856,7 @@ class DynamoOutput:
+         hooks: Optional[Hooks] = None,
+         save: bool = False,
+         cache_entry: Optional[CacheEntry] = None,
++        closure: Optional[tuple] = None,
+     ) -> CheckFunctionManager:
+         assert self.tracer_output.output_graph is not None
+         return CheckFunctionManager(
+@@ -865,6 +866,7 @@ class DynamoOutput:
+             hooks.guard_fail_fn if hooks else None,
+             hooks.guard_filter_fn if hooks else None,
+             save_guards=save,
++            closure=closure,
+         )
+ 
+ 

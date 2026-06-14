@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/repro/after_aot.py b/torch/_dynamo/repro/after_aot.py
+index 9bf6eb84614..10779ea7e31 100644
+--- a/torch/_dynamo/repro/after_aot.py
++++ b/torch/_dynamo/repro/after_aot.py
+@@ -357,7 +357,8 @@ isolate_fails_code_str = None
+     )
+     model_str += textwrap.dedent(
+         """
+-if "__compile_source__" in globals():
++if "__compile_source__" in globals() or "__symint__" in globals():
++
+     import inspect as __after_aot_inspect
+     import linecache as __after_aot_linecache
+     __after_aot_filename = __after_aot_inspect.currentframe().f_code.co_filename

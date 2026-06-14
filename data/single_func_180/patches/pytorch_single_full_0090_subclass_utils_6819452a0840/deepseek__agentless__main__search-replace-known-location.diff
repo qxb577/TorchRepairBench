@@ -1,0 +1,19 @@
+diff --git a/torch/_functorch/_aot_autograd/subclass_utils.py b/torch/_functorch/_aot_autograd/subclass_utils.py
+index cc657ce7f57..2b752b8d664 100644
+--- a/torch/_functorch/_aot_autograd/subclass_utils.py
++++ b/torch/_functorch/_aot_autograd/subclass_utils.py
+@@ -20,12 +20,12 @@ zip = strict_zip
+ def requires_subclass_dispatch(args, fw_metadata: ViewAndMutationMeta) -> bool:
+     args_flattened = pytree.arg_tree_leaves(*args)
+     any_subclass_args = any(
+-        is_traceable_wrapper_subclass(x)
++        is_traceable_wrapper_subclass(x) and not x.is_meta
+         for x in args_flattened
+         if isinstance(x, Tensor)
+     )
+     any_subclass_outputs = any(
+-        is_traceable_wrapper_subclass(x)
++        is_traceable_wrapper_subclass(x) and not x.is_meta
+         for x in fw_metadata.traced_tangents
+         if isinstance(x, Tensor)
+     )

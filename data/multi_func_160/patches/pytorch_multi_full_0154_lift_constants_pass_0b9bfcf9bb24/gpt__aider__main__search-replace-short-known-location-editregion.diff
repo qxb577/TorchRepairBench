@@ -1,0 +1,26 @@
+diff --git a/torch/_export/passes/lift_constants_pass.py b/torch/_export/passes/lift_constants_pass.py
+index 27313a71382..9b2ba19b370 100644
+--- a/torch/_export/passes/lift_constants_pass.py
++++ b/torch/_export/passes/lift_constants_pass.py
+@@ -103,7 +103,7 @@ def lift_constants_pass(
+     """
+     all_constants: Dict[str, Union[torch.Tensor, torch._C.ScriptObject]] = {}
+ 
+-    if len([node for node in gm.graph.nodes if node.op == "placeholder"]) == 0:
++    if len([node for node in gm.graph.nodes if node.op == "placeholder"]) == 0 and not constant_attrs:
+         return {}
+ 
+     inputs = graph_signature.input_specs
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 3b1f0ac50f4..d221795cf96 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -772,7 +772,7 @@ def _export(
+         fake_params_buffers = make_fake_params_buffers(
+             fake_mode, _get_params_buffers(mod)
+         )
+-        ep_non_strict = _export_non_strict(
++        ep_non_strict, lifted_tensor_constants = _export_non_strict(
+             mod,
+             fake_args,
+             fake_kwargs,

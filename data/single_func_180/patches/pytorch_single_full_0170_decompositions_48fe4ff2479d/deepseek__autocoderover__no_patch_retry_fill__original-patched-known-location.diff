@@ -1,0 +1,45 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 634c4b6b495..05fd11c7331 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5049,6 +5049,7 @@ def scaled_dot_product_flash_attention_for_cpu(
+     *,
+     attn_mask: Optional[Tensor] = None,
+     scale: Optional[float] = None,
++    enable_gqa: bool = False,
+ ) -> tuple[Tensor, Tensor]:
+     torch._check(
+         torch.is_floating_point(query),
+@@ -5066,6 +5067,24 @@ def scaled_dot_product_flash_attention_for_cpu(
+         lambda: "q, k, v should have the same head size",
+     )
+ 
++    if enable_gqa:
++        n_heads = query.shape[1]
++        n_kv_heads = key.shape[1]
++        if n_kv_heads != n_heads:
++            n_rep = n_heads // n_kv_heads
++            key = (
++                key.unsqueeze(2)
++                .expand(-1, -1, n_rep, -1, -1)
++                .contiguous(memory_format=torch.contiguous_format)
++                .view(key.shape[0], n_heads, key.shape[2], key.shape[3])
++            )
++            value = (
++                value.unsqueeze(2)
++                .expand(-1, -1, n_rep, -1, -1)
++                .contiguous(memory_format=torch.contiguous_format)
++                .view(value.shape[0], n_heads, value.shape[2], value.shape[3])
++            )
++
+     output, attn = aten._scaled_dot_product_attention_math.default(
+         query,
+         key,
+@@ -5107,6 +5126,7 @@ def scaled_dot_product_flash_attention_for_cpu(
+     return output, attn
+ 
+ 
++
+ def register_inplace(aten_op, outplace_op):
+     @register_decomposition(aten_op)
+     def inplace_op(*args, **kwargs):

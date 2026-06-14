@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 675c4a1cc0d..1faaa182558 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -1138,10 +1138,15 @@ class CppVecOverrides(CppOverrides):
+     def cos(x):
+         return f"{x}.cos()"
+ 
++    @staticmethod
++    def asinh(x):
++        return f"{x}.asinh()"
++
+     @staticmethod
+     def exp(x):
+         return f"{x}.exp()"
+ 
++
+     @staticmethod
+     def exp2(x):
+         return f"{x}.exp2()"

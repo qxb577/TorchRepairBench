@@ -1,0 +1,31 @@
+diff --git a/torch/distributed/tensor/_sharding_prop.py b/torch/distributed/tensor/_sharding_prop.py
+index 1ccb42c47bf..f8117357cd9 100644
+--- a/torch/distributed/tensor/_sharding_prop.py
++++ b/torch/distributed/tensor/_sharding_prop.py
+@@ -200,6 +200,13 @@ class ShardingPropagator:
+     ) -> Union[None, TensorMeta, Sequence[Optional[TensorMeta]]]:
+         return self._propagate_tensor_meta_non_cached(op_schema)
+ 
++    def propagate_tensor_meta(
++        self, op_schema: OpSchema
++    ) -> Union[None, TensorMeta, Sequence[Optional[TensorMeta]]]:
++        if torch._C._are_we_tracing():
++            return self._propagate_tensor_meta_non_cached(op_schema)
++        return self._propagate_tensor_meta(op_schema)
++
+     def _wrap_output_spec_tensor_meta(
+         self,
+         op: OpOverload,
+diff --git a/torch/distributed/tensor/parallel/loss.py b/torch/distributed/tensor/parallel/loss.py
+index 5e485fe492c..32a90bc8f1f 100644
+--- a/torch/distributed/tensor/parallel/loss.py
++++ b/torch/distributed/tensor/parallel/loss.py
+@@ -112,7 +112,7 @@ def _propagate_tensor_meta(
+     kwargs: dict[str, object],
+ ) -> TensorMeta:
+     op_info = DTensor._op_dispatcher.unwrap_to_op_info(op_call, args, kwargs)
+-    tensor_meta = DTensor._op_dispatcher.sharding_propagator._propagate_tensor_meta(
++    tensor_meta = DTensor._op_dispatcher.sharding_propagator.propagate_tensor_meta(
+         op_info.schema
+     )
+     if isinstance(tensor_meta, TensorMeta):

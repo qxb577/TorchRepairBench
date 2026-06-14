@@ -1,0 +1,26 @@
+diff --git a/torch/_export/passes/add_runtime_assertions_for_constraints_pass.py b/torch/_export/passes/add_runtime_assertions_for_constraints_pass.py
+index 78b63c17cbd..f36cdd7d1ca 100644
+--- a/torch/_export/passes/add_runtime_assertions_for_constraints_pass.py
++++ b/torch/_export/passes/add_runtime_assertions_for_constraints_pass.py
+@@ -100,7 +100,7 @@ class _AddRuntimeAssertionsForInlineConstraintsPass(_ExportPassBase):
+                         return call_backs, messages
+                     # We only care about unbacked symints for these inline
+                     # constraints, which are prefixed with 'i'
+-                    constraint = self.range_constraints[symbol]
++                    constraint = self.range_constraints.get(symbol, sympy.Interval(0, sympy.oo))
+                     min_val, max_val = _convert_range_to_int(constraint)
+                     assert_msg = f" is outside of inline constraint [{min_val}, {max_val}]."
+                     call_backs.append(
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 5e893316550..107a9f54c97 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -621,7 +621,7 @@ def _get_updated_range_constraints(
+         return {}
+     range_constraints = {
+         k: v
+-        for k, v in shape_env.var_to_range.items()
++        for k, v in shape_env.runtime_var_to_range().items()
+         if k not in shape_env.replacements
+     }
+     return range_constraints

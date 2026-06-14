@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index a7a40549c06..b73834da056 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1444,7 +1444,8 @@ class VariableBuilder:
+             # accesses. Since these are unlikely to change during the program
+             # execution, we can skip guarding on them.
+             return GetSetDescriptorVariable(value)
+-        elif isinstance(value, types.MethodWrapperType):
++        elif isinstance(value, (types.MethodWrapperType, inspect.Parameter)):
++
+             # Method-wrappers are written in C, and they are not guaranteed to
+             # return the same object on attribute lookup. Therefore, we cannot
+             # insert a ID_MATCH guard here. method-wrappers are very

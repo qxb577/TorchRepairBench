@@ -1,0 +1,37 @@
+diff --git a/torch/_inductor/kernel/flex/common.py b/torch/_inductor/kernel/flex/common.py
+index 6cc197a35b9..998fcf628b2 100644
+--- a/torch/_inductor/kernel/flex/common.py
++++ b/torch/_inductor/kernel/flex/common.py
+@@ -122,9 +122,11 @@ def build_subgraph_module_buffer(
+             torch.ops.flex_lib.zeros_and_scatter.default: zeros_and_scatter_lowering
+         },
+     )
++    pw_subgraph.allow_buffer_creation = True
+     with V.set_graph_handler(pw_subgraph):  # type: ignore[arg-type]
+         pw_subgraph.run(*args)
+ 
++
+     # Since we are allowing mutations/buffer creation, we need to register any fresh buffers
+     # creating during the pointwise subgraph lowering
+     if len(pw_subgraph.buffers) > 0:
+diff --git a/torch/_inductor/subgraph_lowering.py b/torch/_inductor/subgraph_lowering.py
+index 3c8116d402c..aa98d14a86d 100644
+--- a/torch/_inductor/subgraph_lowering.py
++++ b/torch/_inductor/subgraph_lowering.py
+@@ -86,7 +86,7 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+             )
+ 
+     def register_buffer(self, buffer: ir.Buffer, *, set_name: bool = False) -> str:
+-        if self._approved_mutator():
++        if self._approved_mutator() or getattr(self, 'allow_buffer_creation', False):
+             name = self.qualify_name(f"buf{len(self.buffers)}")
+             self.buffers.append(buffer)
+             return name
+@@ -97,6 +97,7 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+                 "but it could also be a bug. Please file a bug report if you think this should be supportable."
+             )
+ 
++
+     def __getattr__(self, name: str) -> Any:
+         return getattr(self.root_graph, name)
+ 

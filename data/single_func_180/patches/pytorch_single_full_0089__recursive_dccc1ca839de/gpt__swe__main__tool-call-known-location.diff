@@ -1,0 +1,14 @@
+diff --git a/torch/jit/_recursive.py b/torch/jit/_recursive.py
+index 716b2ef002d..0e28b8cd180 100644
+--- a/torch/jit/_recursive.py
++++ b/torch/jit/_recursive.py
+@@ -1000,7 +1000,8 @@ def try_compile_fn(fn, loc):
+     # extract the necessary info from the closed over variables on the function
+     # object
+     rcb = _jit_internal.createResolutionCallbackFromClosure(fn)
+-    return torch.jit.script(fn, _rcb=rcb)
++    return torch.jit._script._recursive_compile_class(fn, _rcb=rcb)
++
+ 
+ 
+ def wrap_cpp_class(cpp_class):

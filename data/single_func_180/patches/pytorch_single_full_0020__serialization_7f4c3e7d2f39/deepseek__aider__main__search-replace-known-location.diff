@@ -1,0 +1,15 @@
+diff --git a/torch/distributed/_serialization.py b/torch/distributed/_serialization.py
+index 2aa9786c0e4..00a1bea6268 100644
+--- a/torch/distributed/_serialization.py
++++ b/torch/distributed/_serialization.py
+@@ -77,8 +77,8 @@ class _PseudoZipFile:
+ 
+     def get_storage_from_record(
+         self, key: str, _length: int, _type: int
+-    ) -> torch.Tensor:
+-        return torch.tensor(self.records[key][0], dtype=torch.uint8)
++    ) -> torch.UntypedStorage:
++        return self.records[key][0]
+ 
+     def serialization_id(self) -> str:
+         return "torchft"

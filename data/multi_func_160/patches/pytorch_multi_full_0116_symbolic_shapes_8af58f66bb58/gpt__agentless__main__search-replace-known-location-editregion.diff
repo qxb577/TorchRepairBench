@@ -1,0 +1,13 @@
+diff --git a/torch/utils/_sympy/solve.py b/torch/utils/_sympy/solve.py
+index 02ddf7c3421..f0108fe1deb 100644
+--- a/torch/utils/_sympy/solve.py
++++ b/torch/utils/_sympy/solve.py
+@@ -116,7 +116,7 @@ def _try_isolate_lhs(
+ 
+         # If we can't tell whether 'other' is negative or positive, we do nothing.
+         # That is because we don't know whether we have mirror the operation or not.
+-        if not (isinstance(e, INEQUALITY_TYPES) and other.is_negative is None):
++        if not (isinstance(e, INEQUALITY_TYPES) and other.is_negative is not None):
+             # Divide both sides by 'other'.
+             lhs = lhs / other
+             rhs = rhs / other

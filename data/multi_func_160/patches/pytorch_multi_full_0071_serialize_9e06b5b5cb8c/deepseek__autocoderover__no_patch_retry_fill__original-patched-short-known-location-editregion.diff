@@ -1,0 +1,21 @@
+diff --git a/torch/_export/serde/serialize.py b/torch/_export/serde/serialize.py
+index 09c50438620..f0aecb768a3 100644
+--- a/torch/_export/serde/serialize.py
++++ b/torch/_export/serde/serialize.py
+@@ -1707,7 +1707,7 @@ class GraphModuleDeserializer(metaclass=Final):
+             name = (
+                 serialized_node.outputs[0].as_tensor.name
+                 if len(serialized_node.outputs) == 1
+-                and hasattr(serialized_node.outputs[0], "as_tensor")
++                and serialized_node.outputs[0].HasField("as_tensor")
+                 else None
+             )
+             fx_node = self.graph.create_node(
+@@ -1716,6 +1716,7 @@ class GraphModuleDeserializer(metaclass=Final):
+             self.deserialize_outputs(serialized_node, fx_node)
+             fx_node.meta.update(self.deserialize_metadata(serialized_node.metadata))
+ 
++
+         elif isinstance(target, (torch._ops.OpOverload, *_registered_extension_types())):
+             # For convenience: if this node returns a single tensor, name the
+             # newly-created node after it. This ensures that these tensor values

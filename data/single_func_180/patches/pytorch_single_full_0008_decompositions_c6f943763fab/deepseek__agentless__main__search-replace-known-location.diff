@@ -1,0 +1,12 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 753047bbdcf..526134a1ef7 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5371,6 +5371,7 @@ def isin(elements, test_elements, *, assume_unique=False, invert=False):
+     if not isinstance(elements, torch.Tensor):
+         elements = torch.scalar_tensor(elements, device=test_elements.device)
+     if not isinstance(test_elements, torch.Tensor):
++        test_elements = torch.tensor(test_elements, device=elements.device)
+         if invert:
+             return torch.ne(elements, test_elements)
+         else:

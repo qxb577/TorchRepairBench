@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/convert_frame.py b/torch/_dynamo/convert_frame.py
+index ae95dc4e20d..7d50ff6666d 100644
+--- a/torch/_dynamo/convert_frame.py
++++ b/torch/_dynamo/convert_frame.py
+@@ -793,7 +793,8 @@ def _compile(
+                 cache_entry, frame
+             )
+ 
+-        exceeded, limit_type = exceeds_cache_size_limit(cache_size)
++        exceeded, limit_type = exceeds_cache_size_limit(cache_size) if frame else (False, "")
++
+         if exceeded:
+ 
+             def format_func_info(code: CodeType) -> str:

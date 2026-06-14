@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 0002650dea4..943d396e46b 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1148,7 +1148,8 @@ class SubgraphTracer(fx.Tracer):
+         #   higher-order-op subgraph until we hit the subgraph where the free
+         #   variable is bound
+         if self.parent is not None:
+-            flat_args, tree_spec = pytree.tree_flatten(args)
++            flat_args, tree_spec = pytree.tree_flatten((args, kwargs))
++
+             new_args = []
+             for arg in flat_args:
+                 maybe_new_arg = self.maybe_lift_tracked_freevar_to_input(arg)

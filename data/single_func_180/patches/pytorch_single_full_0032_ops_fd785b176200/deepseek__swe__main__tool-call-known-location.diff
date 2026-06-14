@@ -1,0 +1,17 @@
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index 35e7993454f..bec0df1a703 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -2118,9 +2118,12 @@ def all_dim(func, *args, **kwargs):
+         torch.ops.aten.any.default,
+         torch.ops.aten.max.default,
+         torch.ops.aten.min.default,
++        torch.ops.aten._is_all_true,
++        torch.ops.aten._is_any_true,
+     ],
+     "self: jt_all",
+ )
++
+ def all_any_max_min_default(func, *args, **kwargs):
+     _, new_kwargs = normalize_function(  # type: ignore[misc]
+         func, args=args, kwargs=kwargs, normalize_to_only_use_kwargs=True

@@ -1,0 +1,36 @@
+diff --git a/torch/nested/_internal/nested_tensor.py b/torch/nested/_internal/nested_tensor.py
+index 5494633b09b..f9ef73dd827 100644
+--- a/torch/nested/_internal/nested_tensor.py
++++ b/torch/nested/_internal/nested_tensor.py
+@@ -59,12 +59,21 @@ class NestedTensor(torch.Tensor):
+         lengths=None,
+         **kwargs,
+     ):
++        ragged_source = offsets if lengths is None else lengths
++        ragged_size = get_tensor_symint(ragged_source, coeff=1)
++        _ragged_idx = kwargs.get("_ragged_idx", 1)
++        B = offsets.shape[0] - 1
++        j = _ragged_idx - 1
++        size = (B, *values.shape[:j], ragged_size, *values.shape[j + 1 :])
++        stride = values.stride()
++        strides = (ragged_size * stride[j], *stride)
++
+         ks = DispatchKeySet(DispatchKey.NestedTensor)
+         ks = ks.add(DispatchKey.AutogradNestedTensor)
+         r = torch.Tensor._make_wrapper_subclass(  # type: ignore[attr-defined]
+             cls,
+-            (0,),
+-            (0,),
++            size,
++            strides,
+             0,
+             torch.contiguous_format,
+             values.dtype,
+@@ -79,6 +88,7 @@ class NestedTensor(torch.Tensor):
+         )
+         return r
+ 
++
+     def __init__(self, values, offsets, *, lengths=None, **kwargs):
+         super().__init__()
+         # Only support jagged for now.

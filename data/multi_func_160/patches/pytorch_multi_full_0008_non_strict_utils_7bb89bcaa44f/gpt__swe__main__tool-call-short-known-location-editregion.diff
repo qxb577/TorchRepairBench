@@ -1,0 +1,15 @@
+diff --git a/torch/nn/utils/stateless.py b/torch/nn/utils/stateless.py
+index ae7ebcdf3df..d287a9d6e58 100644
+--- a/torch/nn/utils/stateless.py
++++ b/torch/nn/utils/stateless.py
+@@ -123,8 +123,9 @@ def _reparametrize_module(
+     orig_parameters_and_buffers: Dict[str, Tensor] = {}
+     try:
+         orig_parameters_and_buffers, _ = accessor.swap_tensors_dict(
+-            untied_parameters_and_buffers, allow_missing=True
++            untied_parameters_and_buffers, allow_missing=not strict
+         )
++
+         yield
+     finally:
+         new_parameters_and_buffers, _ = accessor.swap_tensors_dict(

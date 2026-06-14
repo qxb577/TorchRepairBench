@@ -1,0 +1,14 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..edd7842dae3 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -2047,7 +2047,8 @@ def _export_for_training(
+         verify_additional_inputs,
+     ) = _process_export_inputs(mod, args, kwargs, dynamic_shapes)
+ 
+-    original_state_dict = _get_original_state_dict(mod)
++    original_state_dict = _get_original_state_dict(mod).copy()
++
+ 
+     # Call the appropriate export function based on the strictness of tracing.
+     export_func = _strict_export if strict else _non_strict_export

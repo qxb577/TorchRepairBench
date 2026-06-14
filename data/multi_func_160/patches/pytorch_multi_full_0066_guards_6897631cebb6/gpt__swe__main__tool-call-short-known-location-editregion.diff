@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index df8b0736da0..2cdf1be84b0 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1397,7 +1397,8 @@ class VariableBuilder:
+         if is_traceable_wrapper_subclass(value):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+             attrs, _ = value.__tensor_flatten__()
+-            for attr in attrs:
++            for attr in sorted(attrs):
++
+                 inner_value = getattr(value, attr)
+                 inner_source = AttrSource(self.source, attr)
+                 LazyVariableTracker.realize_all(

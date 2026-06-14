@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index a417dd0b6b3..bb688941c4d 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -330,7 +330,8 @@ class SizeVarAllocator:
+ 
+     def expect_true(self, expr: Expr, *, msg: str) -> None:
+         expr = sympy_subs(expr, self.inv_precomputed_replacements)
+-        self.shape_env.defer_runtime_assert(expr, msg, fx_node=V.graph.current_node)
++        self.shape_env.defer_runtime_assert(expr, msg, fx_node=V.graph.current_node if hasattr(V.graph, 'current_node') else None)
++
+ 
+     def expect_equals(self, left: Expr, right: Expr, *, msg: str) -> Expr:
+         # Prefer returning the expression without unbacked symints

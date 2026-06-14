@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index de32baa6d1b..9a7ed959601 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -588,7 +588,7 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+     def export_freevars(self, parent, child):
+         code = self.get_code()
+         for var in code.co_freevars:
+-            if var in child.symbolic_locals:
++            if var in child.symbolic_locals and var not in parent.symbolic_locals:
+                 parent.symbolic_locals[var] = child.symbolic_locals[var]
+ 
+     def reconstruct(self, codegen):

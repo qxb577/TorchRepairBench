@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 3da23d7731e..38f402a8bdc 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -63,6 +63,8 @@ log = logging.getLogger(__name__)
+ 
+ # Ops that allow tensor <op> tensor
+ supported_tensor_comparison_ops = {
++    "is": operator.is_,
++    "is not": operator.is_not,
+     ">": operator.gt,
+     "<": operator.lt,
+     ">=": operator.ge,

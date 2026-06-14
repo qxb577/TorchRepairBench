@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index e73272c655f..d550909a00d 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -68,7 +68,8 @@ class TypedExpr:
+             expr = self.expr
+             if isinstance(expr, sympy.Expr):
+                 expr = expr.expand(identity=True)
+-            self.expr = dtype_to_type(self.dtype)(expr)
++            self.expr = dtype_to_type(self.dtype)(expr) % (1 << torch.iinfo(self.dtype).bits)
++
+ 
+ 
+ class SymPyOps:

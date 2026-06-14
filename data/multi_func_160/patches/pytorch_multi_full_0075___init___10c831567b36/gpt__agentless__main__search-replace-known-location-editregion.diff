@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index 2d93114cf71..7bebc7cabc5 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -282,7 +282,7 @@ def convert_shape_to_inductor(
+     sympy.Expr.
+     """
+     return [
+-        i.node.expr if isinstance(i, torch.SymInt) else sympy.Integer(i) for i in lst
++        i._sympy_() if isinstance(i, torch.SymInt) else sympy.Integer(i) for i in lst
+     ]
+ 
+ 

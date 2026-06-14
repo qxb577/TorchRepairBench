@@ -1,0 +1,14 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..c618ca2dadd 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -11,7 +11,8 @@ from . import _dtypes_impl
+ # ### Scalar types ###
+ 
+ 
+-class generic:
++class generic(metaclass=ABCMeta):
++
+     @property
+     def name(self):
+         return self.__class__.__name__

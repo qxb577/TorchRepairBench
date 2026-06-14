@@ -1,0 +1,18 @@
+diff --git a/torch/_subclasses/fake_tensor.py b/torch/_subclasses/fake_tensor.py
+index 9d2b38f40fe..ce7ead21dac 100644
+--- a/torch/_subclasses/fake_tensor.py
++++ b/torch/_subclasses/fake_tensor.py
+@@ -981,9 +981,13 @@ class FakeTensorMode(TorchDispatchMode):
+         if not torch._library.utils.is_builtin(func):
+             raise _BypassDispatchCache("non-builtin")
+ 
++        if torch.is_inference_mode_enabled():
++            raise _BypassDispatchCache("inference mode")
++
+         # In order to handle storage aliasing, we need to establish the alias
+         # for any view op on a cache hit. But CompositeImplicitAutograd ops may
+         # or may not alias the input, so just punt on caching these.
++
+         if func.is_view and torch._C._dispatch_has_kernel_for_dispatch_key(
+             func.name(), torch._C.DispatchKey.CompositeImplicitAutograd
+         ):

@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/codecache.py b/torch/_inductor/codecache.py
+index ea69ba454f4..89c8dc90f36 100644
+--- a/torch/_inductor/codecache.py
++++ b/torch/_inductor/codecache.py
+@@ -516,7 +516,10 @@ class FxGraphCachePickler(pickle.Pickler):
+         only the metadata for these tensors.
+         """
+         self._stream = io.BytesIO()
+-        super().__init__(self._stream)
++        try:
++            super().__init__(self._stream)
++        except RuntimeError as e:
++            raise BypassFxGraphCache(str(e))
+ 
+         self.dispatch_table = copyreg.dispatch_table.copy()
+         self.dispatch_table.update(

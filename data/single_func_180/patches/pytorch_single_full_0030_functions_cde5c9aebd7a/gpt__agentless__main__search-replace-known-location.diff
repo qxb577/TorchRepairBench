@@ -1,0 +1,15 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index 2b6c159f5c3..a15f0640cb8 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -1393,8 +1393,8 @@ def make_opaque_bitwise_fn(name, real_op_name):
+     class BitwiseFn(sympy.Function):
+         _torch_handler_name = name
+         precedence: int = prec
+-        _torch_unpickler = functools.partial(
+-            make_opaque_bitwise_fn, real_op_name=real_op_name
++        _torch_unpickler = staticmethod(
++            lambda name, real_op_name: make_opaque_bitwise_fn(name, real_op_name)
+         )
+ 
+         @classmethod

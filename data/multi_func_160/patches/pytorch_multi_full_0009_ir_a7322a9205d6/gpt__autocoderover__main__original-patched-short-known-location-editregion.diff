@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 05e3b1b6440..0704ebf936e 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -1921,7 +1921,8 @@ class FusedSchedulerNode(BaseSchedulerNode):
+             #   * Node2 has StarDep of MultiOutput in writes
+             # Rewrite the Node2' StarDep to MemoryDep, because calculate score_fusion_memory
+             # of the template node and its epilogue requires the same type of dependencies
+-            assert isinstance(node2.node, MultiOutput)
++            assert isinstance(node2.node, (MultiOutput, OpaqueMultiOutput))
++
+             assert len(node2.read_writes.writes) == 1
+             assert isinstance(next(iter(node2.read_writes.writes)), StarDep)
+             name = next(iter(node2.read_writes.writes)).name

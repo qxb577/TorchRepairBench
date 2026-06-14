@@ -1,0 +1,23 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 9566f6a1542..1cf1e7335f8 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -1439,7 +1439,6 @@ class FrozensetVariable(SetVariable):
+         return frozenset({k.vt.as_python_constant() for k in self.set_items})
+ 
+     def reconstruct(self, codegen: "PyCodegen") -> None:
+-        codegen.foreach([x.vt for x in self.set_items])
+         codegen.add_push_null(
+             lambda: codegen.extend_output(
+                 [
+@@ -1447,7 +1446,9 @@ class FrozensetVariable(SetVariable):
+                 ]
+             )
+         )
+-        codegen.extend_output(create_call_function(0, False))
++        codegen.foreach([x.vt for x in self.set_items])
++        codegen.append_output(create_instruction("BUILD_LIST", arg=len(self.set_items)))
++        codegen.extend_output(create_call_function(1, False))
+ 
+     def call_method(
+         self,

@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index be1c2202aba..4c6a35a2513 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -54,6 +54,7 @@ from torch._inductor.runtime.hints import DeviceProperties
+ from torch.fx.experimental.symbolic_shapes import ShapeEnv
+ from torch.utils._ordered_set import OrderedSet
+ from torch.utils._pytree import tree_map_only
++from torch._subclasses import FakeTensorMode
+ 
+ 
+ if TYPE_CHECKING:

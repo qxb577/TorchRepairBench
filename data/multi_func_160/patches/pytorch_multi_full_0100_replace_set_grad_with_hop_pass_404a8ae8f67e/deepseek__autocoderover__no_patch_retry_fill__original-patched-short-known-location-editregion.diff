@@ -1,0 +1,18 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2d59a111db9..161ad3e71a4 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -770,13 +770,6 @@ def _export_to_aten_ir(
+             gm, export_graph_signature
+         )
+ 
+-    # Remove nn_module_stack, stack_trace metadata from all placeholders/inputs nodes.
+-    for _mod in gm.modules():
+-        if not isinstance(_mod, torch.fx.GraphModule):
+-            continue
+-        for node in _mod.graph.nodes:
+-            if node.op in ["placeholder", "output"]:
+-                node.meta.pop("nn_module_stack", None)
+                 node.meta.pop("stack_trace", None)
+ 
+     constants = rewrite_script_object_meta(gm)

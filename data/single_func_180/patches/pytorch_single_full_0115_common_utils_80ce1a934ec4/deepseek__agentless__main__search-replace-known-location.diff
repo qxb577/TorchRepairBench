@@ -1,0 +1,30 @@
+diff --git a/torch/testing/_internal/common_utils.py b/torch/testing/_internal/common_utils.py
+index 13a28c5d7eb..d00c57808a8 100644
+--- a/torch/testing/_internal/common_utils.py
++++ b/torch/testing/_internal/common_utils.py
+@@ -2024,15 +2024,18 @@ class TestCase(expecttest.TestCase):
+     _rel_tol: float = 0
+ 
+     # checker to early terminate test suite if unrecoverable failure occurs.
++    _cuda_sync_lock = threading.Lock()
++
+     def _should_stop_test_suite(self):
+         if torch.cuda.is_initialized():
+-            # CUDA device side error will cause subsequence test cases to fail.
+-            # stop entire test suite if catches RuntimeError during torch.cuda.synchronize().
+-            try:
+-                torch.cuda.synchronize()
+-            except RuntimeError as rte:
+-                print("TEST SUITE EARLY TERMINATION due to torch.cuda.synchronize() failure", file=sys.stderr)
+-                return True
++            with self._cuda_sync_lock:
++                # CUDA device side error will cause subsequence test cases to fail.
++                # stop entire test suite if catches RuntimeError during torch.cuda.synchronize().
++                try:
++                    torch.cuda.synchronize()
++                except RuntimeError as rte:
++                    print("TEST SUITE EARLY TERMINATION due to torch.cuda.synchronize() failure", file=sys.stderr)
++                    return True
+             return False
+         else:
+             return False

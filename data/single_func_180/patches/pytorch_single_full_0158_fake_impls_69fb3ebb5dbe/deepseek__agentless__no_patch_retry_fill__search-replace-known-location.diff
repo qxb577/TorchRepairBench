@@ -1,0 +1,13 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0b000cfa1a9..3753ca1f576 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -1344,7 +1344,7 @@ def make_fast_binary_impl(
+             elif common_dtype != op.dtype:
+                 has_different_input_dtypes = True
+ 
+-        if has_different_input_dtypes:
++        if has_different_input_dtypes or type_promotion_kind is not ELEMENTWISE_TYPE_PROMOTION_KIND.DEFAULT:
+             # compute promotion
+             # TODO: we don't need the compute type
+             _, common_dtype = elementwise_dtypes(

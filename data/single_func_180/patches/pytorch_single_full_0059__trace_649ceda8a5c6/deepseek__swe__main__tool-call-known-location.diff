@@ -1,0 +1,16 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index fc3f8ed063c..3b0d4c76f3b 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -1265,7 +1265,10 @@ def _process_export_inputs(
+             f"Expecting `args` to be a tuple of example positional inputs, got {type(args)}",
+         )
+     kwargs = kwargs if kwargs is not None else {}
+-    _, original_in_spec = pytree.tree_flatten((args, kwargs))
++    # Treat NamedTuples as leaf nodes to preserve their structure.
++    _is_namedtuple = lambda obj: isinstance(obj, tuple) and hasattr(obj, '_fields')
++    _, original_in_spec = pytree.tree_flatten((args, kwargs), is_leaf=_is_namedtuple)
++
+ 
+     verify_additional_inputs: Callable[[ExportedProgram], None]
+     out_dynamic_shapes: Optional[_DynamicShapesSpec]

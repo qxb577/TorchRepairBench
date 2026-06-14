@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 152a9736923..0070009e6d9 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1435,7 +1435,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+                                 torch.ops.aten.scalar_tensor.default, (res,)
+                             )
+                             self.graph.call_function(
+-                                torch.ops.aten._assert_async.msg,
++                                torch.ops.aten._assert_scalar.default,
+                                 # TODO: use ra.msg here, but it's pretty
+                                 # useless right now
+                                 (

@@ -1,0 +1,19 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 86685968ac9..31159fb713d 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -5355,11 +5355,12 @@ def meta__flash_attention_forward(
+     scale: Optional[float] = None,
+ ):
+     batch_size = query.size(0)
+-    max_seqlen_batch_q = query.size(1)
++    max_seqlen_batch_q = max_q
+     num_heads = query.size(2)
+     head_dim = query.size(3)
+ 
+-    max_seqlen_batch_k = key.size(1)
++    max_seqlen_batch_k = max_k
++
+ 
+     # Cuda Path
+     attention = torch.empty_like(query)

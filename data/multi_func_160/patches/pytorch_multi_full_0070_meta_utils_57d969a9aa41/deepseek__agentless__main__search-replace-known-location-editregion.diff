@@ -1,0 +1,15 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index d02030d5deb..5cf009777ed 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -1727,6 +1727,10 @@ class MetaConverter(Generic[_TensorT]):
+                         base_symbolic_context,
+                     )
+ 
++                    if shape_env is not None and base_symbolic_context is not None:
++                        from torch.fx.experimental.symbolic_shapes import compute_unbacked_bindings
++                        compute_unbacked_bindings(shape_env, base, base_symbolic_context.unbacked_bindings)
++
+                     def is_c_of_r(
+                         complex_dtype: torch.dtype, real_dtype: torch.dtype
+                     ) -> bool:

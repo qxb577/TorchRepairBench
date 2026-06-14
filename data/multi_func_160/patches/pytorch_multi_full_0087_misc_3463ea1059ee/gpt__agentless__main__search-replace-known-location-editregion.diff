@@ -1,0 +1,24 @@
+diff --git a/torch/_dynamo/variables/torch_function.py b/torch/_dynamo/variables/torch_function.py
+index 3946dccd8dc..b2c213d35d4 100644
+--- a/torch/_dynamo/variables/torch_function.py
++++ b/torch/_dynamo/variables/torch_function.py
+@@ -597,9 +597,7 @@ class TensorWithTFOverrideVariable(TensorVariable):
+ 
+         # This simulates shallow-copying the tensor object.
+         kwargs = dict(tensor_var.__dict__)
+-        assert kwargs.pop("class_type") is torch.Tensor, (
+-            "invalid class type in TensorWithTFOverrideVariable.from_tensor_var"
+-        )
++        kwargs.pop("class_type", None)
+         torch_fn_var = build_torch_function_fn(tx, class_type, cls_source)
+         var = cls(torch_function_fn=torch_fn_var, class_type=class_type, **kwargs)
+         var.install_global(tx)
+@@ -639,7 +637,7 @@ class TensorWithTFOverrideVariable(TensorVariable):
+             )
+ 
+         if hasattr(torch.Tensor, name):
+-            if _is_attr_overidden(tx, self, name):
++            if _is_attr_overidden(tx, self, name) and not hasattr(self, name):
+                 unimplemented(
+                     f"Accessing overridden method/attribute {name} on a tensor"
+                     " subclass with a __torch_function__ override is not supported"

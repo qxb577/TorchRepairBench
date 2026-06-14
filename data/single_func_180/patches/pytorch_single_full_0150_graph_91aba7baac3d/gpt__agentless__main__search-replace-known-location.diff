@@ -1,0 +1,14 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 60c864b43b7..4e521687015 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -382,6 +382,9 @@ class CodeGen:
+         body: List[str] = []
+         globals_: Dict[str, Any] = {}
+         wrapped_fns: Dict[str, None] = {}
++        used_values = set()
++        for node in nodes:
++            used_values.update(user.name for user in node.users)
+ 
+         # Wrap string in list to pass by reference
+         maybe_return_annotation : List[str] = ['']

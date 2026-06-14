@@ -1,0 +1,14 @@
+diff --git a/torch/jit/_recursive.py b/torch/jit/_recursive.py
+index 716b2ef002d..3dbdd6c41b6 100644
+--- a/torch/jit/_recursive.py
++++ b/torch/jit/_recursive.py
+@@ -989,6 +989,9 @@ def try_compile_fn(fn, loc):
+         # don't do anything for them
+         return None
+ 
++    if hasattr(fn, "__prepare_scriptable__"):
++        return fn.__prepare_scriptable__()
++
+     if not inspect.isfunction(fn) and not inspect.ismethod(fn):
+         raise RuntimeError(
+             f"`{fn}` is not a function. Recursive scripting only supports "

@@ -1,0 +1,44 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 8435b80f34c..e0e88d0cd55 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7790,7 +7790,39 @@ def _create_unary_float_meta_func(func):
+     return _f
+ 
+ 
++@register_meta(aten._native_multi_head_attention)
++def meta__native_multi_head_attention(
++    query: Tensor,
++    key: Tensor,
++    value: Tensor,
++    embed_dim: int,
++    num_heads: int,
++    qkv_weight: Tensor,
++    qkv_bias: Tensor,
++    proj_weight: Tensor,
++    proj_bias: Tensor,
++    key_padding_mask: Optional[Tensor],
++    need_weights: bool,
++    average_attn_weights: bool,
++    mask_type: int,
++):
++    # Output shape: same as query
++    out = query.new_empty(query.shape)
++    if need_weights:
++        batch_size = query.shape[0]
++        q_len = query.shape[1]
++        k_len = key.shape[1]
++        if average_attn_weights:
++            weights_shape = (batch_size, q_len, k_len)
++        else:
++            weights_shape = (batch_size, num_heads, q_len, k_len)
++        weights = query.new_empty(weights_shape)
++        return [out, weights]
++    return out
++
++
+ def _create_binary_float_meta_func(func):
++
+     @register_meta(func)
+     @out_wrapper()
+     def _f(x, y):

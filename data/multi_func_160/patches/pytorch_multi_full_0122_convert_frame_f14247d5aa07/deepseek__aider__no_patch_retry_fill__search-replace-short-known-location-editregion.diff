@@ -1,0 +1,12 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 40f05e94891..7c9941a6fda 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -2796,6 +2796,7 @@ class InstructionTranslator(InstructionTranslatorBase):
+             logging.INFO,
+             f"torchdynamo start tracing {f_code.co_name} {code_options['co_filename']}:{code_options['co_firstlineno']}",
+         )
++        self.mutated_closure_cell_contents = mutated_closure_cell_contents
+         super().__init__(
+             output=OutputGraph(
+                 code_options,

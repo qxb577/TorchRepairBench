@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 5b39a0fe435..67c6b08be78 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -216,7 +216,8 @@ class BlockPtrOptions:
+         return V.kernel.index_to_str(advance)
+ 
+     def has_rindex(self):
+-        return "RBLOCK" in self.block_shape
++        return "roffset" in self.offsets
++
+ 
+     def has_tmpmask(self):
+         return False  # block_ptr can't do indirect indexing

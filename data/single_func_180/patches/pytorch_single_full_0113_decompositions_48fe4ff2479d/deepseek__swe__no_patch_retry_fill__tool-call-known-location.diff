@@ -1,0 +1,33 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 634c4b6b495..641e4aa00bc 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5066,6 +5066,20 @@ def scaled_dot_product_flash_attention_for_cpu(
+         lambda: "q, k, v should have the same head size",
+     )
+ 
++    # Handle GQA by repeating key/value heads to match query heads
++    if query.shape[1] != key.shape[1]:
++        n_rep = query.shape[1] // key.shape[1]
++        torch._check(
++            n_rep * key.shape[1] == query.shape[1],
++            lambda: "Number of query heads must be divisible by key heads for GQA",
++        )
++        key = key.unsqueeze(2).expand(-1, -1, n_rep, -1, -1).clone(
++            memory_format=torch.contiguous_format
++        ).view(query.shape)
++        value = value.unsqueeze(2).expand(-1, -1, n_rep, -1, -1).clone(
++            memory_format=torch.contiguous_format
++        ).view(query.shape)
++
+     output, attn = aten._scaled_dot_product_attention_math.default(
+         query,
+         key,
+@@ -5076,6 +5090,7 @@ def scaled_dot_product_flash_attention_for_cpu(
+         dropout_mask=None,
+         scale=scale,
+     )
++
+     # Why this change?
+     # In pre-dispatch export scaled_dot_product_attention is executed via
+     # * flash_attention.

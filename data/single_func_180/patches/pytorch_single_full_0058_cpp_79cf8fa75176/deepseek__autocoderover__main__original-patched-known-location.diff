@@ -1,0 +1,22 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 431087fe785..1905464f27b 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -1157,12 +1157,17 @@ class CppVecOverrides(CppOverrides):
+     def erfc(x):
+         return f"{x}.erfc()"
+ 
++    @staticmethod
++    def asinh(x):
++        return f"{x}.asinh()"
++
+     @staticmethod
+     def erfinv(x):
+         return f"{x}.erfinv()"
+ 
+     @staticmethod
+     def sqrt(x):
++
+         return f"{x}.sqrt()"
+ 
+     @staticmethod

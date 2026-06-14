@@ -1,0 +1,27 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 637fe29d92f..87cc04a63b6 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -6756,16 +6756,16 @@ def meta__segment_reduce_backward(
+     assert lengths is not None or offsets is not None, (
+         "segment_reduce(): Either lengths or offsets must be defined"
+     )
+-    data_contig = data.contiguous()
+-    grad_contig = grad.contiguous()
+     return torch.empty_like(
+-        data_contig,
+-        dtype=grad_contig.dtype,
+-        device=grad_contig.device,
+-        layout=grad_contig.layout,
++        data,
++        dtype=grad.dtype,
++        device=grad.device,
++        layout=grad.layout,
++        memory_format=torch.contiguous_format,
+     )
+ 
+ 
++
+ @register_meta([aten.kthvalue.default, aten.kthvalue.values])
+ @out_wrapper("values", "indices")
+ def kthvalue_meta(self, k, dim=-1, keepdim=False):

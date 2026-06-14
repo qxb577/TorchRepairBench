@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 7fcf7904185..8de4442bd52 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3376,7 +3376,8 @@ def gather(x, dim, index, sparse_grad=False):
+ 
+ @register_lowering(aten.embedding, type_promotion_kind=None)
+ def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=False):
+-    assert not sparse
++    if sparse:
++        return torch.ops.aten.embedding_sparse(weight, indices, padding_idx, scale_grad_by_freq, sparse)
+     assert isinstance(weight, TensorBox)
+     assert isinstance(indices, TensorBox)
+     assert "int" in str(indices.get_dtype())

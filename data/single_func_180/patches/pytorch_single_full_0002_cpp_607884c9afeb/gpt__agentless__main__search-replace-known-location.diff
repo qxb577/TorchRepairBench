@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index f5692a838ec..8137ee144d0 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -599,6 +599,8 @@ class CppOverrides(OpOverrides):
+ 
+     @staticmethod
+     def add(a, b):
++        if isinstance(a, int) and isinstance(b, int) and (a < 0 or b < 0):
++            raise ValueError("Bitwise shift inputs must be non-negative")
+         return f"decltype({a})({a} + {b})"
+ 
+     @staticmethod

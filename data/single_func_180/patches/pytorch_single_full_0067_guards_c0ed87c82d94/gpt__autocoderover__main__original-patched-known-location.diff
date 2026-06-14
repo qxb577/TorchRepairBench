@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index df720896678..970dc5fad17 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -969,7 +969,8 @@ class GuardBuilder(GuardBuilderBase):
+         self.id_ref = id_ref
+         self.source_ref = source_ref
+         self.lookup_weakrefs = lookup_weakrefs
+-        self.scope: dict[str, dict[str, object]] = {"L": local_scope, "G": global_scope}
++        self.scope: dict[str, dict[str, object]] = {"L": local_scope, "G": global_scope, "W": weakref.proxy}
++
+         self.runtime_global_scope = runtime_global_scope or global_scope
+         self.scope["__builtins__"] = builtins.__dict__.copy()
+         for (

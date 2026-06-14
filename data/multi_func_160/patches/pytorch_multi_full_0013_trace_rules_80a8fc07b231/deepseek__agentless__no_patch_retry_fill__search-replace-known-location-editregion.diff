@@ -1,0 +1,36 @@
+diff --git a/torch/_dynamo/trace_rules.py b/torch/_dynamo/trace_rules.py
+index 6be6e4965ce..d4cea8610f4 100644
+--- a/torch/_dynamo/trace_rules.py
++++ b/torch/_dynamo/trace_rules.py
+@@ -3094,6 +3094,18 @@ def is_numpy(obj) -> bool:
+     return isinstance(obj, (np.ndarray, np.generic)) or id(obj) in _numpy_function_ids
+ 
+ 
++def is_numpy_dtype(obj) -> bool:
++    if np is None:
++        return False
++    return isinstance(obj, np.dtype)
++
++
++def is_numpy_type_info(obj) -> bool:
++    if np is None:
++        return False
++    return isinstance(obj, (np.iinfo, np.finfo))
++
++
+ BUILTIN_SKIPLIST = (
+     abc,
+     collections,
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 10a79ed8ff3..0eefcab9e16 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -70,7 +70,7 @@ from ..source import (
+     Source,
+     TupleIteratorGetItemSource,
+ )
+-from ..trace_rules import is_callable_allowed, is_numpy
++from ..trace_rules import is_callable_allowed, is_numpy, is_numpy_dtype, is_numpy_type_info
+ from ..utils import (
+     build_checkpoint_variable,
+     clone_input,

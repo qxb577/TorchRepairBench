@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index 383d5158c2b..933a9826d4b 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -1815,7 +1815,8 @@ class GraphLowering(torch.fx.Interpreter):
+                 ras = self.ras_by_symbol.pop(i0, [])
+                 # NB: size-like not needed, we won't retrace
+                 vr = shape_env.var_to_range[i0]
+-                if not shape_env._default_unspecified_value_range().issubset(vr):
++                if not shape_env._default_unspecified_value_range().isdisjoint(vr):
++
+ 
+                     def is_convertible(s: Expr) -> bool:
+                         if s in (int_oo, -int_oo):

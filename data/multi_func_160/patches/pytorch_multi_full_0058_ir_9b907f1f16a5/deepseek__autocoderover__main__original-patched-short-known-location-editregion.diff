@@ -1,0 +1,23 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 44ff1e88396..7b52c3ccba2 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3381,7 +3381,7 @@ def _unwrap(x):
+ @register_lowering([torch.tensor, aten.scalar_tensor])
+ def tensor(data, *, dtype=None, device=None, layout=None, pin_memory=False):
+     assert_nyi(layout in (None, torch.strided), f"layout={layout}")
+-    assert_nyi(not pin_memory, "pin_memory")
++
+     if isinstance(_unwrap(data), int):
+         dtype = dtype or torch.int64
+     else:
+@@ -3687,7 +3687,9 @@ def empty_strided(
+         dtype=dtype,
+         size=size,
+         stride=stride,
++        is_pinned=pin_memory,
+     )
++
+     return pointwise
+ 
+ 

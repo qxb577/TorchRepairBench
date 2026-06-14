@@ -1,0 +1,15 @@
+diff --git a/torch/distributed/c10d_logger.py b/torch/distributed/c10d_logger.py
+index 2c92176c53e..07ba9de6527 100644
+--- a/torch/distributed/c10d_logger.py
++++ b/torch/distributed/c10d_logger.py
+@@ -32,7 +32,9 @@ def _get_or_create_logger(destination: str = _DEFAULT_DESTINATION) -> logging.Lo
+     )
+     logging_handler.setFormatter(formatter)
+     logger.propagate = False
+-    logger.addHandler(logging_handler)
++    if logging_handler not in logger.handlers:
++        logger.addHandler(logging_handler)
++
+     return logger
+ 
+ 

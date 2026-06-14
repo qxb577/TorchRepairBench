@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index b520869d632..9f6eaf0c5bf 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1981,8 +1981,11 @@ def index(x, indices):
+         x.realize()
+         return fallback_handler(aten.index)(x, indices)
+ 
++    if len(indices) == 1 and not self.get_size().is_broadcastable(indices[0].get_size()):
++        indices[0] = indices[0].unsqueeze(0)
+     indices_sizes = [i.get_size() for i in indices if i is not None]
+     indices_loaders = [i.make_loader() for i in indices if i is not None]
++
+     # no guards on output size, all the guards are set in broadcast_tensors
+ 
+     output_size = list(indices_sizes[0])

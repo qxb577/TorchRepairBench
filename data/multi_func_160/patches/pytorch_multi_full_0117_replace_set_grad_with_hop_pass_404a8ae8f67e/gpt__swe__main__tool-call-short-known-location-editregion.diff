@@ -1,0 +1,14 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2d59a111db9..d8af52df9e8 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -779,7 +779,8 @@ def _export_to_aten_ir(
+                 node.meta.pop("nn_module_stack", None)
+                 node.meta.pop("stack_trace", None)
+ 
+-    constants = rewrite_script_object_meta(gm)
++    constants = rewrite_script_object_meta(gm, export_graph_signature)
++
+     constants.update(lift_constants_pass(gm, export_graph_signature, constant_attrs))
+ 
+     # Prettify names for placeholder nodes.

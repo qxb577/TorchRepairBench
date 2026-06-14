@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index dd3610bb9db..cea9ae467c3 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -292,7 +292,11 @@ class UniformValueConstantFolder(ConstantFolder):
+         return True
+ 
+     def add_node_replacement(self, node: torch.fx.Node, tensor: torch.Tensor) -> None:
+-        self.node_replacements[node] = tensor.flatten()[0].item()
++        scalar_tensor = tensor.flatten()[0]
++        if scalar_tensor.is_complex():
++            self.node_replacements[node] = complex(scalar_tensor)
++        else:
++            self.node_replacements[node] = scalar_tensor.item()
+         self.node_replacements_shapes[node] = node.meta["val"].shape
+         self.constant_data_ptrs[node] = StorageWeakRef(tensor.untyped_storage())
+ 

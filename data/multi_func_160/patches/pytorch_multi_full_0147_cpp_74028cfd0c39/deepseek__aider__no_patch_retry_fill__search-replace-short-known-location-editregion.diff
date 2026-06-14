@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 878fa06e292..7f862f9b401 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -850,6 +850,7 @@ class CppOverrides(OpOverrides):
+         code = BracesBuffer()
+         exponent = V.kernel.cse.newvar()
+         mantissa = V.kernel.cse.newvar()
++        exponent.dtype = torch.int32
+         code.writeline(f"int32_t {exponent};")
+         code.writeline(f"auto {mantissa} = std::frexp({x}, &{exponent});")
+         V.kernel.compute.splice(code)
+@@ -1686,6 +1687,7 @@ class CppVecOverrides(CppOverrides):
+         mantissa = V.kernel.cse.newvar()
+         exponent.update_on_args("frexp", (x,), kwargs={})
+         mantissa.update_on_args("frexp", (x,), kwargs={})
++        exponent.dtype = torch.int32
+         n_vec = V.kernel._get_num_vectors(x.dtype)
+         mantissa_t = (
+             f"at::vec::Vectorized<{cdtype}>"

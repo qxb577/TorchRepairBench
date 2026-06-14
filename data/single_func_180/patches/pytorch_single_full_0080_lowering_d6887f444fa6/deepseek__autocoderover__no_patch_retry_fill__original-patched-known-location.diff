@@ -1,0 +1,21 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 7fcf7904185..af806529bda 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3341,6 +3341,8 @@ def gather(x, dim, index, sparse_grad=False):
+     # sparse_grad doesn't affect forward computation,
+     # and backward tracing is taken care of by AOT Autograd
+     assert isinstance(x, TensorBox)
++    if sparse_grad:
++        return fallback(aten.gather, x, dim, index, sparse_grad=sparse_grad)
+     if index.get_numel() == 0:
+         # Empty index case. Return an empty array with the same shape
+         return new_empty(x, index.get_size())
+@@ -3374,6 +3376,7 @@ def gather(x, dim, index, sparse_grad=False):
+     )
+ 
+ 
++
+ @register_lowering(aten.embedding, type_promotion_kind=None)
+ def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=False):
+     assert not sparse

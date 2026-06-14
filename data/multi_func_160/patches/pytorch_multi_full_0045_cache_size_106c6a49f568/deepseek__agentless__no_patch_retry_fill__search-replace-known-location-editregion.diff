@@ -1,0 +1,12 @@
+diff --git a/torch/_dynamo/cache_size.py b/torch/_dynamo/cache_size.py
+index ea5e2ae0ce1..265bf0db7f0 100644
+--- a/torch/_dynamo/cache_size.py
++++ b/torch/_dynamo/cache_size.py
+@@ -168,6 +168,6 @@ def exceeds_cache_size_limit(cache_size: CacheSizeRelevantForFrame) -> Tuple[boo
+     """
+     if cache_size.will_compilation_exceed_accumulated_limit():
+         return True, "accumulated_cache_size_limit"
+-    if cache_size.will_compilation_exceed_specific_limit(config.cache_size_limit):
++    if cache_size.will_compilation_exceed_specific_limit(config.recompile_limit):
+         return True, "cache_size_limit"
+     return False, ""

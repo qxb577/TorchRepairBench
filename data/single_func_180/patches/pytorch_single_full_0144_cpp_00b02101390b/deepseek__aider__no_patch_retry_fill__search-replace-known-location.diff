@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 675c4a1cc0d..a0c6fce6a71 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -1118,6 +1118,10 @@ class CppVecOverrides(CppOverrides):
+     def sub(a, b):
+         return f"{a} - {b}"
+ 
++    @staticmethod
++    def asinh(x):
++        return f"sleef_asinh({x})"
++
+     @staticmethod
+     def mul(a, b):
+         return f"{a} * {b}"

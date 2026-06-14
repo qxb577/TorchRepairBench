@@ -1,0 +1,17 @@
+diff --git a/torch/_higher_order_ops/effects.py b/torch/_higher_order_ops/effects.py
+index 826932c8482..5b54af81b43 100644
+--- a/torch/_higher_order_ops/effects.py
++++ b/torch/_higher_order_ops/effects.py
+@@ -166,10 +166,12 @@ def with_effects_proxy(
+         (proxy_token, op, *proxy_args),
+         proxy_kwargs,
+     )
++    out_proxy.node.meta["is_impure"] = True
+     result = track_tensor_tree(out, out_proxy, constant=None, tracer=mode.tracer)
+     return result
+ 
+ 
++
+ with_effects.fallthrough(DispatchKey.AutogradCPU)
+ with_effects.fallthrough(DispatchKey.AutogradCUDA)
+ 

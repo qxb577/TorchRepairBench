@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index d331f1238b3..e23ef0b90d6 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -30,6 +30,7 @@ import sympy
+ import torch._numpy as tnp
+ import torch.fx
+ import torch.random
++from torch.fx.experimental.symbolic_shapes import has_free_unbacked_symbols
+ from torch._dynamo import compiled_autograd
+ from torch._subclasses.meta_utils import is_sparse_any
+ from torch.fx.experimental.symbolic_shapes import (
+@@ -1110,7 +1111,11 @@ class TensorVariable(VariableTracker):
+ 
+             # Not sure if __setitem__ can ever save activations, disabling just in case
+             with torch._dynamo.utils._disable_saved_tensors_hooks_during_tracing():
+-                get_fake_value(proxy.node, tx, allow_non_graph_fake=False)
++                if has_free_unbacked_symbols(key):
++                    pass
++                else:
++                    get_fake_value(proxy.node, tx, allow_non_graph_fake=False)
++>>>>
+ 
+             vt = value
+             if isinstance(vt, variables.lazy.LazyVariableTracker):

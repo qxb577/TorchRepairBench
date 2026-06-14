@@ -1,0 +1,41 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 646405ff60b..a81a88f4951 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -343,7 +343,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+         self._current_tx: List[InstructionTranslatorBase] = []
+         self.cleanups: List[CleanupHook] = []
+         self.should_exit = False
+-        self.random_values_var = None
++        self.random_calls = []
+         self.unspec_variable_map: Dict[str, UnspecializedPythonVariable] = {}
+         self.torch_function_enabled = torch._C._is_torch_function_enabled()
+         # Tracks if the output graph has a user defined allowed function in the
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 3e16c7a6008..5cb830b020b 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -588,9 +588,7 @@ class InstructionTranslatorBase(Checkpointable[InstructionTranslatorGraphState])
+     inline_depth: int
+     inconsistent_side_effects: bool
+     current_speculation: Optional[SpeculationEntry]
+-    random_calls: List[
+-        Tuple[Callable[..., object], Tuple[object, ...], Dict[str, object]]
+-    ]
++    random_calls: List[Tuple[Callable[..., object], Tuple[object, ...], Dict[str, object]]] = []
+ 
+     def mark_inconsistent_side_effects(self):
+         """
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 862a1402d48..665652af649 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -608,7 +608,7 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+         ):
+             args = [x.as_python_constant() for x in args]
+             kwargs = {k: v.as_python_constant() for k, v in kwargs.items()}
+-            random_call_index = len(tx.random_calls)
++            random_call_index = len(tx.random_calls) if hasattr(tx, 'random_calls') else 0
+             example_value = self.value(*args, **kwargs)
+             source = RandomValueSource(random_call_index)
+             tx.random_calls.append((self.value, args, kwargs))

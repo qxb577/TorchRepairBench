@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/template_heuristics/triton.py b/torch/_inductor/template_heuristics/triton.py
+index f4c836247df..c3b2508a0a6 100644
+--- a/torch/_inductor/template_heuristics/triton.py
++++ b/torch/_inductor/template_heuristics/triton.py
+@@ -1105,7 +1105,8 @@ class ROCmConfigHeuristic(BaseConfigHeuristic):
+             for BLOCK1 in [16, 32, 64]
+             for BLOCK2 in [32, 64, 128]
+             for w in ([4, 8] if BLOCK1 >= 128 or BLOCK2 >= 128 else [4])
+-            for mfma in [0, 16]
++            for mfma in [0, 1]
++
+             if BLOCK2 % BLOCK1 == 0
+         ]
+ 

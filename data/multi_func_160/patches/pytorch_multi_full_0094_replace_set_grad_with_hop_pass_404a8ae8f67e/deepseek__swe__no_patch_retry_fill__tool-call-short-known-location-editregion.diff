@@ -1,0 +1,13 @@
+diff --git a/torch/_export/passes/replace_set_grad_with_hop_pass.py b/torch/_export/passes/replace_set_grad_with_hop_pass.py
+index 5e47ff57428..c157a978c8c 100644
+--- a/torch/_export/passes/replace_set_grad_with_hop_pass.py
++++ b/torch/_export/passes/replace_set_grad_with_hop_pass.py
+@@ -198,6 +198,8 @@ def replace_set_grad_with_hop_pass(gm: torch.fx.GraphModule, graph_signature):
+             subgm = getattr(new_gm, node.target)
+             if not isinstance(subgm, torch.fx.GraphModule):
+                 continue
++    return new_gm, new_signature
++
+             new_subgm, _ = replace_set_grad_with_hop_pass(subgm, None)
+             setattr(new_gm, node.target, new_subgm)
+ 

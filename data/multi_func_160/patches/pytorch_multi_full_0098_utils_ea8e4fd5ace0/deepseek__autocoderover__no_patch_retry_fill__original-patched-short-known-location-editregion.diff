@@ -1,0 +1,69 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index b8461bc0841..bd461c46b04 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1565,7 +1565,15 @@ def ensure_graph_fake(e, tx):
+ 
+ def get_fake_values_from_nodes(tx, nodes):
+     def visit(n: torch.fx.Node):
+-        return n.meta["example_value"]
++        if "example_value" in n.meta:
++            return n.meta["example_value"]
++        if n.op == "call_function":
++            args, kwargs = get_fake_values_from_nodes(tx, (n.args, n.kwargs))
++            with tx.fake_mode:
++                return n.target(*args, **kwargs)
++        raise RuntimeError(
++            f"Can't get fake value for node {n} without example_value"
++        )
+ 
+     args_kwargs = torch.fx.node.map_arg(nodes, visit)
+     return tree_map_only(
+@@ -1573,6 +1581,7 @@ def get_fake_values_from_nodes(tx, nodes):
+     )
+ 
+ 
++
+ def get_fake_value(node, tx, allow_non_graph_fake=False):
+     """
+     Run the computation represented by `node` using fake tensors and return the result.
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 20b8f09a761..fb7d841faa0 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -723,6 +723,9 @@ class FunctoolsPartialVariable(VariableTracker):
+             len(keys) + len(self.args) + 1, keys, True
+         )
+ 
++    def get_function(self):
++        return self.func.get_function() if isinstance(self.func, FunctoolsPartialVariable) else self.func
++
+     def call_function(
+         self, tx, args: "List[VariableTracker]", kwargs: "Dict[str, VariableTracker]"
+     ) -> "VariableTracker":
+@@ -733,7 +736,8 @@ class FunctoolsPartialVariable(VariableTracker):
+     def call_hasattr(self, tx, name: str) -> VariableTracker:
+         # functools.partial uses slots, so attributes are constant
+         return variables.ConstantVariable.create(
+-            hasattr(functools.partial(identity), name)
++            hasattr(functools.partial(identity), name))
++
+         )
+ 
+     def as_python_constant(self):
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index e57e4bde90d..d89ebc5c19a 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -556,7 +556,11 @@ class NamedTupleVariable(TupleVariable):
+     def as_python_constant(self):
+         return self.python_type()(*[x.as_python_constant() for x in self.items])
+ 
++    def as_proxy(self):
++        return tuple(item.as_proxy() for item in self.items)
++
+     def reconstruct(self, codegen):
++
+         create_fn = getattr(self.tuple_cls, "_make", self.tuple_cls)
+         codegen.append_output(codegen._create_load_const(create_fn))
+         codegen.foreach(self.items)

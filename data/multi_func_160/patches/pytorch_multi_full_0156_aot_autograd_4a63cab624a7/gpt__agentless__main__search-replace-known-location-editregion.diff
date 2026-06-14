@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/compile_fx.py b/torch/_inductor/compile_fx.py
+index 5f4b476e696..497a2218425 100644
+--- a/torch/_inductor/compile_fx.py
++++ b/torch/_inductor/compile_fx.py
+@@ -212,7 +212,7 @@ def get_static_input_idxs(num_fixed: int) -> list[int]:
+     if not context or not context.fw_metadata:
+         return fixed
+ 
+-    return fixed + context.fw_metadata.static_input_indices
++    return context.fw_metadata.static_input_indices + fixed
+ 
+ 
+ def record_original_output_strides(gm: GraphModule) -> None:

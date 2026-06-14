@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 2264c960e7c..b4e6f4055d5 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2653,8 +2653,9 @@ class UserDefinedDictVariable(UserDefinedObjectVariable):
+                 "dict_vt must be constructed by builder.py when source is present"
+             )
+             self._dict_vt = ConstDictVariable(
+-                {}, type(value), mutation_type=ValueMutationNew()
++                type(value)(), type(value), mutation_type=ValueMutationNew()
+             )
++
+         else:
+             self._dict_vt = dict_vt
+         self._dict_methods = dict_methods

@@ -1,0 +1,86 @@
+diff --git a/torch/_dynamo/__init__.py b/torch/_dynamo/__init__.py
+index 02b921b30ee..8bc24a8528f 100644
+--- a/torch/_dynamo/__init__.py
++++ b/torch/_dynamo/__init__.py
+@@ -51,6 +51,7 @@ from .mutation_guard import GenerationTracker
+ from .pgo import reset_code_state
+ from .symbolic_convert import TensorifyState
+ from .utils import (
++    CreateNestedFnCache,
+     graph_break_reasons,
+     guard_failures,
+     orig_code_map,
+@@ -143,6 +144,7 @@ def reset() -> None:
+         TensorifyState.clear()
+         torch._dynamo.utils.warn_once_cache.clear()
+         torch._dynamo.utils.user_obj_id_to_weakref.clear()
++        CreateNestedFnCache.clear()
+         torch._C._autograd._saved_tensors_hooks_set_tracing(False)
+ 
+ 
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 1775dad56d0..91d12bdab6b 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4836,3 +4836,19 @@ def get_traced_code() -> Optional[list[CodeType]]:
+     from torch._guards import TracingContext
+ 
+     return TracingContext.get_traced_code()
++
++
++class CreateNestedFnCache:
++    _cache: dict = {}
++
++    @classmethod
++    def get(cls, key):
++        return cls._cache.get(key)
++
++    @classmethod
++    def set(cls, key, value):
++        cls._cache[key] = value
++
++    @classmethod
++    def clear(cls):
++        cls._cache.clear()
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 6eb7d0666cd..7f0a1d2cde5 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -275,6 +275,27 @@ def _create_nested_fn(
+     code, f_globals, name, defaults, closure, kwdefaults, annotations
+ ):
+     from types import FunctionType
++    from ..utils import CreateNestedFnCache
++
++    def _get_hashable(obj):
++        try:
++            hash(obj)
++            return obj
++        except TypeError:
++            return id(obj)
++
++    key = (
++        _get_hashable(code),
++        _get_hashable(f_globals),
++        _get_hashable(name),
++        _get_hashable(defaults),
++        _get_hashable(closure),
++        _get_hashable(kwdefaults),
++        _get_hashable(annotations),
++    )
++    cached = CreateNestedFnCache.get(key)
++    if cached is not None:
++        return cached
+ 
+     func = FunctionType(code, f_globals, name, defaults, closure)
+     func.__kwdefaults__ = kwdefaults
+@@ -288,6 +309,9 @@ def _create_nested_fn(
+     assert annotations is None or isinstance(annotations, dict)
+     func.__annotations__ = annotations
+ 
++    CreateNestedFnCache.set(key, func)
++    return func
++
+     return func
+ 
+ 

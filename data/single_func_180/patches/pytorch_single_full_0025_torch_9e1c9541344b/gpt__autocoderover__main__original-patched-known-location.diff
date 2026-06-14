@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 43150a30187..2f4252d25a2 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -49,7 +49,8 @@ from ..codegen import PyCodegen
+ from ..create_parameter_op import (
+     can_convert_to_tracable_parameter,
+     new_parameter_placeholder,
+-    tracable_create_parameter,
++    tracable_create_parameter_with_grad,
++
+ )
+ from ..device_interface import get_registered_device_interfaces
+ from ..exc import raise_observed_exception, unimplemented_v2

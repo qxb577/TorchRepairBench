@@ -1,0 +1,13 @@
+diff --git a/torch/_higher_order_ops/triton_kernel_wrap.py b/torch/_higher_order_ops/triton_kernel_wrap.py
+index dfa862c622c..3112d019c3e 100644
+--- a/torch/_higher_order_ops/triton_kernel_wrap.py
++++ b/torch/_higher_order_ops/triton_kernel_wrap.py
+@@ -879,7 +879,7 @@ class TritonHOPifier:
+             if name in kwargs:
+                 # remove special kwargs from `kwargs`
+                 val = kwargs.pop(name)
+-                special_kwargs[name] = val.value
++                special_kwargs[name] = val.as_python_constant()
+ 
+         if special_kwargs:
+             if isinstance(variable.kernel, Autotuner):

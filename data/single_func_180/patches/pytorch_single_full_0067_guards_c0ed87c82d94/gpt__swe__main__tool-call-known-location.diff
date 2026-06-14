@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index df720896678..e976c256c71 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -261,7 +261,8 @@ class GuardManagerWrapper:
+         self.guard_fail_fn: Optional[Callable[[GuardFail], None]] = None
+         self.cache_entry: Optional[CacheEntry] = None
+         self.extra_state: Optional[ExtraState] = None
+-        self.id_matched_objs: dict[str, ReferenceType[object]] = {}
++        self.id_matched_objs: dict[str, Union[ReferenceType[object], weakref.ProxyType]] = {}
++
+         self.no_tensor_aliasing_sources: list[str] = []
+ 
+         self.printed_relational_guards: set[RelationalGuard] = set()

@@ -1,0 +1,15 @@
+diff --git a/torch/nn/modules/transformer.py b/torch/nn/modules/transformer.py
+index dd699537e08..9e6debbb39e 100644
+--- a/torch/nn/modules/transformer.py
++++ b/torch/nn/modules/transformer.py
+@@ -375,8 +375,8 @@ class TransformerEncoder(Module):
+             why_not_sparsity_fast_path = (
+                 f"{enc_layer}.self_attn._qkv_same_embed_dim was not True"
+             )
+-        elif encoder_layer.self_attn.in_proj_bias is None:
+-            why_not_sparsity_fast_path = f"{enc_layer}.self_attn was passed bias=False"
++        elif encoder_layer.self_attn.in_proj_bias is None and self.mask_check:
++            why_not_sparsity_fast_path = f"{enc_layer}.self_attn was passed bias=False and mask_check is True"
+         elif not encoder_layer.activation_relu_or_gelu:
+             why_not_sparsity_fast_path = (
+                 f"{enc_layer}.activation_relu_or_gelu was not True"

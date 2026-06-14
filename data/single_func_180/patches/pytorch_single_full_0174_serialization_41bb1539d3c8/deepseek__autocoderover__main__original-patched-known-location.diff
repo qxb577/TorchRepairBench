@@ -1,0 +1,16 @@
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 8d8ae774e3d..8a3cc84a97b 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -342,7 +342,10 @@ def get_unsafe_globals_in_checkpoint(f: FILE_LIKE) -> List[str]:
+     Returns:
+         A list of strings of pickle GLOBALs in the checkpoint that are not allowlisted for ``weights_only``.
+     """
+-    safe_global_strings = set(_weights_only_unpickler._get_allowed_globals().keys())
++    safe_global_strings = set(_weights_only_unpickler._get_allowed_globals().keys()).union(
++        _weights_only_unpickler._get_user_allowed_globals()
++    )
++
+ 
+     with _open_file_like(f, "rb") as opened_file:
+         if not _is_zipfile(opened_file):

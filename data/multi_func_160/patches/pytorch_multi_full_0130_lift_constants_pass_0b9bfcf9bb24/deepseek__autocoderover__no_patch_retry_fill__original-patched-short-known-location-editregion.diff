@@ -1,0 +1,47 @@
+diff --git a/torch/_export/passes/lift_constants_pass.py b/torch/_export/passes/lift_constants_pass.py
+index 27313a71382..dfd96a29453 100644
+--- a/torch/_export/passes/lift_constants_pass.py
++++ b/torch/_export/passes/lift_constants_pass.py
+@@ -103,8 +103,16 @@ def lift_constants_pass(
+     """
+     all_constants: Dict[str, Union[torch.Tensor, torch._C.ScriptObject]] = {}
+ 
+-    if len([node for node in gm.graph.nodes if node.op == "placeholder"]) == 0:
+-        return {}
++    placeholders = [node for node in gm.graph.nodes if node.op == "placeholder"]
++    if not placeholders:
++        if constant_attrs:
++            fake_mode = gm.meta.get("fake_mode")
++            if fake_mode is None:
++                raise RuntimeError("No fake mode available for lifting constant attributes.")
++        else:
++            return {}
++    else:
++        fake_mode = detect_fake_mode(tuple(node.meta["val"] for node in placeholders))
+ 
+     inputs = graph_signature.input_specs
+     num_custom_obj = sum(
+@@ -114,9 +122,6 @@ def lift_constants_pass(
+         input_specs.kind == InputKind.CONSTANT_TENSOR for input_specs in inputs
+     )
+ 
+-    fake_mode = detect_fake_mode(
+-        tuple(node.meta["val"] for node in gm.graph.nodes if node.op == "placeholder")
+-    )
+ 
+     first_user_input_loc, first_user_input = 0, None
+     for node in gm.graph.nodes:
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 3b1f0ac50f4..427b4b1737a 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -780,7 +780,9 @@ def _export(
+             constant_attrs,
+             pre_dispatch=pre_dispatch,
+             transform=_tuplify_outputs,
++            fake_mode=fake_mode,
+         )
++
+         try:
+             range_constraints = make_constraints(
+                 fake_mode,

@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 4276f5c20c2..958d19a225a 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1122,7 +1122,8 @@ class OutputGraph(OutputGraphGuardsState):
+         # realize any unrealized tensor VTs in case they
+         # need to be added to self.nn_modules as attributes
+         for value in stack_values:
+-            value.realize()
++            if hasattr(value, 'realize'):
++                value.realize()
+ 
+         # Use nn.Module "proxies" in the constructed GraphModule so that
+         # the resulting GM does not hold additional strong references to the original modules.
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 3e3579ccf33..e9b3e01378c 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1464,6 +1464,11 @@ class VariableBuilder:
+         # have a stricter match.
+         self.install_guards(GuardBuilder.SEQUENCE_LENGTH)
+ 
++        # Recursively realize the stack_values to handle self-referential lists
++        for item in value:
++            if hasattr(item, 'realize'):
++                item.realize()
++
+         # Tuples are immutable objects, so we should mark its items static. This
+         # avoids wrapping of tuple items as symints. This helps for nn module
+         # attributes like conv2d strides, dilations.

@@ -1,0 +1,61 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 96c5e762bc4..24035bf03db 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2814,6 +2814,19 @@ class BuiltinVariable(VariableTracker):
+         # Rely on constant_handler
+         if isinstance(a, ConstantVariable) and isinstance(b, ConstantVariable):
+             return None
++        if isinstance(
++            a,
++            (
++                ConstDictVariable,
++                DictKeysVariable,
++                MutableMappingVariable,
++                SetVariable,
++                UserDefinedDictVariable,
++                UserDefinedObjectVariable,
++            ),
++        ):
++            return a.call_method(tx, "__ior__", [b], {})
++
+         if isinstance(a, (SymNodeVariable, ConstantVariable)) and isinstance(
+             b, (SymNodeVariable, ConstantVariable)
+         ):
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 8993b4d6bbf..8c1efcc4781 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -1937,6 +1937,32 @@ class UserDefinedDictVariable(UserDefinedObjectVariable):
+         args: "list[VariableTracker]",
+         kwargs: "dict[str, VariableTracker]",
+     ) -> "VariableTracker":
++        if name == "__ior__":
++            assert len(args) == 1
++            self._dict_vt.call_method(tx, "update", args, kwargs)
++            return self
++        if name == "__or__":
++            import torch._dynamo.variables as variables
++            from torch._dynamo.variables.dicts import ValueMutationNew
++
++            assert len(args) == 1
++            other = args[0]
++            if not isinstance(other, (variables.ConstDictVariable, variables.UserDefinedDictVariable)):
++                raise_observed_exception(
++                    TypeError,
++                    tx,
++                    args=[
++                        f"unsupported operand type(s) for |: 'dict' and '{type(other).__name__}'"
++                    ],
++                )
++            new_items = dict(self._dict_vt.items)
++            new_items.update(other.items)
++            new_dict_vt = variables.ConstDictVariable(
++                new_items, mutation_type=ValueMutationNew()
++            )
++            return variables.UserDefinedDictVariable(
++                self.user_cls(), dict_vt=new_dict_vt
++            )
+         method = self._maybe_get_baseclass_method(name)
+         if method in self._dict_methods:
+             # Dict subclasses can override __missing__ to provide fallback

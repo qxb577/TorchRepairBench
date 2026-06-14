@@ -1,0 +1,41 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index 42d51661a69..1021b61e766 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -511,11 +511,7 @@ class SymInt:
+         return self.node.expr
+ 
+     def __hash__(self) -> builtins.int:
+-        if self.node.is_nested_int():
+-            return hash(self.node.nested_int())
+-        else:
+-            # Force specialization
+-            return hash(builtins.int(self))
++        raise TypeError("SymInt is not hashable")
+ 
+ 
+ class SymFloat:
+diff --git a/torch/_numpy/_util.py b/torch/_numpy/_util.py
+index 477d3d44671..e7c4b6391bb 100644
+--- a/torch/_numpy/_util.py
++++ b/torch/_numpy/_util.py
+@@ -90,11 +90,14 @@ def normalize_axis_tuple(axis, ndim, argname=None, allow_duplicate=False):
+             pass
+     # Going via an iterator directly is slower than via list comprehension.
+     axis = tuple([normalize_axis_index(ax, ndim, argname) for ax in axis])
+-    if not allow_duplicate and len(set(axis)) != len(axis):
+-        if argname:
+-            raise ValueError(f"repeated axis in `{argname}` argument")
+-        else:
+-            raise ValueError("repeated axis")
++    if not allow_duplicate:
++        for i in range(len(axis)):
++            for j in range(i + 1, len(axis)):
++                if axis[i] == axis[j]:
++                    if argname:
++                        raise ValueError(f"repeated axis in `{argname}` argument")
++                    else:
++                        raise ValueError("repeated axis")
+     return axis
+ 
+ 

@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 18ce7c4da43..5d6c0888789 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -460,7 +460,12 @@ def add(
+     if not x_is_complex_tensor or not y_is_complex_tensor:
+         return NotImplemented
+ 
++    # Falling back on non-contiguous complex tensors to avoid issues with view.
++    if not x.is_contiguous() or not y.is_contiguous():
++        return NotImplemented
++
+     output_size_zero = False
++
+     if x.ndim == 0 and y.ndim == 0:
+         output_size_zero = True
+ 

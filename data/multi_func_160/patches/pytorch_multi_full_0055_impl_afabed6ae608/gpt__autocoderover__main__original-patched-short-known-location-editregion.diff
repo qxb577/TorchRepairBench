@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index a36c2e32e3f..902a0afa2a2 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -671,7 +671,8 @@ class GraphLowering(torch.fx.Interpreter):
+             # passthrough lowerings from .pattern_matcher
+             return target(*args, **kwargs)
+ 
+-        if target not in lowerings:
++        if target not in lowerings and not hasattr(target, "_custom_op_preserve_stride_order"):
++
+             assert isinstance(
+                 target, torch._ops.OpOverload
+             ), f"{target} is not an OpOverload"

@@ -1,0 +1,17 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index b8461bc0841..dcf888600ef 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1569,10 +1569,11 @@ def get_fake_values_from_nodes(tx, nodes):
+ 
+     args_kwargs = torch.fx.node.map_arg(nodes, visit)
+     return tree_map_only(
+-        torch.Tensor, functools.partial(ensure_graph_fake, tx=tx), args_kwargs
++        (torch.Tensor, torch.nn.Parameter), functools.partial(ensure_graph_fake, tx=tx), args_kwargs
+     )
+ 
+ 
++
+ def get_fake_value(node, tx, allow_non_graph_fake=False):
+     """
+     Run the computation represented by `node` using fake tensors and return the result.

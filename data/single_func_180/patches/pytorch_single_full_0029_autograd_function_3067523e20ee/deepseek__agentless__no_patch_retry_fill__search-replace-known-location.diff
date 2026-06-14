@@ -1,0 +1,15 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index ec3a3f528ab..da6c8d89415 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -859,6 +859,10 @@ class AutogradFunctionApply(HigherOrderOperator):
+                     raise AssertionError("saved_values must not be None")
+                 return torch.fx.Interpreter(bwd).run(*grad, *saved_values)
+ 
++            @staticmethod
++            def setup_context(ctx: Any, inputs: Any, output: Any) -> None:
++                pass
++
+         return ApplyTemplate.apply(*fwd_args)
+ 
+ 

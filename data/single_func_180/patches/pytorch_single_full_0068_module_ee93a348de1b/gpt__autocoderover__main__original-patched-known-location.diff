@@ -1,0 +1,25 @@
+diff --git a/torch/nn/modules/module.py b/torch/nn/modules/module.py
+index 9f2f1f4c03c..4868a161f49 100644
+--- a/torch/nn/modules/module.py
++++ b/torch/nn/modules/module.py
+@@ -1619,7 +1619,8 @@ class Module:
+                 for m in module.named_modules(memo, submodule_prefix, remove_duplicate):
+                     yield m
+ 
+-    def train(self: T, mode: bool = True) -> T:
++    def train(self: T, mode: Union[bool, None] = True) -> T:
++
+         r"""Sets the module in training mode.
+ 
+         This has any effect only on certain modules. See documentations of
+@@ -1634,7 +1635,10 @@ class Module:
+         Returns:
+             Module: self
+         """
++        if not isinstance(mode, bool):
++            raise ValueError(f"Invalid mode: {mode}. Mode should be a boolean value.")
+         self.training = mode
++
+         for module in self.children():
+             module.train(mode)
+         return self

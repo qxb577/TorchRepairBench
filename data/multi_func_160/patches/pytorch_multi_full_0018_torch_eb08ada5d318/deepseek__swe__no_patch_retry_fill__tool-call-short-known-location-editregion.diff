@@ -1,0 +1,46 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index a507a9dff36..9586fc18fae 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1000,12 +1000,38 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+             # then tree_flatten them, we just let Dynamo symbolically interpret
+             # `tree_flatten((args, kwargs))`. This saves us from having to
+             # worry about the reconstruction logic, side effects, and guards.
+-            packed_input_vt = TupleVariable.build(
+-                tx, (TupleVariable.build(tx, args), ConstDictVariable.build(tx, kwargs))
+-            )
++
++            # Capture any tensors that are free variables of the traced function.
++            # These must be passed as additional graph inputs to avoid
++            # references to uncaptured Tensors in the compiled code.
++            captured_tensor_vts = []
++            if hasattr(fn, "__code__") and hasattr(fn, "__closure__"):
++                for freevar, cell in zip(fn.__code__.co_freevars, fn.__closure__ or ()):
++                    captured_val = cell.cell_contents
++                    if isinstance(captured_val, torch.Tensor):
++                        from .. import variables as var_module
++                        # Wrap the raw tensor as a TensorVariable so it becomes
++                        # part of the flattened input spec.
++                        captured_tensor_vts.append(
++                            var_module.TensorVariable(captured_val, source=None)
++                        )
++
++            args_vt = TupleVariable.build(tx, args)
++            kwargs_vt = ConstDictVariable.build(tx, kwargs)
++            if captured_tensor_vts:
++                captured_vt = TupleVariable.build(tx, captured_tensor_vts)
++                packed_input_vt = TupleVariable.build(
++                    tx, (args_vt, kwargs_vt, captured_vt)
++                )
++            else:
++                packed_input_vt = TupleVariable.build(
++                    tx, (args_vt, kwargs_vt)
++                )
++
+             out_vt = variables.UserFunctionVariable(tree_flatten).call_function(
+                 tx, [packed_input_vt], {}
+             )
++
+             assert isinstance(out_vt, TupleVariable) and len(out_vt.items) == 2
+             flat_args_vts, input_spec_vt = out_vt.items
+             assert isinstance(flat_args_vts, ListVariable)

@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 0a9d010b608..2a8ca8b6747 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -1102,7 +1102,7 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+         super().__init__(**kwargs)
+         self.value = value
+         self.value_type = value_type or type(value)
+-        assert type(value) is self.value_type
++        assert isinstance(value, self.value_type)
+         # This is used with __new__, when the new object is sourceless but the user class can be sourceful.
+         self.cls_source = cls_source
+         if cls_source is None and self.source is not None:

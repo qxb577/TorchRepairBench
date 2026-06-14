@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index c1bc2ae9607..b3224563351 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1590,11 +1590,12 @@ class InstructionTranslatorBase(
+         ) and argsvars.has_force_unpack_var_sequence(self):
+             argsvars = TupleVariable(argsvars.force_unpack_var_sequence(self))
+ 
+-        if not isinstance(argsvars, BaseListVariable) or not isinstance(
+-            kwargsvars, ConstDictVariable
++        if not isinstance(argsvars, BaseListVariable) or not (
++            isinstance(kwargsvars, ConstDictVariable) or isinstance(kwargsvars, variables.UserDefinedObjectVariable)
+         ):
+             unimplemented(f"non-static call {typestr(argsvars)} {typestr(kwargsvars)}")
+ 
++
+         # Map to a dictionary of str -> VariableTracker
+         kwargsvars = kwargsvars.keys_as_python_constant()
+         self.call_function(fn, argsvars.items, kwargsvars)

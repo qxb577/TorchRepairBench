@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index f7ac4d073b5..7f8741ad666 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -550,7 +550,10 @@ class VariableBuilder:
+         # Note - There are some nested values where types mismatch!
+         # We want to get those out and wrap those.
+         if is_function_or_wrapper(value):
+-            value = inspect.getattr_static(value, "_torchdynamo_inline", value)
++            inline_fn = inspect.getattr_static(value, "_torchdynamo_inline", None)
++            if inline_fn is not None and inline_fn is not value:
++                self.source = AttrSource(self.source, "_torchdynamo_inline")
++                value = inline_fn
+ 
+         # Everything else (NB: order matters!)
+         if is_traceable_wrapper_subclass(value) or istype(

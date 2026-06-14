@@ -1,0 +1,17 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 0155c689249..0a50135bd22 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -1988,7 +1988,11 @@ def clamp_max(
+     self: TensorLikeType,
+     max: Optional[TensorOrNumberLikeType] = None,
+ ) -> TensorLikeType:
+-    return torch.clamp(self, max=max)  # type: ignore[arg-type]
++    if max is None:
++        return self
++    a_isnan = torch.isnan(self)  # type: ignore[arg-type]
++    condition = torch.bitwise_or(torch.le(self, max), a_isnan)  # type: ignore[arg-type]
++    return torch.where(condition, self, max)  # type: ignore[arg-type]
+ 
+ 
+ #

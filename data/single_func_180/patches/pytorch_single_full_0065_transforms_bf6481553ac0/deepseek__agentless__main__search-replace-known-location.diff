@@ -1,0 +1,21 @@
+diff --git a/torch/distributions/transforms.py b/torch/distributions/transforms.py
+index 05e91a6feea..e84721b0395 100644
+--- a/torch/distributions/transforms.py
++++ b/torch/distributions/transforms.py
+@@ -199,6 +199,16 @@ class Transform(object):
+         """
+         return shape
+ 
++    def __getstate__(self):
++        # Remove the weakref for pickling
++        state = self.__dict__.copy()
++        state.pop('_inv', None)
++        return state
++
++    def __setstate__(self, state):
++        self.__dict__.update(state)
++        self._inv = None
++
+ 
+ class _InverseTransform(Transform):
+     """

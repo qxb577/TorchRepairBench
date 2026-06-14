@@ -1,0 +1,29 @@
+diff --git a/torch/_higher_order_ops/torchbind.py b/torch/_higher_order_ops/torchbind.py
+index deaf9d503b5..eac91b73b55 100644
+--- a/torch/_higher_order_ops/torchbind.py
++++ b/torch/_higher_order_ops/torchbind.py
+@@ -46,13 +46,21 @@ class CallTorchBind(HigherOrderOperator):
+             "call_torchbind(" + str(schema.arguments[0].real_type) + " obj,"
+         )
+         first_comma_index = schema_str.find(",")
+-        new_schema_str = (
+-            new_schema_str + " str method," + schema_str[first_comma_index + 1 :]
+-        )
++        if first_comma_index == -1:
++            # No additional arguments beyond self, e.g., schema_str = "(self: int) -> None"
++            return_part = schema_str.split(" -> ", 1)[1]
++            new_schema_str = (
++                new_schema_str + " str method) -> " + return_part
++            )
++        else:
++            new_schema_str = (
++                new_schema_str + " str method," + schema_str[first_comma_index + 1 :]
++            )
+         new_schema = torch._C.parse_schema(new_schema_str)
+         return new_schema
+ 
+ 
++
+ call_torchbind = CallTorchBind()
+ 
+ # Register this operator as side-effectful with FX.

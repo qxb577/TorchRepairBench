@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 39d6213d558..b2ff06f286e 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -270,7 +270,7 @@ class BuiltinVariable(VariableTracker):
+     ]:
+         # function -> ([forward name, reverse name, in-place name], in-place op)
+         fns: dict[Callable[..., object], tuple[list[str], Callable[..., object]]] = {
+-            operator.add: (["__add__", "__radd__", "__iadd__"], operator.iadd),
++            operator.add: (["__add__", "__radd__", "__iadd__"], lambda x, y: torch.Size(x) + torch.Size(y) if isinstance(x, torch.Size) or isinstance(y, torch.Size) else operator.iadd(x, y)),
+             operator.sub: (["__sub__", "__rsub__", "__isub__"], operator.isub),
+             operator.mul: (["__mul__", "__rmul__", "__imul__"], operator.imul),
+             operator.truediv: (

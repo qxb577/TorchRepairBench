@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 77faecc04af..6e3ce7d2b9a 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -779,7 +779,8 @@ class InstructionTranslatorBase(
+             inner_fn = fn.fn
+         if inner_fn and callable(inner_fn) and is_forbidden(inner_fn):
+             raise AssertionError(f"Attempt to trace forbidden callable {inner_fn}")
+-        self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
++        try:\n            self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg\n        finally:\n            self.kw_names = None
++-type]
+ 
+     def inline_user_function_return(self, fn, args, kwargs):
+         """

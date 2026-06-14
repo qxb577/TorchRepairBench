@@ -1,0 +1,25 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 44ff1e88396..62593103884 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3664,7 +3664,6 @@ def empty_strided(
+ ):
+     assert isinstance(size, (list, tuple))
+     assert isinstance(stride, (list, tuple, type(None)))
+-    assert_nyi(not pin_memory, "pin_memory")
+     assert_nyi(layout in (None, torch.strided), f"layout={layout}")
+     # pyrefly: ignore [bad-argument-type]
+     dtype = decode_dtype(dtype) or torch.get_default_dtype()
+@@ -3687,10 +3686,12 @@ def empty_strided(
+         dtype=dtype,
+         size=size,
+         stride=stride,
++        is_pinned=pin_memory or False,
+     )
+     return pointwise
+ 
+ 
++
+ @register_lowering(aten.new_empty_strided)
+ def new_empty_strided(
+     x, size, stride, *, dtype=None, layout=None, device=None, pin_memory=None

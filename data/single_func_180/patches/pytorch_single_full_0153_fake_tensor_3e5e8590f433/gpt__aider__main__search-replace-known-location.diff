@@ -1,0 +1,13 @@
+diff --git a/torch/_subclasses/fake_tensor.py b/torch/_subclasses/fake_tensor.py
+index 9d2b38f40fe..6817ff2ed90 100644
+--- a/torch/_subclasses/fake_tensor.py
++++ b/torch/_subclasses/fake_tensor.py
+@@ -868,6 +868,8 @@ class FakeTensorMode(TorchDispatchMode):
+             torch._C._get_dispatch_mode(torch._C._TorchDispatchModeKey.FAKE) is None
+         ), func
+         try:
++            if torch.is_inference_mode_enabled():
++                self.cache_enabled = False
+             return self.dispatch(func, types, args, kwargs)
+         except TypeError:
+             log.exception("fake tensor raised TypeError")

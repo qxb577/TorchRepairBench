@@ -1,0 +1,23 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 3ca91814b8a..5ff16acf13b 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -905,6 +905,18 @@ class UnspecializedNNModuleVariable(UserDefinedObjectVariable):
+     def set_nn_module_stack_source(self, source):
+         self.nn_module_stack_source = source
+ 
++    def call_method(self, tx, name, args, kwargs):
++        if name == "__delattr__":
++            if len(args) != 1 or kwargs:
++                raise unimplemented("__delattr__ with multiple args or kwargs")
++            attr_name = args[0].as_python_constant()
++            delattr(self.value, attr_name)
++            if attr_name in self.inst_dict:
++                del self.inst_dict[attr_name]
++            self.is_state_mutated = True
++            return variables.ConstantVariable(None)
++        return super().call_method(tx, name, args, kwargs)
++
+     @staticmethod
+     @functools.cache
+     def _nn_module_method_ids():

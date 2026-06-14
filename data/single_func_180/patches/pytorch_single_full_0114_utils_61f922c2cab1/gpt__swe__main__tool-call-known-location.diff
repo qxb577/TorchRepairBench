@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 41131be1055..483281e30cf 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1751,8 +1751,11 @@ def get_fake_value(node, tx, allow_non_graph_fake=False):
+         UserErrorType,
+     )
+ 
++    if node.op == 'placeholder':
++        return tracer.real_value_cache[node]
+     op = node.op
+ 
++
+     # FX Node should always return the same fake value
+     if "example_value" in node.meta and is_fake(node.meta["example_value"]):
+         return node.meta["example_value"]

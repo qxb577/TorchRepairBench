@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index fcf77cae6e3..299fc721ebb 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -907,13 +907,6 @@ def repeat(x, repeats):
+                     index[i] = ModularIndexing(index[i], 1, old_size[i])
+         return x_loader(index)
+ 
+-    old_size_product = V.graph.sizevars.size_hint(sympy_product(old_size))
+-    if old_size_product > 0:
+-        # maybe realize the input
+-        x.mark_reuse(
+-            V.graph.sizevars.size_hint(sympy_product(new_size)) // old_size_product
+-        )
+-
+     x_loader = x.make_loader()
+     return Pointwise.create(
+         device=x.get_device(),

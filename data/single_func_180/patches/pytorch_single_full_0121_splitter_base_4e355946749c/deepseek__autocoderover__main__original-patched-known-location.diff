@@ -1,0 +1,15 @@
+diff --git a/torch/fx/passes/splitter_base.py b/torch/fx/passes/splitter_base.py
+index 8a23c73785e..6054efd6de2 100644
+--- a/torch/fx/passes/splitter_base.py
++++ b/torch/fx/passes/splitter_base.py
+@@ -329,6 +329,10 @@ class FxNetAccNodesFinder:
+         for node in self.module.graph.nodes:
+             if node.op not in CALLABLE_NODE_OPS:
+                 continue
++            if node.meta.get("val") is not None and isinstance(node.meta["val"], dict):
++                # dataclass nodes produce dict metadata; skip them to avoid empty subgraphs
++                continue
++
+             if node in self.acc_nodes:
+                 continue
+             if is_node_output_tensor(node):

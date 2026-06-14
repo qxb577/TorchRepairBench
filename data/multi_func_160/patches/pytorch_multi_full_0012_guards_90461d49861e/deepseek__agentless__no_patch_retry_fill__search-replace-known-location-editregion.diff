@@ -1,0 +1,29 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index bcded32ab4f..3aaa0c98cfc 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -172,6 +172,14 @@ class NNModuleVariable(VariableTracker):
+             tx, [variables.ConstantVariable.create(name)], {}
+         )
+ 
++    def guard_to_detect_forward_monkeypatching(self, tx):
++        if self.source:
++            from ..guards import GuardBuilder
++            self.source.add_guard(
++                GuardBuilder.NOT_PRESENT_IN_GENERIC_DICT,
++                {"attr": "forward"}
++            )
++
+     def var_getattr(self, tx, name):
+         from .builder import VariableBuilder
+ 
+@@ -219,6 +227,9 @@ class NNModuleVariable(VariableTracker):
+         if name == "__class__" and not object_member:
+             return variables.UserDefinedClassVariable(base.__class__, source=source)
+ 
++        if name == "forward":
++            self.guard_to_detect_forward_monkeypatching(tx)
++
+         if object_member:
+             return VariableBuilder(tx, NNModuleSource(source))(subobj)
+         else:

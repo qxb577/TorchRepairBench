@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/backends/distributed.py b/torch/_dynamo/backends/distributed.py
+index 3b79d1e68cf..f5c34a57602 100644
+--- a/torch/_dynamo/backends/distributed.py
++++ b/torch/_dynamo/backends/distributed.py
+@@ -421,14 +421,8 @@ class DDPOptimizer:
+             # currently assumes that all the args of all ops are
+             # tensors, but in the case of higher order ops, it could be
+             # a graph module. As a workaround, we are shortcircuiting
+-            raise NotImplementedError(
+-                "DDPOptimizer backend: Found a higher order op in the graph. "
+-                "This is not supported. Please turn off DDP optimizer using "
+-                "torch._dynamo.config.optimize_ddp=False. Note that this can "
+-                "cause performance degradation because there will be one bucket "
+-                "for the entire Dynamo graph. Please refer to this issue - "
+-                "https://github.com/pytorch/pytorch/issues/104674."
+-            )
++            pass  # Allow higher order ops for DDPOptimizer
++
+ 
+         # 1: compute the partition map according to DDP bucket logic
+         buckets = [Bucket()]  # (size, param_names)

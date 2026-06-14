@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index a4bc4bf5a49..1234f9ccf1e 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -163,9 +163,13 @@ class SideEffects:
+         assert isinstance(cellvar, variables.NewCellVariable)
+         if self.has_pending_mutation_of_attr(cellvar, "cell_contents"):
+             return self.load_attr(cellvar, "cell_contents")
+-        if cellvar.pre_existing_contents:
+-            return cellvar.pre_existing_contents
+-        unimplemented("cannot read uninitialized cell")
++        try:
++            return variables.VariableTracker.build(self.tx, cellvar.cell.cell_contents)
++        except ValueError:
++            if cellvar.pre_existing_contents:
++                return cellvar.pre_existing_contents
++            unimplemented("cannot read uninitialized cell")
++
+ 
+     def load_global(self, gvar: VariableTracker, name: str):
+         assert isinstance(gvar, variables.VariableTracker)

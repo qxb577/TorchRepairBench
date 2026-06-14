@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/kernel/conv.py b/torch/_inductor/kernel/conv.py
+index d6e802d00aa..619e3056ef4 100644
+--- a/torch/_inductor/kernel/conv.py
++++ b/torch/_inductor/kernel/conv.py
+@@ -592,7 +592,7 @@ def convolution(
+         conv_configs = V.choices.get_conv_configs(device_type)
+ 
+         for cfg in conv_configs(
+-            sympy_product([x.get_size()[0], *x.get_size()[2:]]),
++            sympy_product([x.get_size()[1], *x.get_size()[2:]]),
+             out_chan,
+             in_chan,
+         ):
+diff --git a/torch/_inductor/template_heuristics/triton.py b/torch/_inductor/template_heuristics/triton.py
+index f4c836247df..9b2c9677a7c 100644
+--- a/torch/_inductor/template_heuristics/triton.py
++++ b/torch/_inductor/template_heuristics/triton.py
+@@ -1125,7 +1125,7 @@ class ROCmConfigHeuristic(BaseConfigHeuristic):
+             for num_stages in [1, 2]
+             for num_warps in [2, 4, 8]
+             for mfma in [0, 16]
+-            for wpeu in [0, int(8 // num_warps)]
++            for wpeu in [0, 8 // num_warps]
+         ]
+ 
+         self.exhaustive_flex_attn_bwd_configs: list[FlexConfig] = [

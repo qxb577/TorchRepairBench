@@ -1,0 +1,13 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 637fe29d92f..8093a2ca738 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -94,7 +94,7 @@ def toRealValueType(dtype):
+ 
+ def check_inplace_broadcast(self_shape, *args_shape):
+     broadcasted_shape = tuple(_broadcast_shapes(self_shape, *args_shape))
+-    torch._check(
++    torch._check(isinstance(k, (int, torch.SymInt)) and
+         broadcasted_shape == self_shape,
+         lambda: f"output with shape {self_shape} doesn't match the broadcast shape {broadcasted_shape}",
+     )

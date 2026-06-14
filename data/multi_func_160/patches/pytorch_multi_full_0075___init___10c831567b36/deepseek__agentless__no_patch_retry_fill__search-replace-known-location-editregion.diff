@@ -1,0 +1,39 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index a6c731cd2c1..cdb21375060 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -514,6 +514,9 @@ class SymInt:
+             # Force specialization
+             return hash(builtins.int(self))
+ 
++    def _sympy_(self):
++        return self.node.expr
++
+ 
+ class SymFloat:
+     """
+@@ -622,6 +625,9 @@ class SymFloat:
+             # Force specialization
+             return hash(builtins.float(self))
+ 
++    def _sympy_(self):
++        return self.node.expr
++
+ 
+ class SymBool:
+     """
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index 2d93114cf71..7c7d63a4bc8 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -281,9 +281,7 @@ def convert_shape_to_inductor(
+     trivial. But for symbolic tensors, we need to map from SymIntNode into
+     sympy.Expr.
+     """
+-    return [
+-        i.node.expr if isinstance(i, torch.SymInt) else sympy.Integer(i) for i in lst
+-    ]
++    return [sympy.sympify(i) for i in lst]
+ 
+ 
+ def convert_shape_to_symint(

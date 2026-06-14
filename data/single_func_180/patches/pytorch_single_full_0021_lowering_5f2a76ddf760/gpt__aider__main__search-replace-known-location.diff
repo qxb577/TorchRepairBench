@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 1cb970f4446..3ee13ee4018 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3422,7 +3422,8 @@ fallback_adaptive_avg_pool2d = fallback_handler(aten._adaptive_avg_pool2d)
+ @register_lowering(aten._adaptive_avg_pool2d)
+ def _adaptive_avg_pool2d(x, output_size):
+     assert isinstance(x, TensorBox)
+-    assert len(output_size) == 2
++    if len(output_size) != 2:
++        return fallback_adaptive_avg_pool2d(x, output_size)
+     x.realize_hint()
+ 
+     *batch, h_in, w_in = x.get_size()

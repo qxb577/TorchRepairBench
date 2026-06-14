@@ -1,0 +1,19 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 37279cd1030..bd0d41076a6 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1335,12 +1335,14 @@ def split(x, sizes, dim=0, clamp=True):
+     result = []
+     start = 0
+     for size in sizes:
++        size = V.graph.sizevars.evaluate_static_shape(size)
+         end = start + size
+         result.append(slice_(x, dim, start, end, clamp=clamp))
+         start = end
+     return result
+ 
+ 
++
+ @register_lowering(aten.split_with_sizes, type_promotion_kind=None)
+ def split_with_sizes(x, sizes, dim=0):
+     return split(x, sizes, dim, clamp=False)

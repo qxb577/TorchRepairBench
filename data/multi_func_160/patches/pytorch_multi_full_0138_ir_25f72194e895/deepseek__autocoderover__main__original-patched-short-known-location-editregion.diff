@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 97af0731f1d..fdf7c2dbdd3 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -4415,11 +4415,13 @@ class DynamicScalar(ExternKernel):
+ 
+     # TODO: handle bools carefully
+     def __init__(self, sym, data):
++        data = V.graph.realize_input(data)
+         super().__init__(None, NoneLayout(torch.device("cpu")), self.unwrap_storage([data]))  # type: ignore[arg-type]
+         if isinstance(sym, sympy.Symbol):
+             self.sym = sym
+             self.is_bool = False
+         else:
++
+             # Special case for boolean.  For Reasons(TM), we don't represent
+             # boolean variables directly in sympy; instead, we generate an
+             # indicator integer variable which we then convert to a boolean by

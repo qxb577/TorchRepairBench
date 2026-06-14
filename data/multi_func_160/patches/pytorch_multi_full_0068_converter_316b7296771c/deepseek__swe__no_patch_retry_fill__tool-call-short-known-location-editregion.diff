@@ -1,0 +1,22 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index 568685f9759..eb7ed09c0c4 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -199,11 +199,15 @@ def get_op_overload(node: torch._C.Node):
+         if override:
+             op_overload = getattr(op_overload_packet, override)
+         else:
+-            op_overload = op_overload_packet.default
++            try:
++                op_overload = op_overload_packet.default
++            except AttributeError:
++                op_overload = op_overload_packet
+     except Exception as e:
+         raise RuntimeError(
+             f"Unable to find operator {node.kind()} with schema {node.schema}"
+-        ) from e
++        )
++ from e
+ 
+     return op_overload
+ 

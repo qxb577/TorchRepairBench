@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/standalone_compile.py b/torch/_inductor/standalone_compile.py
+index 5b172088d86..53e7869641a 100644
+--- a/torch/_inductor/standalone_compile.py
++++ b/torch/_inductor/standalone_compile.py
+@@ -58,7 +58,8 @@ class CompiledArtifact:
+         self._artifacts = artifacts
+ 
+     def __call__(self, *args: Any) -> Any:
+-        return self._compiled_fn(*args)[0]
++        return self._compiled_fn(*args)
++
+ 
+     def save(
+         self, *, path: str, format: Literal["binary", "unpacked"] = "binary"

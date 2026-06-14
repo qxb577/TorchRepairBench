@@ -1,0 +1,45 @@
+diff --git a/torch/jit/_trace.py b/torch/jit/_trace.py
+index 7db85602428..c1ab4e34a8f 100644
+--- a/torch/jit/_trace.py
++++ b/torch/jit/_trace.py
+@@ -645,7 +645,6 @@ def analyze_ts_result_with_export_result(export, trace):
+ 
+     flat_export = pytree.tree_leaves(export)
+     flat_trace = pytree.tree_leaves(trace)
+-
+     for orig, loaded in zip(flat_export, flat_trace):
+         if orig.layout != loaded.layout:
+             return False
+@@ -653,16 +652,24 @@ def analyze_ts_result_with_export_result(export, trace):
+         if orig.layout == torch._mkldnn:  # type: ignore[attr-defined]
+             return True
+         if type(orig) != type(loaded):
+-            return False
+-
+-        if isinstance(orig, torch.Tensor):
+-            if orig.dtype != loaded.dtype:
+-                return False
+-            if not torch.allclose(orig, loaded):
++            # Handle implicit conversion of constants to tensors
++            if isinstance(orig, (int, float, bool)) and isinstance(loaded, torch.Tensor):
++                if loaded.numel() != 1 or orig != loaded.item():
++                    return False
++            elif isinstance(loaded, (int, float, bool)) and isinstance(orig, torch.Tensor):
++                if orig.numel() != 1 or loaded != orig.item():
++                    return False
++            else:
+                 return False
+         else:
+-            if orig != loaded:
+-                return False
++            if isinstance(orig, torch.Tensor):
++                if orig.dtype != loaded.dtype:
++                    return False
++                if not torch.allclose(orig, loaded):
++                    return False
++            else:
++                if orig != loaded:
++                    return False
+     return True
+ 
+ 

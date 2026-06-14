@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/fx_passes/split_cat.py b/torch/_inductor/fx_passes/split_cat.py
+index 7636d7cde36..eaf924796e6 100644
+--- a/torch/_inductor/fx_passes/split_cat.py
++++ b/torch/_inductor/fx_passes/split_cat.py
+@@ -1695,7 +1695,8 @@ def normalize_split_default_aten(match: Match, *args, **kwargs):
+         log.debug("val absent for node: %s", split_node)
+         return
+     assert isinstance(split_node.meta["val"], (list, tuple))
+-    split_sections = [t.size()[split_dim] for t in split_node.meta["val"]]
++    split_sections = [t.size(split_dim) for t in split_node.meta["val"]]
++
+     if any(isinstance(section, torch.SymInt) for section in split_sections):
+         # TODO dynamic_shapes with assume_static_by_default=False fails while AOT Autograd tracing.
+         return

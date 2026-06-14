@@ -1,0 +1,14 @@
+diff --git a/torch/_prims_common/__init__.py b/torch/_prims_common/__init__.py
+index 77fba407b95..3cdeb8f124f 100644
+--- a/torch/_prims_common/__init__.py
++++ b/torch/_prims_common/__init__.py
+@@ -2060,7 +2060,8 @@ def are_strides_like_channels_last_or_false(
+         # Assume stride is not 1, the consequence is min could be larger than needed,
+         # which would result in returning False for this function but not vice versa,
+         # so it's ok.
+-        if guard_or_true(strides[d] > 1):
++        if guard_or_true(shape[d] > 1):
++
+             min *= shape[d]
+     return True
+ 

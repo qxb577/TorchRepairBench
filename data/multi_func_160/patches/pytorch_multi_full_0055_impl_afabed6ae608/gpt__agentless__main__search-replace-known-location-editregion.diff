@@ -1,0 +1,25 @@
+diff --git a/torch/_custom_op/impl.py b/torch/_custom_op/impl.py
+index a826b0246a4..3ffeb5e9b4a 100644
+--- a/torch/_custom_op/impl.py
++++ b/torch/_custom_op/impl.py
+@@ -973,4 +973,6 @@ def _custom_op_with_schema(qualname, schema):
+     torch._C._dispatch_set_report_error_callback(
+         ophandle, functools.partial(report_error_callback, weakref.proxy(result))
+     )
+-    return get_op(qualname)
++    op = get_op(qualname)
++    op._custom_op_preserve_stride = True
++    return op
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index a36c2e32e3f..349c514552a 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -671,7 +671,7 @@ class GraphLowering(torch.fx.Interpreter):
+             # passthrough lowerings from .pattern_matcher
+             return target(*args, **kwargs)
+ 
+-        if target not in lowerings:
++        if target not in lowerings and not hasattr(target, "_custom_op_preserve_stride"):
+             assert isinstance(
+                 target, torch._ops.OpOverload
+             ), f"{target} is not an OpOverload"

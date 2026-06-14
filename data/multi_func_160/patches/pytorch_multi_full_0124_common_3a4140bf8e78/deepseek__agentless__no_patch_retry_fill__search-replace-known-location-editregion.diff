@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/kernel/flex/common.py b/torch/_inductor/kernel/flex/common.py
+index 6cc197a35b9..def83a647fb 100644
+--- a/torch/_inductor/kernel/flex/common.py
++++ b/torch/_inductor/kernel/flex/common.py
+@@ -127,8 +127,9 @@ def build_subgraph_module_buffer(
+ 
+     # Since we are allowing mutations/buffer creation, we need to register any fresh buffers
+     # creating during the pointwise subgraph lowering
+-    if len(pw_subgraph.buffers) > 0:
+-        for buffer in pw_subgraph.buffers:
++    existing_buffers = {b.get_name() for b in V.graph.buffers}
++    for buffer in pw_subgraph.buffers:
++        if buffer.get_name() not in existing_buffers:
+             V.graph.register_buffer(buffer)
+ 
+     def convert_output_node_to_buffer(output_buffer) -> Optional[ComputedBuffer]:

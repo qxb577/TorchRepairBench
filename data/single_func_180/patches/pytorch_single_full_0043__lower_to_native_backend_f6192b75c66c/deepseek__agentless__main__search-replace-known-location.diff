@@ -1,0 +1,12 @@
+diff --git a/torch/ao/quantization/fx/_lower_to_native_backend.py b/torch/ao/quantization/fx/_lower_to_native_backend.py
+index aa71fafbf00..184d95e7cdf 100644
+--- a/torch/ao/quantization/fx/_lower_to_native_backend.py
++++ b/torch/ao/quantization/fx/_lower_to_native_backend.py
+@@ -111,6 +111,7 @@ def is_copy_node(node, modules):
+         torch.flatten,
+         torch.mean,
+         operator.floordiv,
++        torch.nn.functional.channel_shuffle,
+     ]
+     method_list = [
+         "clamp",

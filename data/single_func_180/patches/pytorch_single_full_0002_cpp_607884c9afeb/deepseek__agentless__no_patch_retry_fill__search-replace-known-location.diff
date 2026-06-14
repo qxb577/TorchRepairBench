@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index f5692a838ec..f64b788fc28 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -973,11 +973,13 @@ class CppOverrides(OpOverrides):
+ 
+     @staticmethod
+     def bitwise_left_shift(a, b):
+-        return f"decltype({a})({a} << {b})"
++        bits = a.dtype.itemsize * 8
++        return f"(({b}) < {bits} ? decltype({a})({a} << {b}) : decltype({a})(0))"
+ 
+     @staticmethod
+     def bitwise_right_shift(a, b):
+-        return f"decltype({a})({a} >> {b})"
++        bits = a.dtype.itemsize * 8
++        return f"(({b}) < {bits} ? decltype({a})({a} >> {b}) : decltype({a})({a} < 0 ? -1 : 0))"
+ 
+     @staticmethod
+     def rand(seed: sympy.Expr, offset: sympy.Expr):

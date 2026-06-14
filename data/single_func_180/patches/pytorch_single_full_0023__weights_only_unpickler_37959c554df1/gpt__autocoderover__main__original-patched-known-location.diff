@@ -1,0 +1,15 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 9a146632ded..7efe5380bec 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -171,8 +171,9 @@ def _get_allowed_globals():
+     }
+ 
+     # dtype
+-    for t in torch.storage._dtype_to_storage_type_map().keys():
++    for t in torch._utils._get_all_dtypes():
+         rc[str(t)] = t
++
+     for t in torch.storage._new_dtypes():
+         rc[str(t)] = t
+     # Tensor classes

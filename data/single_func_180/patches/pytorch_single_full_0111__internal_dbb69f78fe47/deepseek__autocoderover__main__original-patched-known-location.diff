@@ -1,0 +1,18 @@
+diff --git a/torch/_logging/_internal.py b/torch/_logging/_internal.py
+index 24e8cc3a14d..98034ae33d9 100644
+--- a/torch/_logging/_internal.py
++++ b/torch/_logging/_internal.py
+@@ -305,8 +305,13 @@ def set_logs(
+                 val = default_level
+ 
+             if log_registry.is_artifact(alias):
++                if not isinstance(val, bool):
++                    raise ValueError(
++                        f"Artifact flag '{alias}' must be a boolean, got {type(val).__name__}"
++                    )
+                 if val:
+                     log_state.enable_artifact(alias)
++
+             elif log_registry.is_log(alias) or alias in log_registry.child_log_qnames:
+                 if val not in logging._levelToName:
+                     raise ValueError(

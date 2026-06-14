@@ -1,0 +1,40 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 5a19e707689..b6b4ff0cf62 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2272,9 +2272,12 @@ class BuiltinVariable(VariableTracker):
+             )
+         if hasattr(a, "set_items") and hasattr(b, "set_items"):
+             return SetVariable(list(a.set_items | b.set_items))
++        if isinstance(a, ConstDictVariable) and isinstance(b, ConstDictVariable):
++            return a.call_method(tx, "__or__", [b], {})
+         # None no-ops this handler and lets the driving function proceed
+         return None
+ 
++
+     call_ior = call_or_
+ 
+     def call_not_(self, tx: "InstructionTranslator", a):
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 2703d8c4eb7..de51ee1a978 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -534,9 +534,18 @@ class ConstDictVariable(VariableTracker):
+             self.items.pop(key)
+             self.items[key] = val
+             return ConstantVariable.create(None)
++        elif name == "__or__" and not kwargs and len(args) == 1:
++            other = args[0]
++            if isinstance(other, ConstDictVariable):
++                new_items = dict(self.items)
++                new_items.update(other.items)
++                return ConstDictVariable(new_items, user_cls=dict)
++            else:
++                unimplemented("dict.__or__ with unsupported other")
+         else:
+             return super().call_method(tx, name, args, kwargs)
+ 
++
+     def unpack_var_sequence(self, tx):
+         self.install_dict_keys_match_guard()
+         return [x.vt for x in self.items.keys()]

@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 18ce7c4da43..c3337d696fb 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -497,9 +497,8 @@ def add(
+     x = x + 0
+     z = z + 0
+ 
+-    x_reshaped = reshape_tensor_complex(x.view(x.real.dtype))
+-    z_reshaped = reshape_tensor_complex(z.view(y.real.dtype))
+-    result = torch.flatten(x_reshaped + z_reshaped, start_dim=-2).view(complex_type)
++    result = x + z
++
+ 
+     if output_size_zero:
+         return result[0]

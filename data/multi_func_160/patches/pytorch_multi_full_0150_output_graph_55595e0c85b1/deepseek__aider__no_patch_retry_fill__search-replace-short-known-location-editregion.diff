@@ -1,0 +1,43 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 24417fa508a..ff6fa3125a1 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1746,6 +1746,17 @@ class OutputGraph:
+                     update_used_symbols(used_symbols, fake)
+ 
+         # After removing unused graphargs, prune unused binds_symbol
++        # Keep symbols from deferred runtime assertions alive, so we don't
++        # prune graphargs that are needed for these assertions.
++        if hasattr(self, 'shape_env') and self.shape_env is not None:
++            deferred_ras = getattr(self.shape_env, 'deferred_runtime_asserts', {})
++            if isinstance(deferred_ras, dict):
++                for sym in deferred_ras.keys():
++                    used_symbols.add(sym)
++            else:
++                for sym in deferred_ras:
++                    used_symbols.add(sym)
++
+         for node in recheck_placeholders:
+             symbol = placeholder_binds_symbol(node)
+             if symbol is not None:
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index 383d5158c2b..5c89ef37c6f 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -1811,6 +1811,7 @@ class GraphLowering(torch.fx.Interpreter):
+                 self.register_buffer(assert_op, set_name=True)
+                 self.register_operation(assert_op)
+ 
++            self.bound_unbacked_symbols |= new_unbacked_defs
+             for i0 in new_unbacked_defs:
+                 ras = self.ras_by_symbol.pop(i0, [])
+                 # NB: size-like not needed, we won't retrace
+@@ -1840,8 +1841,6 @@ class GraphLowering(torch.fx.Interpreter):
+                     else:
+                         make_assert(ra.expr, f"{ra.expr}")
+ 
+-            self.bound_unbacked_symbols |= new_unbacked_defs
+-
+             unbacked_bindings = resolve_unbacked_bindings(
+                 V.graph.sizevars.shape_env, n.meta.get("unbacked_bindings", {})
+             )

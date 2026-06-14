@@ -1,0 +1,19 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..fa804c88523 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -246,9 +246,13 @@ class PackageExporter:
+         package_name = (
+             module_name if is_package else module_name.rsplit(".", maxsplit=1)[0]
+         )
+-        dep_pairs = find_files_source_depends_on(src, package_name)
++        try:
++            dep_pairs = find_files_source_depends_on(src, package_name)
++        except ValueError:
++            dep_pairs = []
+         # Use a dict to get uniquing but also deterministic order
+         dependencies = {}
++
+         for dep_module_name, dep_module_obj in dep_pairs:
+             # handle the case where someone did something like `from pack import sub`
+             # where `sub` is a submodule. In this case we don't have to save pack, just sub.

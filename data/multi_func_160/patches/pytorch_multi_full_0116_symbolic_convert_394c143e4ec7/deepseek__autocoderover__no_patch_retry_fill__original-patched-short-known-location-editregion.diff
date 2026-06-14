@@ -1,0 +1,42 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 33c56e69933..5fa29b09a02 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -568,16 +568,20 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+                 # the cell correctly - that is, the cell's contents are treated as if they
+                 # are local variables, like in UserFunctionVariable's bind_args for freevars.
+                 cand = parent
+-                while cand and name not in cand.symbolic_locals:
++                while cand and name not in cand.symbolic_locals and name not in getattr(cand, 'closure_cells', {}):
+                     cand = cand.parent
+                 if cand is None:
+                     raise RuntimeError(
+-                        f"Couldn't find {name} in the symbolic_locals of the inline interpreter stack"
++                        f"Couldn't find {name} in the symbolic_locals or closure_cells of the inline interpreter stack"
+                     )
+-                result[name] = cand.symbolic_locals[name]
++                if name in cand.symbolic_locals:
++                    result[name] = cand.symbolic_locals[name]
++                else:
++                    result[name] = cand.closure_cells[name]
+             else:
+                 closure_cells[name] = self.closure.items[idx]
+ 
++
+         return result, closure_cells
+ 
+     def export_freevars(self, parent, child):
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 54b57348351..90c0c44af2e 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -346,7 +346,8 @@ class ClosureVariable(UnknownVariable):
+         self.name = name
+ 
+     def reconstruct(self, codegen):
+-        codegen.append_output(codegen.create_load_closure(self.name))
++        codegen.append_output(codegen.create_load(self.name))
++
+ 
+ 
+ # closure variable created by an inlined function

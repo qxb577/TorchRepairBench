@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index fac68fa5242..2978ec59a85 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -589,6 +589,20 @@ def generic_jump(truth_fn: typing.Callable[[object], bool], push: bool):
+                 if push:
+                     self.push(value)
+                 self.jump(inst)
++        elif isinstance(value, DictVariable):
++            # Insert length guard on dict truthiness
++            length_sym = value.call_method(
++                self,
++                "__len__",
++                [],
++                {},
++            ).as_sym_int()
++            expected = truth_fn(True)  # True if truth_fn returns True for non-empty
++            guard_expr = length_sym > 0 if expected else length_sym == 0
++            torch.fx.experimental.symbolic_shapes.expect_true(guard_expr)
++            if push:
++                self.push(value)
++            self.jump(inst)
+         elif isinstance(value, UnspecializedNNModuleVariable):
+             mod = value.value
+             if truth_fn(mod):

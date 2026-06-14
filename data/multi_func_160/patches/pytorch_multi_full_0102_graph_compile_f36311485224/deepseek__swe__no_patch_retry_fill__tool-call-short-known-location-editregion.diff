@@ -1,0 +1,37 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9e9fbb77c3d..81ee1d44eab 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3030,11 +3030,29 @@ class SqueezeView(BaseView):
+             return ReinterpretView(data=storage, layout=new_layout)
+ 
+         if dim is None:
+-            # redirect to a generic view
+-            return View.create(x, [s for s in x.get_size() if s != 1])
++            new_size = [s for s in x.get_size() if s != 1]
++            new_stride = [stride for size, stride in zip(x.get_size(), x.get_stride()) if size != 1]
++            layout = FixedLayout(
++                x.get_device(),
++                x.get_dtype(),
++                new_size,
++                new_stride,
++                x.get_layout().offset,
++            )
++            return ReinterpretView(data=x, layout=layout)
+         else:
+             assert x.get_size()[dim] == 1
+-            return View.create(x, [s for i, s in enumerate(x.get_size()) if i != dim])
++            new_size = [s for i, s in enumerate(x.get_size()) if i != dim]
++            new_stride = [stride for i, stride in enumerate(x.get_stride()) if i != dim]
++            layout = FixedLayout(
++                x.get_device(),
++                x.get_dtype(),
++                new_size,
++                new_stride,
++                x.get_layout().offset,
++            )
++            return ReinterpretView(data=x, layout=layout)
++
+ 
+     @staticmethod
+     def squeezer(

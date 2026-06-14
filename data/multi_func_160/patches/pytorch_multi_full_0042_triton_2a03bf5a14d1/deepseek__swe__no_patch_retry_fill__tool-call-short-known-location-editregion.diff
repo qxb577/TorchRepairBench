@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/runtime/triton_heuristics.py b/torch/_inductor/runtime/triton_heuristics.py
+index 75584a60c0f..483a117de20 100644
+--- a/torch/_inductor/runtime/triton_heuristics.py
++++ b/torch/_inductor/runtime/triton_heuristics.py
+@@ -1751,6 +1751,8 @@ def grid(*numels):
+             x_grid,
+             y_grid,
+             z_grid,
++
++            z_grid,
+         )
+ 
+     setattr(grid_fn, "grid_fn_str", f"grid({numels})")  # noqa: B010

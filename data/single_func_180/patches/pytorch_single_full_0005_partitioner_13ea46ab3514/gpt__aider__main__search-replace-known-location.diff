@@ -1,0 +1,18 @@
+diff --git a/torch/fx/passes/infra/partitioner.py b/torch/fx/passes/infra/partitioner.py
+index 7bb536dbba9..eda40126e78 100644
+--- a/torch/fx/passes/infra/partitioner.py
++++ b/torch/fx/passes/infra/partitioner.py
+@@ -94,7 +94,12 @@ class CapabilityBasedPartitioner:
+         # DFS starting from the partition id in the key.
+         partition_map: dict[int, set] = collections.defaultdict(set)
+ 
+-        # assumptions: nodes in candidate list is sorted in topological order
++        # assumptions: nodes in candidate list are sorted in topological order
++        def reassign_getitem_chain(node, partition_id):
++            current = node.args[0]
++            while hasattr(current, 'op') and current.op == "call_function" and current.target == operator.getitem:
++                assignment[current] = partition_id
++                current = current.args[0]
+         assignment: dict[Node, int] = {}  # mapping from node to partition_id
+         partitions_by_id: dict[
+             int, Partition

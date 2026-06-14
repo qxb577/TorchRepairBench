@@ -1,0 +1,32 @@
+diff --git a/torch/distributed/fsdp/_fully_shard/_fsdp_api.py b/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
+index af5a3624764..3a85576c2d3 100644
+--- a/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
++++ b/torch/distributed/fsdp/_fully_shard/_fsdp_api.py
+@@ -52,7 +52,8 @@ class MixedPrecisionPolicy:
+         # then we do not need extra casting
+         if self.param_dtype == self.reduce_dtype:
+             # Bypass the frozen dataclass checks
+-            object.__setattr__(self, "reduce_dtype", None)
++            object.__setattr__(self, "reduce_dtype", self.param_dtype)
++
+ 
+ 
+ @dataclass
+diff --git a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+index 20bd13c3800..96628078025 100644
+--- a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
++++ b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+@@ -419,9 +419,13 @@ class FSDPParam:
+         if param_dtype == self.orig_dtype:
+             param_dtype = None
+         self.param_dtype = param_dtype
++        # Clamp `reduce_dtype` to `None` if no casting is required
++        if reduce_dtype == self.orig_dtype:
++            reduce_dtype = None
+         self.reduce_dtype = reduce_dtype
+         # None indicates that the mixed precision is not enabled
+ 
++
+     def _init_extensions(self) -> None:
+         inner_tensor = self._sharded_local_tensor
+         has_fsdp_pre_all_gather = hasattr(inner_tensor, "fsdp_pre_all_gather")

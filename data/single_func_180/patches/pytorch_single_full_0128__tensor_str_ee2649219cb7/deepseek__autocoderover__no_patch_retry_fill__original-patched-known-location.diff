@@ -1,0 +1,23 @@
+diff --git a/torch/_tensor_str.py b/torch/_tensor_str.py
+index 921e97be233..e3d15098a05 100644
+--- a/torch/_tensor_str.py
++++ b/torch/_tensor_str.py
+@@ -156,8 +156,16 @@ class _Formatter:
+             )
+ 
+             if nonzero_finite_vals.numel() == 0:
+-                # no valid number, do nothing
+-                return
++                # no valid number, use zero as a sample to compute max_width
++                nonzero_finite_vals = tensor_view.new_zeros(1)
++                nonzero_finite_abs = nonzero_finite_vals.abs()
++                nonzero_finite_min = nonzero_finite_abs.min()
++                nonzero_finite_max = nonzero_finite_abs.max()
++            else:
++                nonzero_finite_abs = tensor_totype(nonzero_finite_vals.abs())
++                nonzero_finite_min = tensor_totype(nonzero_finite_abs.min())
++                nonzero_finite_max = tensor_totype(nonzero_finite_abs.max())
++
+ 
+             if tensor.dtype == torch.float8_e8m0fnu:  # type: ignore[attr-defined]
+                 # float8_e8m0fnu is special and does not define arithmetic ops,

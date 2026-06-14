@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 5b39a0fe435..28d4f4774cd 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -224,6 +224,10 @@ class BlockPtrOptions:
+     def has_mask(self):
+         return bool(self.boundary_check())
+ 
++    def has_rmask(self):
++        return False
++
++
+ 
+ def triton_reshape(value: str, old_shape: List[str], new_shape: List[str]):
+     """Workaround https://github.com/openai/triton/issues/2836"""

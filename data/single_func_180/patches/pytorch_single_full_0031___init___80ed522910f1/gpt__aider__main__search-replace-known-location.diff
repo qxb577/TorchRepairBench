@@ -1,0 +1,13 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 4ea23ae3233..b4def3fbd69 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -4031,7 +4031,7 @@ def rot90(
+ 
+ 
+ def _check_stack_inputs(tensors: TensorSequenceType) -> None:
+-    entry_shape = tensors[0].shape
++    entry_shape = tuple(tensors[0].shape)
+     for i in range(1, len(tensors)):
+         assert tensors[i].shape == entry_shape, (
+             f"stack expects each tensor to be equal size, but got {entry_shape} at entry 0 "

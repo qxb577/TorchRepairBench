@@ -1,0 +1,27 @@
+diff --git a/torch/_functorch/_aot_autograd/subclass_utils.py b/torch/_functorch/_aot_autograd/subclass_utils.py
+index cc657ce7f57..f345f88c5e7 100644
+--- a/torch/_functorch/_aot_autograd/subclass_utils.py
++++ b/torch/_functorch/_aot_autograd/subclass_utils.py
+@@ -9,6 +9,7 @@ from typing import Any, List, Optional, Tuple, Union
+ import torch.utils._pytree as pytree
+ 
+ from torch import Tensor
++from torch._subclasses.fake_tensor import FakeTensor
+ from torch.utils._python_dispatch import is_traceable_wrapper_subclass
+ 
+ from .schemas import SubclassCreationMeta, ViewAndMutationMeta
+@@ -22,12 +23,12 @@ def requires_subclass_dispatch(args, fw_metadata: ViewAndMutationMeta) -> bool:
+     any_subclass_args = any(
+         is_traceable_wrapper_subclass(x)
+         for x in args_flattened
+-        if isinstance(x, Tensor)
++        if isinstance(x, Tensor) and not isinstance(x, FakeTensor)
+     )
+     any_subclass_outputs = any(
+         is_traceable_wrapper_subclass(x)
+         for x in fw_metadata.traced_tangents
+-        if isinstance(x, Tensor)
++        if isinstance(x, Tensor) and not isinstance(x, FakeTensor)
+     )
+     # This tells us whether or not we need to perform any unwrapping/wrapping of tensor subclasses at runtime.
+     return any_subclass_args or any_subclass_outputs

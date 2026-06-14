@@ -1,0 +1,13 @@
+diff --git a/torch/testing/_creation.py b/torch/testing/_creation.py
+index c541ae1d932..4663ac8c0a0 100644
+--- a/torch/testing/_creation.py
++++ b/torch/testing/_creation.py
+@@ -18,7 +18,7 @@ _FLOATING_OR_COMPLEX_TYPES = [*_FLOATING_TYPES, *_COMPLEX_TYPES]
+ def _uniform_random_(t: torch.Tensor, low: float, high: float) -> torch.Tensor:
+     # uniform_ requires to-from <= std::numeric_limits<scalar_t>::max()
+     # Work around this by scaling the range before and after the PRNG
+-    if high - low >= torch.finfo(t.dtype).max:
++    if t.dtype in torch.testing._integral_types and high - low >= torch.iinfo(t.dtype).max:
+         return t.uniform_(low / 2, high / 2).mul_(2)
+     else:
+         return t.uniform_(low, high)

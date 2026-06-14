@@ -1,0 +1,28 @@
+diff --git a/torch/_functorch/_aot_autograd/frontend_utils.py b/torch/_functorch/_aot_autograd/frontend_utils.py
+index 55b84c12df8..7da644a34a0 100644
+--- a/torch/_functorch/_aot_autograd/frontend_utils.py
++++ b/torch/_functorch/_aot_autograd/frontend_utils.py
+@@ -270,7 +270,8 @@ def _detect_attribute_assignment(mod: torch.nn.Module):
+             _collect_assigned_tensor_attributes, snapshot, new_attrs
+         )
+         # restore state of all attributes (including, e.g., of primitive types)
+-        mod.__dict__.update(snapshot)
++        mod.__dict__.update({k: v for k, v in snapshot.items() if k in mod.__dict__})
++
+ 
+         if assigned_tensor_attributes:
+             if len(assigned_tensor_attributes) > 1:
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..ae9b8930e0f 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -2047,7 +2047,8 @@ def _export_for_training(
+         verify_additional_inputs,
+     ) = _process_export_inputs(mod, args, kwargs, dynamic_shapes)
+ 
+-    original_state_dict = _get_original_state_dict(mod)
++    original_state_dict = {k: v.clone() for k, v in _get_original_state_dict(mod).items()}
++
+ 
+     # Call the appropriate export function based on the strictness of tracing.
+     export_func = _strict_export if strict else _non_strict_export

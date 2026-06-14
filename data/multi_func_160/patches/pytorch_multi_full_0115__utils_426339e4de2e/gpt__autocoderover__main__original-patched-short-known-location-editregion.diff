@@ -1,0 +1,20 @@
+diff --git a/torch/_utils.py b/torch/_utils.py
+index 3315d6548d1..27f769a61b1 100644
+--- a/torch/_utils.py
++++ b/torch/_utils.py
+@@ -177,10 +177,14 @@ def _get_async_or_non_blocking(function_name, non_blocking, kwargs):
+ # be a TypedStorage
+ def _rebuild_tensor(storage, storage_offset, size, stride):
+     # first construct a tensor with the correct dtype/device
+-    t = torch.tensor([], dtype=storage.dtype, device=storage._untyped_storage.device)
++    if isinstance(storage, torch._subclasses.FakeTensor):
++        t = torch._subclasses.FakeTensor([], dtype=storage.dtype, device=storage.device)
++    else:
++        t = torch.tensor([], dtype=storage.dtype, device=storage._untyped_storage.device)
+     return t.set_(storage._untyped_storage, storage_offset, size, stride)
+ 
+ 
++
+ def get_tensor_metadata(tensor):
+     # Tensor's Metadata for serializing.
+     # Currently, this only returns a dict[string, bool] specifing whether

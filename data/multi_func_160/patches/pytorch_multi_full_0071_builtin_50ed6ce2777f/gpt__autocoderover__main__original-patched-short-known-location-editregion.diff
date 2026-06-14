@@ -1,0 +1,33 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 8f9859e80c5..2436ca0e742 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1975,9 +1975,12 @@ class BuiltinVariable(VariableTracker):
+             install_guard(args[0].source.make_guard(GuardBuilder.ID_MATCH))
+             constant_result = id(args[0].value)
+             return variables.ConstantVariable.create(constant_result)
++        elif len(args) == 1 and isinstance(args[0], variables.TensorVariable):
++            return args[0].call_id(tx)
+         else:
+             unimplemented(f"call_id with args {args}")
+ 
++
+     def call_deepcopy(self, tx: "InstructionTranslator", x):
+         unimplemented(f"copy.deepcopy {repr(x)}")
+ 
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 74bb779489a..bc6329b2a03 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -444,7 +444,11 @@ class TensorVariable(VariableTracker):
+             raise NotImplementedError
+         return result
+ 
++    def call_id(self, tx: "InstructionTranslator"):
++        return variables.ConstantVariable.create(id(self.proxy.node))
++
+     def has_unpack_var_sequence(self, tx):
++
+         return self.ndim > 0
+ 
+     def unpack_var_sequence(self, tx: "InstructionTranslator", idxes=None):

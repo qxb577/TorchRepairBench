@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 5db712372a1..61901041883 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -5069,9 +5069,10 @@ def adaptive_max_pool2d(x, output_size):
+ 
+ 
+ def _fractional_pooling_offsets(samples, in_sz, out_sz, kernel_sz, dim, ndims):
+-    out_sz = out_sz[dim]
+-    in_sz = in_sz[dim]
+-    kernel_sz = kernel_sz[dim]
++    out_sz = out_sz[dim] if isinstance(out_sz, (list, tuple)) else out_sz
++    in_sz = in_sz[dim] if isinstance(in_sz, (list, tuple)) else in_sz
++    kernel_sz = kernel_sz[dim] if isinstance(kernel_sz, (list, tuple)) else kernel_sz
++
+     samples_loader = samples.make_loader()
+ 
+     def load(prefix, i):

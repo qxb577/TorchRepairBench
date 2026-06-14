@@ -1,0 +1,16 @@
+diff --git a/torch/utils/data/dataset.py b/torch/utils/data/dataset.py
+index 73f71f80921..2e58d09146e 100644
+--- a/torch/utils/data/dataset.py
++++ b/torch/utils/data/dataset.py
+@@ -316,8 +316,11 @@ class Subset(Dataset[T_co]):
+         self.indices = indices
+ 
+     def __getitem__(self, idx):
++        if isinstance(idx, slice):
++            return Subset(self.dataset, self.indices[idx])
+         return self.dataset[self.indices[idx]]
+ 
++
+     def __len__(self):
+         return len(self.indices)
+ 

@@ -1,0 +1,14 @@
+diff --git a/torch/export/_unlift.py b/torch/export/_unlift.py
+index ae4c09b7c8c..6ae3973c87c 100644
+--- a/torch/export/_unlift.py
++++ b/torch/export/_unlift.py
+@@ -46,7 +46,8 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+     def _normalize_type(t):
+         return str(_pytree_subclasses_that_lose_info.get(t, t))
+ 
+-    def _match_normalized_structure(a, b):
++    def _match_normalized_structure(x, y)
++:
+         if a is b:
+             return True
+         if _normalize_type(a.type) != _normalize_type(b.type):

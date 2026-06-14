@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 9d4b644543c..070393ffb58 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3275,7 +3275,8 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+         if name in self.closure_cells:
+             return self.closure_cells[name]
+         else:
+-            return InlinedClosureVariable(name=name)
++            return InlinedClosureVariable(name=name, closure_cells=self.closure_cells)
++
+ 
+     def check_replace_is_safe(self, oldvar):
+         if not is_side_effect_safe(oldvar.mutable_local):
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 33c56e69933..1b70fd713e4 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -539,7 +539,8 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+         return self.f_globals
+ 
+     def bind_args(self, parent, args, kwargs):
+-        from .misc import InlinedClosureVariable
++        from .misc import InlinedClosureVariable, ClosureVariable
++
+ 
+         code = self.get_code()
+         func = types.FunctionType(
+@@ -560,7 +561,8 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+         for idx, name in enumerate(code.co_freevars):
+             cell = self.closure.items[idx]
+             assert name not in result
+-            if isinstance(cell, InlinedClosureVariable):
++            if isinstance(cell, (InlinedClosureVariable, ClosureVariable)):
++
+                 # InlinedClosureVariable's are created from LOAD_CLOSURE's from
+                 # InliningInstructionTranslators when the variable name is not found in closure_cells.
+                 # They should remain outside of closure_cells, so that our callee (the
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 54b57348351..d1bb18be364 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -341,9 +341,12 @@ class ClosureVariable(UnknownVariable):
+         *UnknownVariable._nonvar_fields,
+     }
+ 
+-    def __init__(self, name, **kwargs) -> None:
++    def __init__(self, name, closure_cells=None, **kwargs) -> None:
++
+         super().__init__(**kwargs)
+         self.name = name
++        self.closure_cells = closure_cells or {}
++
+ 
+     def reconstruct(self, codegen):
+         codegen.append_output(codegen.create_load_closure(self.name))

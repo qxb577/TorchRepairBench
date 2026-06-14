@@ -1,0 +1,15 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index 879e0f5f93a..d1b4df21981 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -781,8 +781,9 @@ def _safe_copy(dst: torch.Tensor, src: Optional[torch.Tensor]) -> None:
+ 
+ 
+ def _safe_clone(src: torch.Tensor) -> Optional[torch.Tensor]:
+-    if type(src) is not torch.Tensor:
++    if type(src) is not torch.Tensor and type(src) is not torch.nn.Buffer:
+         return None
++
+     return src.clone()
+ 
+ 

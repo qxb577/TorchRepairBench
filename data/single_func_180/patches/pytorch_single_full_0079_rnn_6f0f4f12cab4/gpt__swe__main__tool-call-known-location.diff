@@ -1,0 +1,16 @@
+diff --git a/torch/nn/modules/rnn.py b/torch/nn/modules/rnn.py
+index 5726e31d419..09569b057f0 100644
+--- a/torch/nn/modules/rnn.py
++++ b/torch/nn/modules/rnn.py
+@@ -499,7 +499,10 @@ class RNN(RNNBase):
+     def forward(self, input: PackedSequence, hx: Optional[Tensor] = None) -> Tuple[PackedSequence, Tensor]:
+         pass
+ 
+-    def forward(self, input, hx=None):  # noqa: F811
++    def forward(self, input, hx=None):
++        if input.size(-1) != self.input_size:
++            raise RuntimeError(f"input.size(-1) must be equal to input_size. Expected {self.input_size}, got {input.size(-1)}")
++  # noqa: F811
+         self._update_flat_weights()
+ 
+         num_directions = 2 if self.bidirectional else 1

@@ -1,0 +1,23 @@
+diff --git a/torch/_higher_order_ops/cond.py b/torch/_higher_order_ops/cond.py
+index ae4dba02bac..a294de34459 100644
+--- a/torch/_higher_order_ops/cond.py
++++ b/torch/_higher_order_ops/cond.py
+@@ -27,6 +27,7 @@ from torch.fx.experimental.proxy_tensor import (
+     disable_proxy_modes_tracing,
+     ProxyTorchDispatchMode,
+     track_tensor_tree,
++    _temp_remove_pre_dispatch_torch_function_mode,
+ )
+ from torch.fx.passes.shape_prop import _extract_tensor_metadata
+ from torch.utils._python_dispatch import _get_current_dispatch_mode
+@@ -131,8 +132,8 @@ def cond(pred, true_fn, false_fn, operands):
+     if not torch._dynamo.is_dynamo_supported():
+         raise RuntimeError("torch.cond requires dynamo support.")
+ 
+-    with _set_compilation_env():
+-        with torch._dynamo.utils.disable_cache_limit():
++    with _set_compilation_env(), torch._dynamo.utils.disable_cache_limit():
++        with _temp_remove_pre_dispatch_torch_function_mode():
+             return torch.compile(cond_op, backend="eager", fullgraph=True)(
+                 pred, true_fn, false_fn, operands
+             )

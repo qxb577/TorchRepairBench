@@ -1,0 +1,42 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index fd5b54e4f7f..9978d8e668f 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -531,7 +531,8 @@ class SideEffects:
+         for var in self._get_modified_vars():
+             if isinstance(var, variables.ListVariable):
+                 # old[:] = new
+-                cg(var, allow_cache=False)
++                cg(var, allow_cache=True)
++
+                 cg(var.mutable_local.source)  # type: ignore[attr-defined]
+                 cg.extend_output(
+                     [
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 193e227267e..8333a685f34 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -640,7 +640,8 @@ class VariableBuilder:
+                     source=self.source,
+                 )
+             else:
+-                result = ConstDictVariable(result, type(value), source=self.source)
++                result = ConstDictVariable(result, type(value), source=self.source, mutable_local=MutableLocal())
++
+ 
+             return self.set_source_and_track_mutable(value, result)
+         elif isinstance(value, torch.nn.Module):
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index e8323ec6f70..4a07da0dc73 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -130,7 +130,8 @@ class ConstDictVariable(VariableTracker):
+     def __init__(
+         self, items: Dict[VariableTracker, VariableTracker], user_cls=dict, **kwargs
+     ) -> None:
+-        super().__init__(**kwargs)
++        super().__init__(items=items, **kwargs)
++
+ 
+         Hashable = ConstDictVariable._HashableTracker
+ 

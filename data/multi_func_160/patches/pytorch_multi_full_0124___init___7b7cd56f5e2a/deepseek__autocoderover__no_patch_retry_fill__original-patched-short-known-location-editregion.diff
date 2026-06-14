@@ -1,0 +1,57 @@
+diff --git a/torch/_prims_common/__init__.py b/torch/_prims_common/__init__.py
+index b2721129cff..a9f90a4335b 100644
+--- a/torch/_prims_common/__init__.py
++++ b/torch/_prims_common/__init__.py
+@@ -460,7 +460,8 @@ def is_non_overlapping_and_dense(a: Tensor) -> bool:
+     # Short-circuits for tensors of rank one, which are
+     # non-overlapping and "dense" if their stride is one
+     if a.ndim == 1:
+-        return a.stride()[0] == 1
++        return guard_size_oblivious(a.stride()[0] == 1)
++
+ 
+     # Checks that there exists a permutation of the strides s.t. the tensor would be contiguous
+     # Sorts (length, stride) pairs by stride
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index e128a3b5f81..ff396f4992b 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -2975,12 +2975,21 @@ def contiguous(
+         lambda: "preserve memory format is unsupported by the contiguous operator",
+     )
+ 
++    # If any dimension is an unbacked symbolic integer, we cannot prove
++    # contiguity, so clone to guarantee the desired memory format.
++    if any(
++        isinstance(dim, torch.SymInt) and not dim.is_constant()
++        for dim in a.shape
++    ):
++        return torch.clone(a, memory_format=memory_format)
++
+     if utils.is_contiguous_for_memory_format(a, memory_format=memory_format):
+         return a
+ 
+     return torch.clone(a, memory_format=memory_format)
+ 
+ 
++
+ @out_wrapper()
+ def dstack(tensors: TensorSequenceType) -> TensorLikeType:
+     torch._check(len(tensors) > 0, lambda: "dstack expects a non-empty TensorList")
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index db28aad88eb..2cb172a9ba6 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -1024,10 +1024,9 @@ def make_fast_binary_impl(
+             for op in operands:
+                 if not isinstance(op, torch.Tensor):
+                     continue
+-                is_contiguous = is_contiguous and op.is_contiguous(
+-                    memory_format=torch.contiguous_format
+-                )
++                is_contiguous = is_contiguous and definitely_contiguous(op)
+                 is_channels_last = is_channels_last and op.is_contiguous(
++
+                     memory_format=torch.channels_last
+                 )
+         if is_contiguous:

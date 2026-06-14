@@ -1,0 +1,17 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index b369673d921..ce9f92a0086 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -1203,10 +1203,12 @@ def make_opaque_unary_fn(name):
+             return None
+ 
+     OpaqueUnaryFn.__name__ = "OpaqueUnaryFn_" + name
++    OpaqueUnaryFn.__qualname__ = "OpaqueUnaryFn_" + name
+ 
+     return OpaqueUnaryFn
+ 
+ 
++
+ # Keep in sync with math_op_names in torch/fx/experimental/sym_node.py
+ OpaqueUnaryFn_sqrt = make_opaque_unary_fn("sqrt")
+ OpaqueUnaryFn_cos = make_opaque_unary_fn("cos")

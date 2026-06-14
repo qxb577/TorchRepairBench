@@ -1,0 +1,15 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index fc3f8ed063c..a60b66fab4d 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -1264,6 +1264,10 @@ def _process_export_inputs(
+             UserErrorType.INVALID_INPUT,
+             f"Expecting `args` to be a tuple of example positional inputs, got {type(args)}",
+         )
++    # Convert NamedTuples to regular tuples so that the tree spec does not
++    # include the subclass information, matching the module's flat signature.
++    if hasattr(args, '_fields'):
++        args = tuple(args)
+     kwargs = kwargs if kwargs is not None else {}
+     _, original_in_spec = pytree.tree_flatten((args, kwargs))
+ 

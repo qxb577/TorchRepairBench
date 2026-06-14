@@ -1,0 +1,78 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index a8a5b216f84..6e64958e1de 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -72,6 +72,7 @@ _TORCH_DTYPE_TO_ENUM = {
+     torch.int8: 1,
+     torch.int16: 2,
+     torch.int32: 3,
++    torch.int32: 3,
+     torch.int64: 4,
+     torch.float16: 5,
+     torch.float32: 6,
+@@ -84,6 +85,7 @@ _TORCH_DTYPE_TO_ENUM = {
+ }
+ 
+ 
++
+ def get_dtype_as_int(tensor):
+     """
+     prim::dtype has the signature "Tensor a) -> int", where it gets the dtype of
+@@ -409,18 +411,51 @@ class TS2FXGraphConverter:
+             self.name_to_node[name] = fx_node
+ 
+     def convert_aten_tensor(self, node: torch._C.Node):
+-        """aten::tensor creates a constant tensor ad-hoc --> GetAttr"""
++        """aten::tensor creates a constant tensor ad-hoc --> GetAttr if constant, otherwise call_function"""
+         args, kwargs = self.get_args_kwargs(node, torch.ops.aten.tensor.default._schema)
+         for k in kwargs:
+             if k == "requires_grad":
+                 kwargs[k] = bool(kwargs[k])  # 0 -> False, 1 -> True
+-        tensor = torch.tensor(*args, **kwargs)
++
++        # Check if all arguments are constants (i.e., no torch._C.Value)
++        is_all_const = True
++        for arg in args:
++            if isinstance(arg, torch._C.Value):
++                is_all_const = False
++                break
++        if is_all_const:
++            for v in kwargs.values():
++                if isinstance(v, torch._C.Value):
++                    is_all_const = False
++                    break
+ 
+         output_name = node.output().debugName()
+-        alias_name = f"lifted_tensor_{output_name}"
+-        fx_node = self.fx_graph.get_attr(alias_name)
+-        self.name_to_node[output_name] = fx_node
+-        self.name_to_tensor_constants[alias_name] = tensor
++
++        if is_all_const:
++            # Create constant tensor and register as lifted constant
++            tensor = torch.tensor(*args, **kwargs)
++            alias_name = f"lifted_tensor_{output_name}"
++            fx_node = self.fx_graph.get_attr(alias_name)
++            self.name_to_node[output_name] = fx_node
++            self.name_to_tensor_constants[alias_name] = tensor
++        else:
++            # Convert arguments to FX nodes and emit a call_function
++            def convert_arg(arg):
++                if isinstance(arg, torch._C.Value):
++                    # Assume the value already has an FX node in name_to_node
++                    return self.name_to_node[arg.debugName()]
++                return arg
++
++            fx_args = tuple(convert_arg(a) for a in args)
++            fx_kwargs = {k: convert_arg(v) for k, v in kwargs.items()}
++            fx_node = self.fx_graph.call_function(
++                torch.ops.aten.tensor.default,
++                args=fx_args,
++                kwargs=fx_kwargs
++            )
++            self.name_to_node[output_name] = fx_node
++            # Do not lift as constant
++
+ 
+     def convert_prim_Constant(self, node: torch._C.Node):
+         name = node.output().debugName()

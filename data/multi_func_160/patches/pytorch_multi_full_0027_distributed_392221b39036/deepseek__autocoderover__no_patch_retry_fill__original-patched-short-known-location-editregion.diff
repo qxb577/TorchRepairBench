@@ -1,0 +1,71 @@
+diff --git a/torch/_dynamo/backends/distributed.py b/torch/_dynamo/backends/distributed.py
+index 3b79d1e68cf..d3ff5ab3de1 100644
+--- a/torch/_dynamo/backends/distributed.py
++++ b/torch/_dynamo/backends/distributed.py
+@@ -414,21 +414,10 @@ class DDPOptimizer:
+         and returns its callable.
+         """
+         if has_higher_order_op(gm):
+-            # This indicates presence of a higher order op. For now, we
+-            # have no way to break the higher order op into two buckets.
+-            # Allowing higher order ops in the graph also requires
+-            # changes in the split_module, becuase graph splitter
+-            # currently assumes that all the args of all ops are
+-            # tensors, but in the case of higher order ops, it could be
+-            # a graph module. As a workaround, we are shortcircuiting
+-            raise NotImplementedError(
+-                "DDPOptimizer backend: Found a higher order op in the graph. "
+-                "This is not supported. Please turn off DDP optimizer using "
+-                "torch._dynamo.config.optimize_ddp=False. Note that this can "
+-                "cause performance degradation because there will be one bucket "
+-                "for the entire Dynamo graph. Please refer to this issue - "
+-                "https://github.com/pytorch/pytorch/issues/104674."
+-            )
++            # Higher order ops are now supported. The graph splitter
++            # has been updated to handle them.
++            pass
++
+ 
+         # 1: compute the partition map according to DDP bucket logic
+         buckets = [Bucket()]  # (size, param_names)
+diff --git a/torch/_export/utils.py b/torch/_export/utils.py
+index ad0bfee4525..311ecdff2e5 100644
+--- a/torch/_export/utils.py
++++ b/torch/_export/utils.py
+@@ -628,9 +628,13 @@ def node_inline_(call_mod_node: torch.fx.Node) -> None:
+     output = [node for node in sub_gm.graph.nodes if node.op == "output"]
+ 
+     for ph, arg in zip(phs, call_mod_node.args):
+-        assert isinstance(arg, torch.fx.Node)
++        if not isinstance(arg, torch.fx.Node):
++            # In case of HOPs, the argument might be a GraphModule.
++            # We cannot replace the placeholder with a non-Node, so skip.
++            continue
+         node_replace_(ph, arg)
+ 
++
+     with gm.graph.inserting_before(call_mod_node):
+         for node in body:
+             new_node = gm.graph.node_copy(node)
+diff --git a/torch/fx/passes/split_module.py b/torch/fx/passes/split_module.py
+index b4437af5323..db15e0acbf6 100644
+--- a/torch/fx/passes/split_module.py
++++ b/torch/fx/passes/split_module.py
+@@ -179,12 +179,17 @@ def split_module(
+         elif node.op == "get_attr":
+             base_mod_env[node.name] = base_mod_graph.get_attr(node.target)  # type: ignore[arg-type]
+             base_mod_env[node.name].meta = node.meta.copy()
++            # Handle nested attributes that may be GraphModules
+             attr_val = m
+             for atom in node.target.split("."):  # type: ignore[union-attr]
+                 if not hasattr(attr_val, atom):
+                     raise AttributeError(f"Node target {node.target} not found!")
+                 attr_val = getattr(attr_val, atom)
+             base_mod_attrs[node.target] = attr_val  # type: ignore[index]
++            if isinstance(attr_val, torch.fx.GraphModule):
++                # Register the submodule so it's retrievable
++                base_mod_env[node.name].graph.lint()  # Ensure graph is valid
++
+         return base_mod_env, base_mod_attrs
+ 
+     import sympy

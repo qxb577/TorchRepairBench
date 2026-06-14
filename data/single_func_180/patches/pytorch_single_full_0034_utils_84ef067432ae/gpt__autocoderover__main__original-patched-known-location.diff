@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index e729afbde61..a6b2e26ee8f 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -208,7 +208,8 @@ class ReinplaceCounters:
+     @classmethod
+     def add_missed_opportunities(cls, trigger: ReInplaceTrigger, count: int) -> None:
+         if count != 0:
+-            cls._values[f"missed_tensors_{trigger}"] += count
++            cls._values[f"missed_tensors_{trigger.name}"] += count
++
+ 
+     @classmethod
+     def clear(cls) -> None:

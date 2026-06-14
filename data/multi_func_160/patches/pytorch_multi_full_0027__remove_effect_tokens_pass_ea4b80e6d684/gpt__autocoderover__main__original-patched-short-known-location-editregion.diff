@@ -1,0 +1,14 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 6bee49d99f1..82edf5cfde8 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -1619,7 +1619,8 @@ class Graph:
+         # the removed node.
+         changed = False
+         for node in reversed(self.nodes):
+-            if not node.is_impure() and len(node.users) == 0:
++            if not self.has_side_effect(node) and len(node.users) == 0:
++
+                 self.erase_node(node)
+                 changed = True
+ 

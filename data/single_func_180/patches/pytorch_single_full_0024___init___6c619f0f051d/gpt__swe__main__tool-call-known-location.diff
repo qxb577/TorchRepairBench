@@ -1,0 +1,26 @@
+diff --git a/torch/autograd/__init__.py b/torch/autograd/__init__.py
+index 05f2c2f6c62..8a35e17039e 100644
+--- a/torch/autograd/__init__.py
++++ b/torch/autograd/__init__.py
+@@ -314,13 +314,16 @@ def backward(
+             not provided, the gradient is accumulated into all the leaf Tensors that
+             were used to compute the :attr:`tensors`.
+     """
+-    if torch._C._are_functorch_transforms_active():
+-        raise RuntimeError(
+-            "backward() called inside a functorch transform. This is not "
+-            "supported, please use functorch.grad or functorch.vjp instead "
+-            "or call backward() outside of functorch transforms."
++    if type(tensors) is not tuple:
++        tensors = (tensors,)
++    if type(grad_tensors) is not tuple:
++        grad_tensors = (grad_tensors,)
++    if any(hasattr(t, '__torch_function__') for t in tensors):
++        return handle_torch_function(
++            backward, (tensors, grad_tensors), tensors, grad_tensors, retain_graph, create_graph, inputs
+         )
+ 
++
+     if grad_variables is not None:
+         warnings.warn(
+             "`grad_variables` is deprecated. Use `grad_tensors` instead.",

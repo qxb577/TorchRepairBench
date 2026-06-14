@@ -1,0 +1,31 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 722a7c88dbe..6aa45cc3677 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1128,17 +1128,17 @@ class OutputGraph:
+ 
+             stored_graph_output_var = False
+             output = []
+-            if count_calls(self.graph) != 0 or len(pass2.graph_outputs) != 0:
+-                output.extend(
+-                    self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+-                )
++            output.extend(
++                self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
++            )
+ 
+-                if len(pass2.graph_outputs) != 0:
+-                    output.append(pass2.create_store(graph_output_var))
+-                    stored_graph_output_var = True
+-                else:
+-                    output.append(create_instruction("POP_TOP"))
++            if len(pass2.graph_outputs) != 0:
++                output.append(pass2.create_store(graph_output_var))
++                stored_graph_output_var = True
++            else:
++                output.append(create_instruction("POP_TOP"))
+             append_prefix_insts()
++
+             self.add_output_instructions(output + pass2.get_instructions())
+ 
+             # restore all the live local vars

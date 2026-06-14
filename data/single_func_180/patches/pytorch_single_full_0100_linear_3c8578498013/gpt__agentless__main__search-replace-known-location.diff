@@ -1,0 +1,13 @@
+diff --git a/torch/nn/modules/linear.py b/torch/nn/modules/linear.py
+index c8a17e5e591..8d44ab6645d 100644
+--- a/torch/nn/modules/linear.py
++++ b/torch/nn/modules/linear.py
+@@ -272,7 +272,7 @@ class LazyLinear(LazyModuleMixin, Linear):
+         factory_kwargs = {"device": device, "dtype": dtype}
+         # bias is hardcoded to False to avoid creating tensor
+         # that will soon be overwritten.
+-        super().__init__(0, 0, False)
++        super().__init__(0, out_features, False)
+         self.weight = UninitializedParameter(**factory_kwargs)
+         self.out_features = out_features
+         if bias:

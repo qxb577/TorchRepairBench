@@ -1,0 +1,45 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index d2d00c18ebf..3febe2b999c 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2234,7 +2234,8 @@ class BuiltinVariable(VariableTracker):
+         obj: VariableTracker,
+         name_var: VariableTracker,
+     ):
+-        return self.call_setattr(tx, obj, name_var, variables.DeletedVariable())
++        return self.call_setattr(tx, obj, name_var, variables.DeletedVariable(), delattr=True)
++
+ 
+     def call_type(self, tx: "InstructionTranslator", obj: VariableTracker):
+         try:
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index bf3b37e3b15..aeaac729f8d 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -102,10 +102,14 @@ if TYPE_CHECKING:
+     from torch._dynamo.symbolic_convert import InstructionTranslator
+ 
+ 
++def is_standard_delattr(val):
++    return val in (object.__delattr__, BaseException.__delattr__)
++
+ def is_standard_setattr(val):
+     return val in (object.__setattr__, BaseException.__setattr__)
+ 
+ 
++
+ def is_forbidden_context_manager(ctx):
+     f_ctxs = []
+ 
+@@ -871,8 +875,9 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+             if method is object.__init__:
+                 return ConstantVariable.create(None)
+ 
+-            if is_standard_setattr(method) or isinstance(self.value, threading.local):
+-                return self.method_setattr_standard(tx, *args, **kwargs)
++            if is_standard_setattr(method) or is_standard_delattr(method) or isinstance(self.value, threading.local):
++                return self.method_setattr_standard(tx, *args, **kwargs, delattr=is_standard_delattr(method))
++
+ 
+             if method is object.__eq__ and len(args) == 1 and not kwargs:
+                 other = args[0]

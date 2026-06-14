@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 7f25baa8e61..4dab1951f21 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -2118,7 +2118,7 @@ class OutputGraph(OutputGraphCommon):
+             root.add_nn_modules(sub_gms)  # type: ignore[arg-type]
+ 
+             self.current_tracer._maybe_preserve_original_meta(tx, output_node)
+-            if not config.do_not_emit_runtime_asserts:
++            if not config.do_not_emit_runtime_asserts and not self.export:
+                 # There is a rare scenario where codegen_suffix adds a new entry
+                 # to self.nn_modules while `root` knows only about the
+                 # nn_modules at the time of its creation. This causes failures
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index b5f25be5bf9..cf9ae0fa70a 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -1371,7 +1371,7 @@ class CondHigherOrderVariable(TorchHigherOrderOperatorVariable):
+                 supports_aliasing=self.supports_aliasing,
+             )
+ 
+-            if not only_consist_of(ret_val, (TensorVariable, ConstantVariable)):
++            if not only_consist_of(ret_val, (TensorVariable, ConstantVariable, ShapeVariable)):
+                 unimplemented(
+                     "Expected branches to return a possibly nested pytree of tensors "
+                     "or constant ints but it consists of others.",

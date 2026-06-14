@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index 5a7d06734da..faf399567db 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -3587,9 +3587,11 @@ class LocalMapWrappedHigherOrderVariable(WrapHigherOrderVariable):
+         )
+ 
+         # Validate
+-        expected_num_inputs = len(in_placements.value)
++        expected_num_inputs = len(in_placements.value) if in_placements else 0
++
+         actual_num_inputs = len(body_gmod.graph.find_nodes(op="placeholder"))
+-        expected_num_outputs = len(out_placements.value)
++        expected_num_outputs = len(out_placements.value) if out_placements else 0
++
+         assert len(body_gmod.graph.find_nodes(op="output")) == 1
+         actual_num_outputs = len(body_gmod.graph.find_nodes(op="output")[0].args[0])
+ 

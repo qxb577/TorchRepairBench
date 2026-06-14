@@ -1,0 +1,13 @@
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index dab2ec46fb7..815d57fb12b 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -224,6 +224,8 @@ def lookup_jagged(func, *args, **kwargs) -> Optional[Callable]:
+             check_schema(check_schema_str, func, *args, **kwargs)
+             return functools.partial(jagged_unary_pointwise, func)
+         elif num_tensor_args == 2:
++            if not (isinstance(args[0], NestedTensor) or isinstance(args[1], NestedTensor)):
++                return None
+             check_schema("lhs: any, rhs: any, ...", func, *args, **kwargs)
+             return functools.partial(jagged_binary_pointwise, func)
+ 

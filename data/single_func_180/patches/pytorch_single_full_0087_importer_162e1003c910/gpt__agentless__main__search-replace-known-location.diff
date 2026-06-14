@@ -1,0 +1,18 @@
+diff --git a/torch/package/importer.py b/torch/package/importer.py
+index 3ae277d431e..6ca26f5e98b 100644
+--- a/torch/package/importer.py
++++ b/torch/package/importer.py
+@@ -42,6 +42,13 @@ class Importer(ABC):
+     """
+ 
+     @abstractmethod
++    def whichmodule(self, obj: Any, name: str) -> str:
++        for importer in self._importers:
++            module_name = importer.whichmodule(obj, name)
++            if module_name != "__main__":
++                return module_name
++        return "__main__"
++
+     def import_module(self, module_name: str) -> ModuleType:
+         """Import `module_name` from this environment.
+ 

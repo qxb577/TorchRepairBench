@@ -1,0 +1,21 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index c145c3deb7f..964c9c3a33f 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -177,6 +177,8 @@ def _get_flattened_mesh_by_layout(
+     Returns:
+         The flattened DeviceMesh if it was explicitly created, None otherwise.
+     """
++    if torch.compiler.is_compiling():
++        return None
+     root_mesh = mesh._get_root_mesh()
+     mesh_dim_names = mesh.mesh_dim_names
+ 
+@@ -202,6 +204,7 @@ def _get_flattened_mesh_by_layout(
+     return None
+ 
+ 
++
+ # Track (mesh_hash, mesh_dims, reason) we've already warned about to avoid repeated warnings
+ _warned_flatten_issues: set[tuple[int, tuple[int, ...], str]] = set()
+ 

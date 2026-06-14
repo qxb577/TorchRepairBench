@@ -1,0 +1,13 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 637db6192b1..1eb338ec2d7 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -1543,7 +1543,7 @@ def native_group_norm_backward(
+         lambda: f"Expect gamma to have {C} elements but got {gamma.numel() if gamma is not None else -1}",
+     )
+ 
+-    cpg, _rem = divmod(C, group)
++    cpg, _rem = C // group, C % group
+     torch._check(
+         _rem == 0,
+         lambda: f"Expect number of channels {C} to be evenly-divisible by number of groups {group}",

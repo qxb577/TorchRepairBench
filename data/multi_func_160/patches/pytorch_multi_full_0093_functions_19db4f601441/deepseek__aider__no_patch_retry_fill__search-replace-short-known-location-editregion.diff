@@ -1,0 +1,13 @@
+diff --git a/torch/_higher_order_ops/triton_kernel_wrap.py b/torch/_higher_order_ops/triton_kernel_wrap.py
+index dfa862c622c..6bd166cb0f4 100644
+--- a/torch/_higher_order_ops/triton_kernel_wrap.py
++++ b/torch/_higher_order_ops/triton_kernel_wrap.py
+@@ -888,7 +888,7 @@ class TritonHOPifier:
+                 new_configs = copy.deepcopy(variable.kernel.configs)
+                 for config in new_configs:
+                     config.__dict__.update(special_kwargs)
+-                new_kernel = autotune(configs=new_configs, key=[])(variable.kernel.fn)
++                new_kernel = autotune(configs=new_configs, key=variable.kernel.keys)(variable.kernel.fn)
+             else:
+                 # if there is no Autotuner, wrap the kernel into a
+                 # new one with a single config with special kwargs

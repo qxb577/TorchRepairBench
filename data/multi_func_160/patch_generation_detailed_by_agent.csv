@@ -1,0 +1,9 @@
+model,agent,total_bug_units,patch_generated,patch_file_exists,applicable_patch,generated_but_not_applicable,no_patch,main_patch,retry_fill_patch,patch_generation_rate,applicable_patch_rate,non_applicable_status_counts
+deepseek,agentless,160,114,114,113,1,46,24,90,0.7125,0.7063,search_replace_whitespace_check_failed:1
+deepseek,aider,160,66,66,65,1,94,24,42,0.4125,0.4062,search_replace_whitespace_check_failed:1
+deepseek,autocoderover,160,123,123,118,5,37,26,97,0.7688,0.7375,acr_original_patched_whitespace_check_failed:5
+deepseek,swe,160,119,119,114,5,41,29,90,0.7438,0.7125,swe_tool_call_whitespace_check_failed:5
+gpt,agentless,160,157,157,153,4,3,157,0,0.9812,0.9563,search_replace_whitespace_check_failed:4
+gpt,aider,160,94,94,94,0,66,79,15,0.5875,0.5875,
+gpt,autocoderover,160,158,158,157,1,2,133,25,0.9875,0.9812,acr_original_patched_whitespace_check_failed:1
+gpt,swe,160,146,146,144,2,14,146,0,0.9125,0.9000,swe_tool_call_whitespace_check_failed:2

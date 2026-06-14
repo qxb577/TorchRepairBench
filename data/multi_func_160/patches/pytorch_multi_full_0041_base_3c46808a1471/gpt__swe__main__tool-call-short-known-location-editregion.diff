@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 14e02625368..9a16619edd1 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -160,7 +160,8 @@ def fn_var_getattr(tx, fn, source, name):
+     except AttributeError:
+         # function does not have a __getattr__ or __getattribute__ method,
+         # so we can safely assume that this attribute is absent
+-        raise_observed_exception(AttributeError, tx)
++        raise_observed_exception(AttributeError, tx, name)
++
+ 
+     # Special handling for known dunder attributes
+     if name in fn_known_dunder_attrs:

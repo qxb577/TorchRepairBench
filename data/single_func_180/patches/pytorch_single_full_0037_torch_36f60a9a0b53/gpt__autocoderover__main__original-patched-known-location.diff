@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 3d0541dacfd..0fcb2d972d9 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -69,7 +69,9 @@ from ..utils import (
+     product,
+     proxy_args_kwargs,
+     unwrap_if_wrapper,
++    is_contiguous_or_false,
+ )
++
+ from .base import raise_type_error_exc, typestr, VariableTracker
+ from .ctx_manager import (
+     AutocastModeVariable,

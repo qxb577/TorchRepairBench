@@ -1,0 +1,32 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 6feec49148d..e664e3607fa 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -2333,9 +2333,25 @@ def _index_copy(
+     # Treat scalars as elements of \R^1
+     zero_dim = x.ndim == 0
+     x1 = x.unsqueeze(0) if zero_dim else x
+-    idx = (None,) * dim + (index,)
++    n_dim = x1.ndim
++    index_reshaped = (
++        index.view((1,) * dim + (-1,) + (1,) * (n_dim - dim - 1))
++        if index.ndim > 0
++        else index
++    )
++    idx = []
++    for i in range(n_dim):
++        if i == dim:
++            idx.append(index_reshaped)
++        else:
++            idx.append(
++                torch.arange(x1.size(i), device=x1.device, dtype=torch.long).view(
++                    (1,) * i + (-1,) + (1,) * (n_dim - i - 1)
++                )
++            )
+     index_put = aten.index_put_ if inplace else aten.index_put
+-    out = index_put(x1, idx, tensor)
++    out = index_put(x1, tuple(idx), tensor)
++
+     if inplace:
+         return x
+     else:

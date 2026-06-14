@@ -1,0 +1,47 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index cdb4e5334c5..425ec29b4da 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1925,18 +1925,7 @@ def wrap_fx_proxy_cls(
+             example_value = wrap_to_fake_tensor_and_record(
+                 example_value, tx=tx, **kwargs
+             )
+-        if isinstance(example_value, torch.Tensor) and (
+-            maybe_get_fake_mode(example_value) is not tx.fake_mode
+-        ):
+-            raise InternalTorchDynamoError(
+-                "`example_value` needs to be a `FakeTensor`"
+-                f"wrapped by this instance of Dynamo. Found: {example_value}"
+-            )
+-
+-    if isinstance(example_value, torch.Tensor):
+-        is_parameter = isinstance(example_value, torch.nn.Parameter)
+-
+-        # NB: In most (all?) cases, this does not actually do a clone.
++        if isinstance(example_value, torch.Tensor) and
+         # (WARNING: this means that if we mutate metadata on the fake
+         # tensor, the stored example value will update too!)
+         example_value = _clone_input(example_value)
+diff --git a/torch/multiprocessing/reductions.py b/torch/multiprocessing/reductions.py
+index 727b4f3fc37..c66995b65aa 100644
+--- a/torch/multiprocessing/reductions.py
++++ b/torch/multiprocessing/reductions.py
+@@ -345,6 +345,18 @@ def reduce_tensor(tensor):
+             ),
+         )
+ 
++    if tensor.device.type == 'meta':
++        return (
++            rebuild_meta_tensor,
++            (
++                type(tensor),
++                tensor.size(),
++                tensor.stride(),
++                tensor.storage_offset(),
++                tensor.requires_grad,
++                tensor.dtype,
++            ),
++        )
+     # _backward_hooks purposely omitted here, see Note [Don't serialize hooks]
+     metadata = (
+         tensor.storage_offset(),

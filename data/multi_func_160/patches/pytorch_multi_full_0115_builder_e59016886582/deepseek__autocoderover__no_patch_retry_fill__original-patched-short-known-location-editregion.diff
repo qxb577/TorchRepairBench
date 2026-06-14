@@ -1,0 +1,71 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index cdb4e5334c5..9e06bbc0976 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1918,8 +1918,10 @@ def wrap_fx_proxy_cls(
+             # otherwise this is wrong!
+             kwargs = {
+                 "is_tensor": target_cls
+-                in (TensorVariable, TensorWithTFOverrideVariable),
++                in (TensorVariable, TensorWithTFOverrideVariable)
++                or example_value.device.type == 'meta',
+             }
++
+             assert "source" in options and options["source"] is not None
+             kwargs["source"] = options["source"]
+             example_value = wrap_to_fake_tensor_and_record(
+diff --git a/torch/multiprocessing/reductions.py b/torch/multiprocessing/reductions.py
+index 727b4f3fc37..b42609ccb7e 100644
+--- a/torch/multiprocessing/reductions.py
++++ b/torch/multiprocessing/reductions.py
+@@ -120,6 +120,24 @@ def rebuild_tensor(cls, storage, metadata):
+     return t
+ 
+ 
++def rebuild_meta_tensor(
++    tensor_cls,
++    tensor_size,
++    tensor_stride,
++    tensor_offset,
++    dtype,
++    device,
++    requires_grad,
++):
++    t = torch.empty(tensor_size, dtype=dtype, device=device)
++    t = t.as_strided(tensor_size, tensor_stride, tensor_offset)
++    if tensor_cls == torch.nn.parameter.Parameter:
++        t = torch.nn.parameter.Parameter(t, requires_grad=requires_grad)
++    else:
++        t.requires_grad = requires_grad
++    return t
++
++
+ def rebuild_cuda_tensor(
+     tensor_cls,
+     tensor_size,
+@@ -131,6 +149,7 @@ def rebuild_cuda_tensor(
+     storage_handle,
+     storage_size_bytes,
+     storage_offset_bytes,
++
+     requires_grad,
+     ref_counter_handle,
+     ref_counter_offset,
+@@ -345,6 +364,9 @@ def reduce_tensor(tensor):
+             ),
+         )
+ 
++    if tensor.device.type == 'meta':
++        return (rebuild_meta_tensor, (type(tensor), tensor.dtype, tensor.device, tensor.size(), tensor.stride(), tensor.storage_offset(), tensor.requires_grad))
++
+     # _backward_hooks purposely omitted here, see Note [Don't serialize hooks]
+     metadata = (
+         tensor.storage_offset(),
+@@ -355,6 +377,7 @@ def reduce_tensor(tensor):
+     return (rebuild_tensor, (type(tensor), storage, metadata))
+ 
+ 
++
+ def rebuild_nested_tensor(
+     rebuild_buffer_func,
+     rebuild_buffer_args,

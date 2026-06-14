@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 83619731f7f..8fc13001d2b 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4061,7 +4061,7 @@ def is_rng_state_getter_or_setter(value):
+         torch.set_rng_state,
+         torch.cuda.set_rng_state,
+     )
+-    return value in (*setters, *getters)
++    return value in (*setters, *getters) or is_tensor_base_attr_getter(value)
+ 
+ 
+ def is_tensor_base_attr_getter(value):
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 653bcaf4ba3..ead89de538e 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1924,7 +1924,7 @@ class BuiltinVariable(VariableTracker):
+             if isinstance(obj, variables.TensorVariable):
+                 from .builder import wrap_fx_proxy
+ 
+-                if name == "requires_grad":
++                if name in {"requires_grad", "real", "imag"}:
+                     # TODO(voz): Make it work properly
+                     unimplemented(
+                         "mutating requires_grad can introduce a new leaf from non-leaf or vice versa in "

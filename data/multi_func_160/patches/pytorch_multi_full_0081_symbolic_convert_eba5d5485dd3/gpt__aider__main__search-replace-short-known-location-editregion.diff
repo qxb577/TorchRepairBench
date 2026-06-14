@@ -1,0 +1,22 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 15bffbb5935..2c506de632c 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -521,10 +521,13 @@ class BuiltinVariable(VariableTracker):
+         if (
+             self.can_insert_in_graph()
+             and tensor_args
+-            and not (
+-                self.fn is operator.getitem
+-                and isinstance(args[0], ConstDictVariable)
+-                and isinstance(args[1], variables.TensorVariable)
++            and (
++                not (
++                    self.fn is operator.getitem
++                    and isinstance(args[0], ConstDictVariable)
++                    and isinstance(args[1], variables.TensorVariable)
++                )
++                or all(isinstance(arg, variables.ConstantVariable) for arg in args)
+             )
+         ):
+             try:

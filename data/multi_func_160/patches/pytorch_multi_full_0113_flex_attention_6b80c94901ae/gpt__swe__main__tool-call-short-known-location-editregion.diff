@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/kernel/flex/flex_flash_attention.py b/torch/_inductor/kernel/flex/flex_flash_attention.py
+index bcb235bd29d..fba66e353f4 100644
+--- a/torch/_inductor/kernel/flex/flex_flash_attention.py
++++ b/torch/_inductor/kernel/flex/flex_flash_attention.py
+@@ -68,7 +68,8 @@ def is_trivial_graph(graph_module: GraphModule, is_score_graph: bool):
+             return False
+         return True  # party on garth
+     # mask mod graph is empty if we have 4 inputs and full_default output
+-    return len(placeholders) == 4 and output_val.target == torch.ops.aten.full.default
++    return len(placeholders) == 4 and output_val.target == torch.ops.aten.full.default and all(p.meta['tensor_meta'].shape[0] == placeholders[0].meta['tensor_meta'].shape[0] for p in placeholders)
++
+ 
+ 
+ def _can_use_flex_flash_attention(

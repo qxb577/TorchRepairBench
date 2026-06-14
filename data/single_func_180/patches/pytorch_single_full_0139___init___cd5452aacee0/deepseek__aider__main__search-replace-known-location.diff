@@ -1,0 +1,15 @@
+diff --git a/torch/cuda/__init__.py b/torch/cuda/__init__.py
+index f735a414ecc..9c445fa9490 100644
+--- a/torch/cuda/__init__.py
++++ b/torch/cuda/__init__.py
+@@ -135,6 +135,10 @@ def is_bf16_supported(including_emulation: bool = True):
+     if torch.version.hip:
+         return True
+ 
++    # If there are no CUDA devices, bfloat16 is not supported.
++    if torch.cuda.device_count() == 0:
++        return False
++
+     device = torch.cuda.current_device()
+ 
+     # Check for CUDA version and device compute capability.

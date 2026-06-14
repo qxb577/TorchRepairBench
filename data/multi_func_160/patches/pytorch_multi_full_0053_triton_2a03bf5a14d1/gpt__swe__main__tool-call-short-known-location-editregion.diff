@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/runtime/triton_heuristics.py b/torch/_inductor/runtime/triton_heuristics.py
+index 75584a60c0f..eea7798c474 100644
+--- a/torch/_inductor/runtime/triton_heuristics.py
++++ b/torch/_inductor/runtime/triton_heuristics.py
+@@ -1738,7 +1738,8 @@ def grid(*numels):
+         max_y_grid = get_max_y_grid()
+         if znumel is None:
+             div = ceildiv(y_grid, max_y_grid)
+-            y_grid = y_grid // div
++            y_grid = min(y_grid // div, max_y_grid)
++
+             z_grid = div
+         else:
+             z_grid = get_grid_dim(znumel, meta.get("ZBLOCK", None))

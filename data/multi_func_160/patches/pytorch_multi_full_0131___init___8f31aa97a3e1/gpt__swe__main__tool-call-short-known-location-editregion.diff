@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/__init__.py b/torch/_dynamo/__init__.py
+index 02b921b30ee..c8685b8e4f4 100644
+--- a/torch/_dynamo/__init__.py
++++ b/torch/_dynamo/__init__.py
+@@ -56,9 +56,11 @@ from .utils import (
+     orig_code_map,
+     register_hook_for_recompile_user_context,
+     reset_frame_count,
++    CreateNestedFnCache,
+ )
+ 
+ 
++
+ # Register polyfill functions
+ from .polyfills import loader as _  # usort: skip # noqa: F401
+ 

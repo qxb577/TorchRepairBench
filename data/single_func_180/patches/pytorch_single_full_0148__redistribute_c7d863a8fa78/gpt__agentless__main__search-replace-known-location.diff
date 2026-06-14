@@ -1,0 +1,13 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index a540a763bb6..9ae4a43550f 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -184,7 +184,7 @@ def _get_flattened_mesh_by_layout(
+         return None
+ 
+     # Convert mesh dim indices to dim names
+-    dim_names = tuple(mesh_dim_names[i] for i in mesh_dims)
++    dim_names = tuple(mesh_dim_names[mesh._get_root_mesh().mesh_dim_names.index(mesh.mesh_dim_names[i])] for i in mesh_dims)
+ 
+     # Get the submesh for these dimensions
+     submesh = mesh[dim_names]

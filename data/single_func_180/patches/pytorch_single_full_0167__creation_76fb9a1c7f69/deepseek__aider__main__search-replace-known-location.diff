@@ -1,0 +1,13 @@
+diff --git a/torch/testing/_creation.py b/torch/testing/_creation.py
+index c541ae1d932..fd18b3e8dc4 100644
+--- a/torch/testing/_creation.py
++++ b/torch/testing/_creation.py
+@@ -172,7 +172,7 @@ def make_tensor(
+                 low,
+                 high,
+                 lowest_inclusive=torch.iinfo(dtype).min,
+-                highest_exclusive=torch.iinfo(dtype).max,
++                highest_exclusive=torch.iinfo(dtype).max + 1,
+                 # This is incorrect for `torch.uint8`, but since we clamp to `lowest`, i.e. 0 for `torch.uint8`,
+                 # _after_ we use the default value, we don't need to special case it here
+                 default_low=-9,

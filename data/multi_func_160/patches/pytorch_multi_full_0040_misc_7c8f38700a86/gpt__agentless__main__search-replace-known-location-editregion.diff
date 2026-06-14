@@ -1,0 +1,29 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..0d1c698825a 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -11,7 +11,7 @@ from . import _dtypes_impl
+ # ### Scalar types ###
+ 
+ 
+-class generic:
++class generic(object):
+     @property
+     def name(self):
+         return self.__class__.__name__
+@@ -397,13 +397,13 @@ def issubclass_(arg, klass):
+         return False
+ 
+ 
+-def issubdtype(arg1, arg2):
++def issubdtype(arg1, arg2) -> bool:
+     # cf https://github.com/numpy/numpy/blob/v1.24.0/numpy/core/numerictypes.py#L356-L420
+     if not issubclass_(arg1, generic):
+         arg1 = dtype(arg1).type
+     if not issubclass_(arg2, generic):
+         arg2 = dtype(arg2).type
+-    return issubclass(arg1, arg2)
++    return issubclass(arg1, arg2) if isinstance(arg1, type) and isinstance(arg2, type) else False
+ 
+ 
+ __all__ = ["dtype", "DType", "typecodes", "issubdtype", "set_default_dtype"]

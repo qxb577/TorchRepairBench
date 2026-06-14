@@ -1,0 +1,14 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 634c4b6b495..9d701884b42 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5075,7 +5075,9 @@ def scaled_dot_product_flash_attention_for_cpu(
+         is_causal=is_causal,
+         dropout_mask=None,
+         scale=scale,
++        enable_gqa=True,
+     )
++
+     # Why this change?
+     # In pre-dispatch export scaled_dot_product_attention is executed via
+     # * flash_attention.

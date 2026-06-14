@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 83619731f7f..cd606d5b9d6 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4072,8 +4072,11 @@ def is_tensor_base_attr_getter(value):
+     )
+ 
+ 
+-def is_torch_function_object(value):
+-    return hasattr(value, "__torch_function__")
++def is_tensor_getset_descriptor(name):
++    desc = getattr(torch._C._TensorBase, name, None)
++    if desc is None:
++        return False
++    if type(desc).__name__
+ 
+ 
+ def has_torch_function(vt: torch._dynamo.variables.base.VariableTracker) -> bool:

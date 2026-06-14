@@ -1,0 +1,17 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 15bffbb5935..ec7eab06ef1 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -526,7 +526,12 @@ class BuiltinVariable(VariableTracker):
+                 and isinstance(args[0], ConstDictVariable)
+                 and isinstance(args[1], variables.TensorVariable)
+             )
++            and not (
++                isinstance(args[0], variables.ConstantVariable)
++                and isinstance(args[1], variables.TensorVariable)
++            )
+         ):
++
+             try:
+                 fn = self.fn
+ 

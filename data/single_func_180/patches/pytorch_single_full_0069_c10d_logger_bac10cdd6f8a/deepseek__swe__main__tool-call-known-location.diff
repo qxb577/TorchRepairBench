@@ -1,0 +1,20 @@
+diff --git a/torch/distributed/c10d_logger.py b/torch/distributed/c10d_logger.py
+index 2c92176c53e..271a99accc5 100644
+--- a/torch/distributed/c10d_logger.py
++++ b/torch/distributed/c10d_logger.py
+@@ -40,10 +40,15 @@ def _get_logging_handler(
+     destination: str = _DEFAULT_DESTINATION,
+ ) -> Tuple[logging.Handler, str]:
+     log_handler = _log_handlers[destination]
++    # deepcopy to avoid duplicated logging messages when both c10d and dcp loggers are enabled.
++    # See https://github.com/pytorch/pytorch/issues/130423
++    import copy
++    log_handler = copy.deepcopy(log_handler)
+     log_handler_name = type(log_handler).__name__
+     return (log_handler, log_handler_name)
+ 
+ 
++
+ global _c10d_logger
+ _c10d_logger = _get_or_create_logger()
+ 

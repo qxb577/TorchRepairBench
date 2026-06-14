@@ -1,0 +1,19 @@
+diff --git a/torch/_higher_order_ops/cond.py b/torch/_higher_order_ops/cond.py
+index ae4dba02bac..9fd71debe12 100644
+--- a/torch/_higher_order_ops/cond.py
++++ b/torch/_higher_order_ops/cond.py
+@@ -133,9 +133,11 @@ def cond(pred, true_fn, false_fn, operands):
+ 
+     with _set_compilation_env():
+         with torch._dynamo.utils.disable_cache_limit():
+-            return torch.compile(cond_op, backend="eager", fullgraph=True)(
+-                pred, true_fn, false_fn, operands
+-            )
++            with _temp_remove_pre_dispatch_torch_function_mode():
++                return torch.compile(cond_op, backend="eager", fullgraph=True)(
++                    pred, true_fn, false_fn, operands
++                )
++
+ 
+ 
+ """

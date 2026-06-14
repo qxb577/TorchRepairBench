@@ -1,0 +1,17 @@
+diff --git a/torch/fx/experimental/normalize.py b/torch/fx/experimental/normalize.py
+index d7bd2c11468..0fc179f04a5 100644
+--- a/torch/fx/experimental/normalize.py
++++ b/torch/fx/experimental/normalize.py
+@@ -80,9 +80,11 @@ class NormalizeArgs(Transformer):
+         )
+         if new_args_and_kwargs:
+             new_args, new_kwargs = new_args_and_kwargs
+-            return self.tracer.create_proxy(
++            proxy = self.tracer.create_proxy(
+                 "call_function", target, new_args, new_kwargs
+             )
++            proxy.node.meta = n.meta
++            return proxy
+         else:
+             return super().call_function(target, args, kwargs)
+ 

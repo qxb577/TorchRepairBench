@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/subgraph_lowering.py b/torch/_inductor/subgraph_lowering.py
+index 3c8116d402c..4eb37154ee6 100644
+--- a/torch/_inductor/subgraph_lowering.py
++++ b/torch/_inductor/subgraph_lowering.py
+@@ -87,7 +87,8 @@ class PointwiseSubgraphLowering(torch.fx.Interpreter):
+ 
+     def register_buffer(self, buffer: ir.Buffer, *, set_name: bool = False) -> str:
+         if self._approved_mutator():
+-            name = self.qualify_name(f"buf{len(self.buffers)}")
++            name = self.qualify_name(f"buf{len(self.buffers)}") if set_name else buffer.name
++
+             self.buffers.append(buffer)
+             return name
+         else:

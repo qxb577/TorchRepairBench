@@ -1,0 +1,24 @@
+diff --git a/torch/testing/_internal/common_utils.py b/torch/testing/_internal/common_utils.py
+index 13a28c5d7eb..b7a2e969281 100644
+--- a/torch/testing/_internal/common_utils.py
++++ b/torch/testing/_internal/common_utils.py
+@@ -2087,6 +2087,19 @@ class TestCase(expecttest.TestCase):
+     def enforceNonDefaultStream(self):
+         return CudaNonDefaultStream()
+ 
++    def assertNoUnraisable(self, func):
++        original_hook = sys.unraisablehook
++        collected_exc = []
++        def hook(args):
++            collected_exc.append(args.exc_value)
++        sys.unraisablehook = hook
++        try:
++            func()
++        finally:
++            sys.unraisablehook = original_hook
++        if collected_exc:
++            self.fail(f"Unraisable exception(s) raised: {collected_exc}")
++
+     def wrap_with_cuda_policy(self, method_name, policy):
+         test_method = getattr(self, method_name)
+         # the import below may initialize CUDA context, so we do it only if

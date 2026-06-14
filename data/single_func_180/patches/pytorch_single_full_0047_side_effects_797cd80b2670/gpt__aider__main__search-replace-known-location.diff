@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index eed90ed5a9c..de254baa99c 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -129,7 +129,7 @@ class SideEffects:
+     ) -> None:
+         super().__init__()
+         self.output_graph_weakref = weakref.ref(output_graph)
+-        self.id_to_variable = id_to_variable or {}
++        self.id_to_variable = id_to_variable.copy() if id_to_variable else {}
+         self.store_attr_mutations = store_attr_mutations or {}
+         self.keepalive = keepalive or []
+         self.save_for_backward = save_for_backward or []

@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index f691e2b46db..a9fd87075c6 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1220,7 +1220,8 @@ def pointwise_cat(inputs, dim=0):
+     inputs_loaders = [inp.make_loader() for inp in inputs]
+ 
+     def inner_fn(idx):
+-        idx_dim = ops.index_expr(idx[dim], torch.int64)
++        idx_dim = ops.index_expr(idx[dim], torch.int32)
++
+ 
+         masks = []
+         masked_loads = []

@@ -1,0 +1,2 @@
+validation_csv,canonical_patch_bugs,complete_bugs,partial_bugs,not_started_bugs,canonical_patch_rows,validated_patch_rows,missing_patch_rows,pass_rows,fail_or_env_error_rows
+$TORCHREPAIRBENCH_ROOT/benchmark_pilot/multi_func_160/allruns_multi_patch_test_validation_corrected22.csv,326,22,0,304,958,89,869,23,66

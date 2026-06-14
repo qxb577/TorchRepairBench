@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 15bffbb5935..e6f0d72eed7 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -473,7 +473,9 @@ class BuiltinVariable(VariableTracker):
+         return [codegen.create_load_global(name, False, add=True)]
+ 
+     def constant_args(self, *args, **kwargs):
+-        return check_constant_args(args, kwargs)
++        return check_constant_args(args, kwargs) or any(
++            isinstance(i, variables.ConstantVariable) for i in itertools.chain(args, kwargs.values())
++        )
+ 
+     def tensor_args(self, *args, **kwargs):
+         return any(

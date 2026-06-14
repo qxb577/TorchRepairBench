@@ -1,0 +1,25 @@
+diff --git a/torch/testing/_internal/common_utils.py b/torch/testing/_internal/common_utils.py
+index 13a28c5d7eb..27d22426634 100644
+--- a/torch/testing/_internal/common_utils.py
++++ b/torch/testing/_internal/common_utils.py
+@@ -2103,6 +2103,20 @@ class TestCase(expecttest.TestCase):
+         test_method = getattr(self, method_name)
+         setattr(self, method_name, self.wrap_method_with_policy(test_method, policy))
+ 
++    def assertNoUnraisable(self, callable, *args, **kwargs):
++        unraisable = []
++        old_hook = sys.unraisablehook
++        def hook(unraisable_exc):
++            unraisable.append(unraisable_exc)
++        sys.unraisablehook = hook
++        try:
++            callable(*args, **kwargs)
++        finally:
++            sys.unraisablehook = old_hook
++        if unraisable:
++            self.fail(f"Unraisable exceptions occurred: {unraisable}")
++
++
+     # A policy is a zero-argument function that returns a context manager.
+     # We don't take the context manager directly as it may be necessary to
+     # construct it once per test method

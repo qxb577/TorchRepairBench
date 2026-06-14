@@ -1,0 +1,20 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index e49eef37077..b0277483f93 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -704,7 +704,15 @@ class VariableBuilder:
+                     source=AttrSource(self.source, name),
+                 )
+                 for name in namedtuple_fields(type(value))
++            ] + [
++                LazyVariableTracker.create(
++                    getattr(value, name),
++                    source=AttrSource(self.source, name),
++                )
++                for name in dir(value)
++                if name not in namedtuple_fields(type(value))
+             ]
++
+             result = NamedTupleVariable(
+                 output, tuple_cls=type(value), source=self.source
+             )

@@ -1,0 +1,16 @@
+diff --git a/torch/export/pt2_archive/_package_weights.py b/torch/export/pt2_archive/_package_weights.py
+index 314f1550cb6..0b698a6d4a9 100644
+--- a/torch/export/pt2_archive/_package_weights.py
++++ b/torch/export/pt2_archive/_package_weights.py
+@@ -121,9 +121,9 @@ def group_weights(all_weights: dict[str, Weights]) -> list[OrderedSet[tuple[str,
+     Returns a list of sets, each set contains a tuple of (model_name, weight_name).
+     """
+ 
+-    weights_dict: dict[int, OrderedSet[tuple[str, str]]] = collections.defaultdict(
++    weights_dict: dict[tuple[int, torch.dtype], OrderedSet[tuple[str, str]]] = collections.defaultdict(
+         OrderedSet
+-    )  # storage_key -> set(weight)
++    )  # (storage_key, dtype) -> set(weight)
+ 
+     for model_name, weights in all_weights.items():
+         for weight_name, (_, properties) in weights.items():

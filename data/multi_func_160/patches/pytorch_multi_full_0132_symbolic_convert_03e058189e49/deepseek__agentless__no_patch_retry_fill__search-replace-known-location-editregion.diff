@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index c1bc2ae9607..96ea6e6fbc4 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1590,6 +1590,9 @@ class InstructionTranslatorBase(
+         ) and argsvars.has_force_unpack_var_sequence(self):
+             argsvars = TupleVariable(argsvars.force_unpack_var_sequence(self))
+ 
++        if not isinstance(kwargsvars, ConstDictVariable):
++            kwargsvars = BuiltinVariable.call_custom_dict(self, dict, kwargsvars)
++
+         if not isinstance(argsvars, BaseListVariable) or not isinstance(
+             kwargsvars, ConstDictVariable
+         ):

@@ -1,0 +1,15 @@
+diff --git a/torch/optim/adamw.py b/torch/optim/adamw.py
+index 5588a2bc51a..ef5202a3aa9 100644
+--- a/torch/optim/adamw.py
++++ b/torch/optim/adamw.py
+@@ -34,6 +34,10 @@ class AdamW(Adam):
+         differentiable: bool = False,
+         fused: Optional[bool] = None,
+     ):
++        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay, amsgrad=amsgrad,
++                        maximize=maximize, foreach=foreach, capturable=capturable, differentiable=differentiable, fused=fused)
++        if 'decoupled_weight_decay' not in defaults:
++            defaults['decoupled_weight_decay'] = True
+         super().__init__(
+             params,
+             lr,

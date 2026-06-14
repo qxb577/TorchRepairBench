@@ -1,0 +1,24 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index 9444fae168f..4db34edae16 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -223,6 +223,19 @@ class PackageExporter:
+         self.patterns: Dict[GlobGroup, _PatternInfo] = {}
+         self._unique_id = 0
+ 
++    def save_source_file(self, module_name: str, path: str) -> None:
++        """Save source file or directory to the package."""
++        if os.path.isdir(path):
++            for f in os.listdir(path):
++                file_path = os.path.join(path, f)
++                if os.path.isfile(file_path) and f.endswith('.py'):
++                    submodule_name = module_name + '.' + f[:-3] if f != '__init__.py' else module_name
++                    self.save_source_file(submodule_name, file_path)
++        else:
++            with open(path) as fh:
++                source = fh.read()
++            self.save_source_string(module_name, source)
++
+     def get_unique_id(self) -> str:
+         """Get an id. This id is guaranteed to only be handed out once for this package."""
+         ret = str(self._unique_id)

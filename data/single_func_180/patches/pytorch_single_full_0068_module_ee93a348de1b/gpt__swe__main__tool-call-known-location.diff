@@ -1,0 +1,14 @@
+diff --git a/torch/nn/modules/module.py b/torch/nn/modules/module.py
+index 9f2f1f4c03c..b38b4ab9313 100644
+--- a/torch/nn/modules/module.py
++++ b/torch/nn/modules/module.py
+@@ -1619,7 +1619,8 @@ class Module:
+                 for m in module.named_modules(memo, submodule_prefix, remove_duplicate):
+                     yield m
+ 
+-    def train(self: T, mode: bool = True) -> T:
++    def train(self: T, mode: Union[bool, None] = True) -> T:
++
+         r"""Sets the module in training mode.
+ 
+         This has any effect only on certain modules. See documentations of

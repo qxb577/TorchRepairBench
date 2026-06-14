@@ -1,0 +1,24 @@
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 2b84c1497ce..07c9c0049a1 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -791,6 +791,19 @@ class GetAttrVariable(VariableTracker):
+                 return variables.ConstantVariable(True)
+             else:
+                 return variables.ConstantVariable(False)
++        elif (
++            name == "__contains__"
++            and isinstance(self.obj, variables.UserDefinedClassVariable)
++            and len(args) == 1
++            and args[0].is_python_constant()
++            and not kwargs
++        ):
++            key = args[0].as_python_constant()
++            if self.obj.has_key_in_generic_dict(tx, key):
++                return variables.ConstantVariable(True)
++            else:
++                return variables.ConstantVariable(False)
++
+ 
+         return super().call_method(tx, name, args, kwargs)
+ 

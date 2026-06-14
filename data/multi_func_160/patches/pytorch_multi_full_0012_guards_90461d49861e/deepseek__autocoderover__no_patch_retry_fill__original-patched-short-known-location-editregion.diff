@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 0e714cb1a54..a63d486bab1 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -1135,6 +1135,13 @@ class GuardBuilder(GuardBuilderBase):
+             self.get_guard_manager(guard).add_type_match_guard(
+                 obj_id, get_verbose_code_parts(code, guard)
+             )
++
++    def NOT_PRESENT_IN_GENERIC_DICT(self, guard: Guard) -> None:
++        # guard.attr is the attribute name e.g. "forward"
++        attr = guard.attr
++        code = f"'{attr}' not in object.__getattribute__({self.arg_ref(guard)}, '__dict__')"
++        self._produce_guard_code(guard, [code])
++
+         else:
+             self._produce_guard_code(guard, [code])
+ 

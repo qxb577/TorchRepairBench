@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 96dbbf9265a..64e27dd4ef5 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1128,7 +1128,14 @@ class OutputGraph:
+ 
+             stored_graph_output_var = False
+             output = []
+-            if count_calls(self.graph) != 0 or len(pass2.graph_outputs) != 0:
++            if (
++                count_calls(self.graph) != 0
++                or len(pass2.graph_outputs) != 0
++                or (
++                    tx.distributed_state is not None
++                    and tx.distributed_state.all_states is None
++                )
++            ):
+                 output.extend(
+                     self.compile_and_call_fx_graph(tx, pass2.graph_output_vars(), root)
+                 )
+@@ -1138,6 +1145,7 @@ class OutputGraph:
+                     stored_graph_output_var = True
+                 else:
+                     output.append(create_instruction("POP_TOP"))
++
+             append_prefix_insts()
+             self.add_output_instructions(output + pass2.get_instructions())
+ 

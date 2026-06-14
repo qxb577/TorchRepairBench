@@ -1,0 +1,13 @@
+diff --git a/torch/fx/passes/infra/partitioner.py b/torch/fx/passes/infra/partitioner.py
+index 7bb536dbba9..dc4ac8d7965 100644
+--- a/torch/fx/passes/infra/partitioner.py
++++ b/torch/fx/passes/infra/partitioner.py
+@@ -53,7 +53,7 @@ class _DependencyViewer:
+     def __init__(self, graph_module: GraphModule):
+         self.downstreams = collections.defaultdict(set)
+ 
+-        for node in reversed(graph_module.graph.nodes):
++        for node in graph_module.graph.nodes:
+             for output_node in node.users:
+                 # add output_node and output_node's downstream dependency
+                 self.downstreams[node].add(output_node)

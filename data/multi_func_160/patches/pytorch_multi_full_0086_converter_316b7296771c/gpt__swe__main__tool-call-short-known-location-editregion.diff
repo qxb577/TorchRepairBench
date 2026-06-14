@@ -1,0 +1,14 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index 568685f9759..9fb864a7527 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -24,7 +24,8 @@ from torchgen.model import FunctionSchema
+ def inplace_optimize_sym_size_div(gm: torch.fx.GraphModule):
+     def pattern(im, dim, scale):
+         sym_size_int = torch.ops.aten.sym_size.int(im, dim)
+-        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int)
++        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int, dtype=torch.int)
++
+         div_scalar_mode = torch.ops.aten.div.Scalar_mode(
+             scalar_tensor, scale, rounding_mode="trunc"
+         )

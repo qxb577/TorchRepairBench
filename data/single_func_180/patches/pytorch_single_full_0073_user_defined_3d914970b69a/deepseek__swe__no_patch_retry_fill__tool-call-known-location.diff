@@ -1,0 +1,20 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index ef80a55dd02..a95ef60310f 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2758,6 +2758,8 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+                 self.value.__dict__, AttrSource(self.source, "__dict__")
+             )
+             return self.generic_dict_vt
++        elif isinstance(getattr(type(self.value), name, None), property):
++            return super().var_getattr(tx, name)
+         elif out := self.generic_dict_vt.maybe_getitem_const(
+             variables.ConstantVariable(name)
+         ):
+@@ -2766,5 +2768,6 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+             return super().var_getattr(tx, name)
+ 
+ 
++
+ class RandomVariable(UserDefinedObjectVariable):
+     pass

@@ -1,0 +1,13 @@
+diff --git a/torch/fx/experimental/const_fold.py b/torch/fx/experimental/const_fold.py
+index 554395f37f2..09767b5e05a 100644
+--- a/torch/fx/experimental/const_fold.py
++++ b/torch/fx/experimental/const_fold.py
+@@ -139,7 +139,7 @@ def split_const_subgraphs(
+ 
+         # If the node itself is constant, or all of its inputs are constant,
+         # then tag it as constant.
+-        if node.op != "get_attr" and not set(node.all_input_nodes).issubset(const_nodes):
++        if node.op != "get_attr" and not all(n in const_nodes for n in node.all_input_nodes):
+             continue
+ 
+         # If provided skip folding function says to skip, then skip.

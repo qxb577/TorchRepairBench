@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 5d667040f5e..4563802a6f2 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1917,6 +1917,8 @@ def _warn_complex_not_supported():
+ # output.
+ def unsupported_input_tensor(t: torch.Tensor, parent=None, node=None):
+     "Do not support reading or writing to this tensor"
++    if t.is_meta():
++        return True
+     if t.is_complex():
+         # Complex views are supported with IR ComplexView
+         if parent and parent.target in (
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 66f6b08c9c4..78e83382cb4 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -4394,7 +4394,7 @@ class Scheduler:
+ 
+             if not isinstance(node, NopKernelSchedulerNode):
+                 device = node.get_device()
+-                if device is not None and self.get_backend(device).ready_to_flush():
++                if device is not None and device.type != 'meta' and self.get_backend(device).ready_to_flush():
+                     self.flush()
+ 
+         if self.current_device and device_need_guard(self.current_device.type):

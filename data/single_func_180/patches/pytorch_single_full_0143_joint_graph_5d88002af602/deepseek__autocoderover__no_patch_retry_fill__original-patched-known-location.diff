@@ -1,0 +1,19 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index 0f1b6179410..67d1d447554 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -287,9 +287,14 @@ class UniformValueConstantFolder(ConstantFolder):
+             and len(node.args) == 2
+         ):
+             args, kwargs = self.fetch_args_kwargs_from_env(node)
++            # Bail out if the fill value is a symbolic integer,
++            # to avoid specializing on dynamic shape values.
++            if isinstance(args[1], torch.SymInt):
++                return self.unknown_value
+             new_args = [[1], args[1]]
+             return aten.full.default(*new_args, **node.kwargs)
+ 
++
+         # handle before view ops because this changes value
+         if node.target == aten.view.dtype:
+             return super(ConstantFolder, self).run_node(node)

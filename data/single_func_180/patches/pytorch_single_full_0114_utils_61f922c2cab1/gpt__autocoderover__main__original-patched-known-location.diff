@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 41131be1055..5bc6a59ce44 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1935,12 +1935,16 @@ def get_real_value(node, tracer):
+     if node in cache:
+         return cache[node]
+ 
++    if node.op == "placeholder":
++        return tracer.real_value_cache.get(node, None)
++
+     op = node.op
+     args, kwargs = torch.fx.node.map_arg(
+         (node.args, node.kwargs),
+         lambda n: get_real_value(n, tracer),
+     )
+ 
++
+     if op == "call_module":
+         nn_module = tracer.output_graph.nn_modules[node.target]
+         if not is_lazy_module(nn_module):

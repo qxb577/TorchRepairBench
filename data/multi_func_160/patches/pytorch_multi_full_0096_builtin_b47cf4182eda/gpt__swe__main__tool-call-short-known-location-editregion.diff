@@ -1,0 +1,52 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index e927a3df47d..954b20c7386 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -837,12 +837,16 @@ class BuiltinVariable(VariableTracker):
+     call_min = _call_min_max
+     call_max = _call_min_max
+ 
+-    def call_abs(self, tx, arg: "VariableTracker"):
++    def call_pos(self, tx, arg: "VariableTracker"):
++
+         # Call arg.__abs__()
+-        abs_method = BuiltinVariable(getattr).call_function(
+-            tx, [arg, ConstantVariable.create("__abs__")], {}
++        pos_method = BuiltinVariable(getattr).call_function(
++
++            tx, [arg, ConstantVariable.create("__pos__")], {}
++
+         )
+-        return abs_method.call_function(tx, [], {})
++        return pos_method.call_function(tx, [], {})
++
+ 
+     def call_round(self, tx, arg, *args, **kwargs):
+         # Call arg.__round__()
+diff --git a/torch/fx/experimental/sym_node.py b/torch/fx/experimental/sym_node.py
+index 3bc3aae1cf1..63f8d0da535 100644
+--- a/torch/fx/experimental/sym_node.py
++++ b/torch/fx/experimental/sym_node.py
+@@ -215,8 +215,10 @@ class SymNode:
+ 
+     # These methods call the metaprogrammed methods, they're hand written
+     # here so we get good stack traces
+-    def abs(self) -> "SymNode":
+-        return self._abs()  # type: ignore[attr-defined]
++    def pos(self) -> "SymNode":
++
++        return self._pos()  # type: ignore[attr-defined]
++
+ 
+     def round(self, ndigits=None) -> "SymNode":
+         return self._round(ndigits)  # type: ignore[attr-defined]
+@@ -407,7 +409,8 @@ class SymNode:
+ 
+ # TODO: this probably needs the sizes-strides eval functions
+ METHOD_TO_OPERATOR = {
+-    "abs": operator.abs,
++    "pos": operator.pos,
++
+     "add": operator.add,
+     "and": operator.and_,
+     "ceil": math.ceil,

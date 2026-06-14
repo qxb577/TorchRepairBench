@@ -1,0 +1,40 @@
+diff --git a/torch/_functorch/_aot_autograd/autograd_cache.py b/torch/_functorch/_aot_autograd/autograd_cache.py
+index 68759cbaaab..abfe9437e23 100644
+--- a/torch/_functorch/_aot_autograd/autograd_cache.py
++++ b/torch/_functorch/_aot_autograd/autograd_cache.py
+@@ -578,8 +578,6 @@ class GenericCompiledBackward(InductorOutput[TOut]):
+     # Used by AOTDispatchAutograd.post_compile
+     backward_state_indices: list[int]
+     num_symints_saved_for_bw_: int
+-
+-
+ @dataclass
+ class CompiledBackward(GenericCompiledBackward[CompiledFxGraph], FxGraphCacheLoadable):
+     """
+@@ -589,6 +587,13 @@ class CompiledBackward(GenericCompiledBackward[CompiledFxGraph], FxGraphCacheLoa
+     def _is_backward(self) -> bool:
+         return True
+ 
++    def post_compile(self, compiled_graph, example_inputs, cudagraphs):
++        compiled_fn = super().post_compile(compiled_graph, example_inputs, cudagraphs)
++        return torch._dynamo.disable(
++            compiled_fn, reason="do not trace generated backwards pass"
++        )
++
++
+ 
+ # Forward types don't have any extra parameters, so this is just a TypeAlias, in essence
+ class BundledCompiledForward(CompiledFxGraphLoadable):
+@@ -599,7 +604,11 @@ class BundledCompiledForward(CompiledFxGraphLoadable):
+ class BundledCompiledBackward(
+     GenericCompiledBackward[CompiledFxGraph], CompiledFxGraphLoadable
+ ):
+-    pass
++    def post_compile(self, compiled_graph, example_inputs, cudagraphs):
++        compiled_fn = super().post_compile(compiled_graph, example_inputs, cudagraphs)
++        return torch._dynamo.disable(
++            compiled_fn, reason="do not trace generated backwards pass"
++        )
+ 
+ 
+ TForward = TypeVar("TForward", bound=InductorOutput)

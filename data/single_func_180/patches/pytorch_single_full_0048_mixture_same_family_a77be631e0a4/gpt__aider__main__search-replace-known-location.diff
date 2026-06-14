@@ -1,0 +1,15 @@
+diff --git a/torch/distributions/mixture_same_family.py b/torch/distributions/mixture_same_family.py
+index b5a853797b4..6745c0fa2e8 100644
+--- a/torch/distributions/mixture_same_family.py
++++ b/torch/distributions/mixture_same_family.py
+@@ -94,8 +94,9 @@ class MixtureSameFamily(Distribution):
+ 
+         event_shape = self._component_distribution.event_shape
+         self._event_ndims = len(event_shape)
++        broadcast_shape = torch.broadcast_shapes(mdbs, cdbs)
+         super().__init__(
+-            batch_shape=cdbs, event_shape=event_shape, validate_args=validate_args
++            batch_shape=broadcast_shape, event_shape=event_shape, validate_args=validate_args
+         )
+ 
+     def expand(self, batch_shape, _instance=None):

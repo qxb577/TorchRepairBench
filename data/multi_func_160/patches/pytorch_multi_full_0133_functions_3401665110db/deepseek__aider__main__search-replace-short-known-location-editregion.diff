@@ -1,0 +1,26 @@
+diff --git a/torch/nn/attention/flex_attention.py b/torch/nn/attention/flex_attention.py
+index 27b81f49fe9..a432e2c948e 100644
+--- a/torch/nn/attention/flex_attention.py
++++ b/torch/nn/attention/flex_attention.py
+@@ -266,11 +266,16 @@ def _get_mod_type(fn: Callable) -> _ModificationType:
+     considered as a score_mod function. If the function has 4 positional arguments, it is
+     considered as a mask function.
+     """
+-    num_positional_args = sum(
+-        1
+-        for param in inspect.signature(fn).parameters.values()
+-        if param.default is inspect.Parameter.empty
+-    )
++    # Use fn.__code__ to avoid Dynamo graph break from inspect.signature
++    if hasattr(fn, "__code__"):
++        num_positional_args = fn.__code__.co_argcount
++    else:
++        # Fallback for non-code objects like built-ins
++        num_positional_args = sum(
++            1
++            for param in inspect.signature(fn).parameters.values()
++            if param.default is inspect.Parameter.empty
++        )
+     assert num_positional_args == 5 or num_positional_args == 4
+     if num_positional_args == 5:
+         return _ModificationType.SCORE_MOD

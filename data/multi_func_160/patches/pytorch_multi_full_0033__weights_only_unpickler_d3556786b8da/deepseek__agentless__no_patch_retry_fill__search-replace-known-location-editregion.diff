@@ -1,0 +1,37 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 90926105db7..3421f911e9f 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -73,6 +73,7 @@ from torch._utils import IMPORT_MAPPING, NAME_MAPPING
+ 
+ 
+ _marked_safe_globals_list: List[Any] = []
++_blocked_modules: set[str] = {'nt', 'posix'}
+ 
+ 
+ def _add_safe_globals(safe_globals: List[Any]):
+@@ -221,6 +222,10 @@ class Unpickler:
+                     elif module in IMPORT_MAPPING:
+                         module = IMPORT_MAPPING[module]
+                 full_path = f"{module}.{name}"
++                if module in _blocked_modules:
++                    raise UnpicklingError(
++                        f"unsupported GLOBAL {full_path} whose module {module} is blocked"
++                    )
+                 if full_path in _get_allowed_globals():
+                     self.append(_get_allowed_globals()[full_path])
+                 elif full_path in _get_user_allowed_globals():
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 587895b6864..739926944b0 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -1147,6 +1147,9 @@ def load(
+     def _get_wo_message(message: str) -> str:
+         pattern = r"GLOBAL (\S+) was not an allowed global by default."
+         has_unsafe_global = re.search(pattern, message) is not None
++        # If the message is a module blocklist error, do not wrap it.
++        if "module is blocked" in message:
++            return message
+         if has_unsafe_global:
+             updated_message = (
+                 "Weights only load failed. This file can still be loaded, to do so you have two options "

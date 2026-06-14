@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 3dd41a1d91f..2622aca0f24 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -576,7 +576,15 @@ class VariableBuilder:
+         ):
+             return self.wrap_tensor(value)
+         elif is_namedtuple(value):
+-            return self.wrap_listlike(value)
++            from ..source import AttrSource
++            return NamedTupleVariable(
++                tuple(
++                    self.wrap(getattr(value, field), source=AttrSource(self.source, field))
++                    for field in value._fields
++                ),
++                UserDefinedObjectVariable(value, self.source),
++            )
++
+ 
+         elif value is torch.utils._pytree.SUPPORTED_NODES:
+             # For SUPPORTED_NODES, we guard on the dictionary version (PEP509)

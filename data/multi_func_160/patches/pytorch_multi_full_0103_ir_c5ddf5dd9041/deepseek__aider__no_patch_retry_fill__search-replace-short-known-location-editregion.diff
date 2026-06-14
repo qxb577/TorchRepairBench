@@ -1,0 +1,31 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 386734212f3..f962d74014f 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3003,7 +3003,8 @@ class SliceView(View):
+         sizevars = V.graph.sizevars
+         dim_size = x.get_size()[dim]
+ 
+-        if any(free_unbacked_symbols(x) for x in (start, end, dim_size)):
++        from torch.fx.experimental.symbolic_shapes import has_unbacked_symbols
++        if any(has_unbacked_symbols(x) for x in (start, end, dim_size)):
+ 
+             def clamp(x, lower, upper):  # type: ignore[no-untyped-def]
+                 return sympy.Min(sympy.Max(x, lower), upper)
+diff --git a/torch/fx/passes/runtime_assert.py b/torch/fx/passes/runtime_assert.py
+index 9dd87d49ef5..b6f614b84cd 100644
+--- a/torch/fx/passes/runtime_assert.py
++++ b/torch/fx/passes/runtime_assert.py
+@@ -173,9 +173,10 @@ def insert_deferred_runtime_asserts(
+         )
+         try:
+             node.meta[val_key] = node.target(*fake_args)  # type: ignore[operator]
+-        except NotImplementedError:
++        except (NotImplementedError, torch.fx.experimental.symbolic_shapes.GuardOnDataDependentSymNode):
+             # This can happen when attempting to reify a symbol with an unsupported call_function node,
+-            # e.g. with NestedTensors + sym_size.int via match_symbol().
++            # e.g. with NestedTensors + sym_size.int via match_symbol(), or when the operation
++            # relies on data-dependent unbacked SymInts (e.g., slice bounds from subclasses).
+             # This seems to be fine, as the node gets CSE'd and deleted later in favor of a SymInt graph input.
+             pass
+         if stack_trace is not None:

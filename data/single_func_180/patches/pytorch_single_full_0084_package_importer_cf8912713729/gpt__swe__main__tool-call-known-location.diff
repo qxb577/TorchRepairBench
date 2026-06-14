@@ -1,0 +1,14 @@
+diff --git a/torch/package/package_importer.py b/torch/package/package_importer.py
+index 72bde854cba..3591182cba5 100644
+--- a/torch/package/package_importer.py
++++ b/torch/package/package_importer.py
+@@ -157,7 +157,8 @@ class PackageImporter(Importer):
+         self._mangler = PackageMangler()
+ 
+         # used for reduce deserializaiton
+-        self.storage_context: Any = None
++        self.storage_context: Optional[torch._C.StorageContext] = None
++
+         self.last_map_location = None
+ 
+         # used for torch.serialization._load

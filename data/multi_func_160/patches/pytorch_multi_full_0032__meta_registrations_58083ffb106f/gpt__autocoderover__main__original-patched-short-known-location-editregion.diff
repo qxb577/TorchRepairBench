@@ -1,0 +1,18 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 3afe3a98d10..51ad4362988 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -369,11 +369,12 @@ def meta_copy_(self, src, non_blocking=False):
+     # In theory, we should make this more robust by carefully
+     # auditing our C++ copy_() kernel and copying the checks here.
+ 
+-    if torch._debug_has_internal_overlap(self) == 1:  # 1 == MemOverlap::Yes
++    if torch._debug_has_internal_overlap(self) != 0:  # 0 == MemOverlap::No
+         raise RuntimeError(
+             "more than one element of the written-to tensor refers to a single memory location"
+         )
+ 
++
+     if isinstance(src, Tensor):
+         intermediate = src.to(self, non_blocking)
+         if self.size() != intermediate.size():

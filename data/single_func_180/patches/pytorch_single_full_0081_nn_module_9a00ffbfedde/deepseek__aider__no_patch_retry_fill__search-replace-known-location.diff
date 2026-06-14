@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 8378ad83926..35401e28e12 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -216,8 +216,14 @@ class NNModuleVariable(VariableTracker):
+         submod: torch.nn.Module,
+         *key_extra: Any,
+         **options: Any,
+-    ) -> None:
+-        return
++    ) -> VariableTracker:
++        return tx.output.register_attr_or_module(
++            submod,
++            self.module_key,
++            *key_extra,
++            source=source,
++            **options,
++        )
+ 
+     def unpack_var_sequence(self, tx: "InstructionTranslator") -> list[VariableTracker]:
+         # implement list/iter/tuple/etc calls

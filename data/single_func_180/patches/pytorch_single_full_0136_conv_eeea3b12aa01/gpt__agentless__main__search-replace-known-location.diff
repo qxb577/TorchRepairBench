@@ -1,0 +1,17 @@
+diff --git a/torch/nn/modules/conv.py b/torch/nn/modules/conv.py
+index 3f894532a64..349136e6597 100644
+--- a/torch/nn/modules/conv.py
++++ b/torch/nn/modules/conv.py
+@@ -1161,10 +1161,10 @@ class _LazyConvXdMixin(LazyModuleMixin):
+             assert isinstance(self.weight, UninitializedParameter)
+             if self.transposed:
+                 self.weight.materialize((
+-                    self.in_channels, self.out_channels // self.groups, *self.kernel_size))
++                    self.out_channels, self.in_channels // self.groups, *self.kernel_size))
+             else:
+                 self.weight.materialize((
+-                    self.out_channels, self.in_channels // self.groups, *self.kernel_size))
++                    self.out_channels, self.out_channels // self.groups, *self.kernel_size))
+             if self.bias is not None:
+                 assert isinstance(self.bias, UninitializedParameter)
+                 self.bias.materialize((self.out_channels,))

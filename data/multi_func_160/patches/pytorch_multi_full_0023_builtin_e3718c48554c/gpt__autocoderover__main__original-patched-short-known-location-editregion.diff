@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 96c5e762bc4..22e64bbc03e 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2805,7 +2805,8 @@ class BuiltinVariable(VariableTracker):
+                 UserDefinedObjectVariable,
+             ),
+         ):
+-            return a.call_method(tx, "__or__", [b], {})
++            return a.call_method(tx, "__ior__", [b], {})
++
+ 
+         # None no-ops this handler and lets the driving function proceed
+         return None

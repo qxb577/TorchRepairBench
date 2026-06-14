@@ -1,0 +1,43 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index d331f1238b3..ee59b41208e 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1116,7 +1116,8 @@ class TensorVariable(VariableTracker):
+             if isinstance(vt, variables.lazy.LazyVariableTracker):
+                 vt = variables.lazy.LazyVariableTracker.realize_all(vt)
+ 
+-            self.synchronize_attributes(tx, type(vt))
++            self.synchronize_attributes(tx, type(vt), skip_unbacked=True)
++
+ 
+         if config.use_graph_deduplication or config.track_nodes_for_deduplication:
+             tx.output.region_tracker.add_node_mutation(proxy.node, 0)
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index 8ba3779b4fd..091ff79c526 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -16,7 +16,8 @@ from torch._higher_order_ops.triton_kernel_wrap import (
+     kernel_side_table,
+     triton_kernel_wrapper_functional,
+ )
+-from torch._inductor import config, inductor_prims
++from torch._inductor import config, inductor_prims, unbacked_symbol_handler
++
+ from torch._inductor.fx_utils import get_node_storage, is_node_realized
+ from torch._inductor.lowering import (
+     inplaceable_foreach_ops as inplaceable_foreach_ops_lowerings,
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 6df8f06cc02..551f65c38ed 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1279,8 +1279,9 @@ def slice_(x, dim=0, start=0, end=2**63, step=1, clamp=True):
+     # clamp is True, unbacked start / end
+     assert clamp
+     unbacked_bindings = resolve_unbacked_bindings(
+-        V.graph.sizevars.shape_env, V.graph.current_node.meta["unbacked_bindings"]
++        V.graph.sizevars.shape_env, V.graph.current_node.meta.get("unbacked_bindings", {})
+     )
++
+     assert unbacked_bindings is not None
+     assert len(unbacked_bindings) <= 2, unbacked_bindings
+     sym_size, sym_storage = None, None

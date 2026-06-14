@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index a5dc828135d..6500e99d99e 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -1315,10 +1315,11 @@ class TritonTemplate(KernelTemplate):
+             kernel = self.kernel_type(
+                 kernel_name=str(Placeholder.KERNEL_NAME),
+                 output_node=out_node,
+-                workspace_arg=workspace_arg,
+                 use_jit=False,
++                workspace_arg=workspace_arg,
+                 **options,
+             )
++
+             render = functools.partial(
+                 kernel.render,
+                 self.template,

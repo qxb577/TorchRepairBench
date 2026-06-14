@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/decorators.py b/torch/_dynamo/decorators.py
+index ff1156b04b6..e2ff216fca4 100644
+--- a/torch/_dynamo/decorators.py
++++ b/torch/_dynamo/decorators.py
+@@ -85,8 +85,8 @@ def disable(fn=None, recursive=True, *, reason=None):
+         if fn is not None:
+             fn = innermost_fn(fn)
+             assert callable(fn)
+-            return DisableContext(msg=reason)(fn)
+-        return DisableContext(msg=reason)
++            return DisableContext(msg=reason, precompile=False)(fn)
++        return DisableContext(msg=reason, precompile=False)
+     else:
+ 
+         def wrap(fn):
+diff --git a/torch/_dynamo/eval_frame.py b/torch/_dynamo/eval_frame.py
+index 73f36ba5719..90cad558a12 100644
+--- a/torch/_dynamo/eval_frame.py
++++ b/torch/_dynamo/eval_frame.py
+@@ -846,8 +846,8 @@ class RunOnlyContext(_TorchDynamoContext):
+ 
+ 
+ class DisableContext(_TorchDynamoContext):
+-    def __init__(self, msg: Optional[str] = None) -> None:
+-        super().__init__(callback=None)
++    def __init__(self, msg: Optional[str] = None, precompile: bool = True) -> None:
++        super().__init__(callback=None if precompile else False)
+         self.msg = msg
+ 
+     def __call__(self, fn):

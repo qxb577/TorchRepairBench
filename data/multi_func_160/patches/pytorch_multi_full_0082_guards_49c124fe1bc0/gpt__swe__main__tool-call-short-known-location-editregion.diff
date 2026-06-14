@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 8c20aa33810..c5550ad8679 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -1796,7 +1796,8 @@ class GuardBuilder(GuardBuilderBase):
+     def TENSOR_MATCH(self, guard: Guard, value=None):
+         # For FSDP modules, we can skip guards on nn module tensors because FSDP
+         # eager assumes that the params are unchanged once the model is wrapped.
+-        if guard.is_fsdp_module():
++        if guard.is_fsdp_module() and not guard.is_specialized_nn_module():
++
+             return
+ 
+         # For tensors that are part of the Dynamo extracted Fx graph module, an

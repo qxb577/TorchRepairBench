@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 2fbf909b509..0c99bf1ad73 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1521,7 +1521,9 @@ class VariableBuilder:
+             return self.tx.output.side_effects.track_object_existing(value, result)
+         elif issubclass(type(value), MutableMapping):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+-            return MutableMappingVariable(value, source=self.source)
++            result = MutableMappingVariable(value, source=self.source)
++            return self.tx.output.side_effects.track_object_existing(value,
++
+         elif is_frozen_dataclass(value):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+             result = FrozenDataClassVariable.create(self.tx, value, source=self.source)

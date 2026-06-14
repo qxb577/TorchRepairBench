@@ -1,0 +1,25 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 5d667040f5e..92a21e95dd8 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1917,16 +1917,18 @@ def _warn_complex_not_supported():
+ # output.
+ def unsupported_input_tensor(t: torch.Tensor, parent=None, node=None):
+     "Do not support reading or writing to this tensor"
+-    if t.is_complex():
++    if t.is_complex() or t.is_meta:
+         # Complex views are supported with IR ComplexView
+         if parent and parent.target in (
+             torch.ops.aten.view.dtype,
+             torch.ops.prims.convert_element_type.default,
+         ):
+             return False
+-        _warn_complex_not_supported()
++        if t.is_complex():
++            _warn_complex_not_supported()
+         return True
+ 
++
+     if t.dtype == torch.float8_e8m0fnu:
+         if not node:
+             return True

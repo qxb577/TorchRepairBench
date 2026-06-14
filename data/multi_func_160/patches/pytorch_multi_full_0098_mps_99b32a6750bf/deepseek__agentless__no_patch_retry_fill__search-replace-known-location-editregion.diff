@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index c24cde56358..3049dabbe41 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -736,10 +736,13 @@ class TritonPrinter(PythonPrinter):
+         )
+ 
+     def _print_Float(self, expr: sympy.Expr) -> str:
++        # When the float value is exactly zero, print it as 0 to avoid
++        # type mismatches in Triton (e.g., when used as an index).
++        float_str = "0" if float(expr) == 0 else str(expr)
+         if config.is_fbcode() and torch.version.hip:
+-            ret = f"{expr}"
++            ret = float_str
+         else:
+-            ret = f"tl.full([], {expr}, tl.float64)"
++            ret = f"tl.full([], {float_str}, tl.float64)"
+         return ret
+ 
+     def _print_ToFloat(self, expr: sympy.Expr) -> str:

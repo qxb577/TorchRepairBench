@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 21005f9b564..dddf1532b18 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -969,7 +969,8 @@ class GetAttrVariable(VariableTracker):
+     def __init__(self, obj, name, **kwargs) -> None:
+         super().__init__(**kwargs)
+         assert isinstance(obj, VariableTracker)
+-        assert isinstance(name, str)
++        assert isinstance(name, (str, torch._dynamo.variables.base.VariableTracker))
++
+         self.obj = obj
+         self.name = name
+ 
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index bf5e7ddfbea..f824538ae2f 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -273,7 +273,8 @@ class TensorVariable(VariableTracker):
+             raise NotImplementedError
+ 
+         real_value = getattr(_input_associated_real_value, name)
+-        if callable(real_value):
++        if callable(real_value) and not isinstance(real_value, torch._dynamo.variables.base.VariableTracker):
++
+             # Callables have more nuanced handling, and we should let the existing system delegate here.
+             # Raising was past behavior and so should always be sound to fall back.
+             # Note - at a certain point we may want to handle

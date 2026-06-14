@@ -1,0 +1,16 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index ec3a3f528ab..93e323a4440 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -814,8 +814,9 @@ class AutogradFunctionApply(HigherOrderOperator):
+         **fwd_kwargs: Any,
+     ) -> Any:
+         saved_values: Iterable[Any] | None = None
+-        non_differentiable_idx = fwd_kwargs["non_differentiable_idx"]
+-        saved_for_backward_idx = fwd_kwargs["saved_for_backward_idx"]
++        non_differentiable_idx = fwd_kwargs.get("non_differentiable_idx", [])
++        saved_for_backward_idx = fwd_kwargs.get("saved_for_backward_idx", [])
++
+ 
+         class ApplyTemplate(torch.autograd.Function):
+             @staticmethod

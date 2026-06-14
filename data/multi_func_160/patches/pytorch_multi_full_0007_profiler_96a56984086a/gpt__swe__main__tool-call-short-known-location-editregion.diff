@@ -1,0 +1,14 @@
+diff --git a/torch/profiler/profiler.py b/torch/profiler/profiler.py
+index 81f1d2c2f1e..912420a8a62 100644
+--- a/torch/profiler/profiler.py
++++ b/torch/profiler/profiler.py
+@@ -203,7 +203,8 @@ class _KinetoProfile:
+         if self.execution_trace_observer:
+             self.execution_trace_observer.stop()
+         assert self.profiler is not None
+-        self.profiler.__exit__(None, None, None)
++        self.profiler.__exit__(None, None, None); self.profiler = None
++
+ 
+     def export_chrome_trace(self, path: str):
+         """

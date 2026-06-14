@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index 3a490090054..a68150aaea6 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -61,9 +61,11 @@ def graph_call_function(graph: torch.fx.Graph, fn, *args, **kwargs):
+ 
+     node = graph.call_function(fn, args, kwargs)
+     node.meta["val"] = fake_result
++    node.meta["unbacked_bindings"] = V.fake_mode.shape_env.unbacked_bindings
+     return node
+ 
+ 
++
+ @dataclass
+ class ViewOp:
+     target: torch._ops.OpOverload

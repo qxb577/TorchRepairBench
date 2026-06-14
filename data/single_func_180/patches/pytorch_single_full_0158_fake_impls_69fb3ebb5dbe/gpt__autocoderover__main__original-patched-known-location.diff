@@ -1,0 +1,15 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0b000cfa1a9..e63bbedaa5b 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -1343,6 +1343,10 @@ def make_fast_binary_impl(
+                 common_dtype = op.dtype
+             elif common_dtype != op.dtype:
+                 has_different_input_dtypes = True
++                # Promote to float if one of the operands is an integer
++                if torch.is_floating_point(op) or torch.is_floating_point(common_dtype):
++                    common_dtype = torch.promote_types(common_dtype, torch.float32)
++
+ 
+         if has_different_input_dtypes:
+             # compute promotion

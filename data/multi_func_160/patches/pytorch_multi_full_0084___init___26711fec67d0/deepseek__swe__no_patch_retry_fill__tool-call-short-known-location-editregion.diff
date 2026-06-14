@@ -1,0 +1,20 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 89ea8700af1..fe12080faf6 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -4921,9 +4921,15 @@ def unsqueeze(a: TensorLikeType, dim: int) -> TensorLikeType:
+ # TODO: Turn this into a decomposition (currently fails on reshape meta tests)
+ @register_decomposition(aten.view.default)
+ def view(a: TensorLikeType, *shape: ShapeType) -> TensorLikeType:
++    if isinstance(a, torch.Tensor) and a.is_fake:
++        from torch._subclasses.fake_impls import _view_has_unbacked_input
++        if _view_has_unbacked_input(a, shape):
++            from torch._subclasses.fake_impls import _view_unbacked_meta
++            return _view_unbacked_meta(a, shape)
+     return _reshape_view_helper(a, *shape, allow_copy=False)
+ 
+ 
++
+ # CompositeImplicitAutograd - don't register decomp
+ def view_as(self: TensorLikeType, other: TensorLikeType) -> TensorLikeType:
+     return self.view(other.size())

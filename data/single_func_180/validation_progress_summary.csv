@@ -1,0 +1,2 @@
+validation_csv,canonical_patch_bugs,complete_bugs,partial_bugs,not_started_bugs,canonical_patch_rows,validated_patch_rows,missing_patch_rows,pass_rows,fail_or_env_error_rows,not_run_rows
+benchmark_pilot/single_func_180/allruns_patch_test_validation_corrected562.csv,170,170,0,0,1108,1108,0,359,745,0

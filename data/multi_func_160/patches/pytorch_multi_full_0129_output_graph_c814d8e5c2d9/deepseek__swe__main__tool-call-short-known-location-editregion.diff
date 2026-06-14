@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 646405ff60b..39057864eaf 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -343,8 +343,9 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+         self._current_tx: List[InstructionTranslatorBase] = []
+         self.cleanups: List[CleanupHook] = []
+         self.should_exit = False
+-        self.random_values_var = None
++        self.random_values_var = []
+         self.unspec_variable_map: Dict[str, UnspecializedPythonVariable] = {}
++
+         self.torch_function_enabled = torch._C._is_torch_function_enabled()
+         # Tracks if the output graph has a user defined allowed function in the
+         # graph. This is used later to determine if we should fallback to eager

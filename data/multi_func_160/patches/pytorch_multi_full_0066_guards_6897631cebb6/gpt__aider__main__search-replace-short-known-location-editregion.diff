@@ -1,0 +1,39 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 7f697bba5f0..e646806bb7d 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -980,7 +980,7 @@ class GuardBuilder(GuardBuilderBase):
+                 example_value=example_value,
+                 guard_manager_enum=guard_manager_enum,
+             )
+-        elif istype(source, ScriptObjectQualifiedNameSource):
++        elif istype(source, ScriptObjectQualifiedNameSource) or istype(source, SubclassAttrListSource):
+             assert base_guard_manager  # to make mypy happy
+             out = base_guard_manager.lambda_manager(
+                 python_lambda=lambda x: x._type().qualified_name(),
+diff --git a/torch/_dynamo/source.py b/torch/_dynamo/source.py
+index 02ae0bfb209..e47862c3999 100644
+--- a/torch/_dynamo/source.py
++++ b/torch/_dynamo/source.py
+@@ -149,7 +149,7 @@ class WeakRefCallSource(ChainedSource):
+         codegen.extend_output(create_call_function(0, False))
+ 
+     def guard_source(self):
+-        return self.base.guard_source()
++        return f"{self.base.guard_source()}.{self.name()}"
+ 
+     def name(self):
+         return f"{self.base.name()}()"
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index df8b0736da0..26127677a56 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1397,7 +1397,7 @@ class VariableBuilder:
+         if is_traceable_wrapper_subclass(value):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+             attrs, _ = value.__tensor_flatten__()
+-            for attr in attrs:
++            for attr in sorted(attrs):
+                 inner_value = getattr(value, attr)
+                 inner_source = AttrSource(self.source, attr)
+                 LazyVariableTracker.realize_all(

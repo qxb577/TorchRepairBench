@@ -1,0 +1,13 @@
+diff --git a/torch/_jit_internal.py b/torch/_jit_internal.py
+index f4dabcbf97d..42ae497bd8b 100644
+--- a/torch/_jit_internal.py
++++ b/torch/_jit_internal.py
+@@ -600,7 +600,7 @@ def _copy_to_script_wrapper(fn):
+ 
+ def module_has_exports(mod):
+     for name in dir(mod):
+-        item = getattr(mod, name)
++        item = inspect.getattr_static(mod, name, None)
+         if callable(item):
+             if get_torchscript_modifier(item) is FunctionModifiers.EXPORT:
+                 return True

@@ -1,0 +1,14 @@
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 8d8ae774e3d..0c4c0e4f86d 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -354,7 +354,8 @@ def get_unsafe_globals_in_checkpoint(f: FILE_LIKE) -> List[str]:
+                 )
+             data_file = io.BytesIO(zip_file.get_record("data.pkl"))
+             all_globals = _weights_only_unpickler.get_globals_in_pkl(data_file)
+-            return list(all_globals.difference(safe_global_strings))
++            return list(all_globals.difference(safe_global_strings).difference(_get_user_allowed_globals()))
++
+ 
+ 
+ class skip_data:

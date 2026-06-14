@@ -1,0 +1,14 @@
+diff --git a/torch/_compile.py b/torch/_compile.py
+index 05e63baa7c9..2c4ab91e07e 100644
+--- a/torch/_compile.py
++++ b/torch/_compile.py
+@@ -48,7 +48,8 @@ def _disable_dynamo(
+                 disable_fn = torch._dynamo.disable(fn, recursive)
+                 fn.__dynamo_disable = disable_fn  # type: ignore[attr-defined]
+ 
+-            return disable_fn(*args, **kwargs)
++            with torch.compiler.set_stance("eager_on_recompile"):
++                return disable_fn(*args, **kwargs)
+ 
+         return inner
+     else:

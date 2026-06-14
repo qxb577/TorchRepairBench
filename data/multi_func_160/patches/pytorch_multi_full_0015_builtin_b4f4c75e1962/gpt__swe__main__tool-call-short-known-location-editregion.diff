@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index c6b90d3de2b..9e5d2e197d0 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1415,7 +1415,8 @@ class BuiltinVariable(VariableTracker):
+                     out = tx.inline_user_function_return(func_var, args, kwargs)
+                     if isinstance(out, ConstDictVariable):
+                         return out
+-                    return BuiltinVariable(user_cls).call_custom_dict(tx, user_cls, out)
++                    return BuiltinVariable(user_cls).call_custom_dict(tx, type(arg.value), out)
++
+         elif not args and kwargs:
+             items = {ConstantVariable.create(k): v for k, v in kwargs.items()}
+             return variables.ConstDictVariable(

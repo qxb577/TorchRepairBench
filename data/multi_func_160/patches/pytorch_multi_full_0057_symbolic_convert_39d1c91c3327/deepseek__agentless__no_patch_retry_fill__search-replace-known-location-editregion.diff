@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 8922d7cbbab..1ab629513c2 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -2643,9 +2643,20 @@ class InstructionTranslatorBase(
+         return self.output.tracing_context.fake_mode
+ 
+     def find_symbolic_locals_name(self, tensor_variable):
++        # Unwrap if tensor_variable is a NewCellVariable
++        if isinstance(tensor_variable, variables.NewCellVariable):
++            inner = tensor_variable.cell_contents
++        else:
++            inner = tensor_variable
+         for key, value in self.symbolic_locals.items():
+             if value is tensor_variable:
+                 return key
++            if isinstance(value, variables.NewCellVariable) and value.cell_contents is tensor_variable:
++                return key
++            if value is inner:
++                return key
++            if isinstance(value, variables.NewCellVariable) and value.cell_contents is inner:
++                return key
+         return None
+ 
+     @contextlib.contextmanager
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 6f500fff176..2d4ed8f21d3 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -983,7 +983,12 @@ Either create the tensor outside the compiled region, or do not set the tensor t
+                 ]
+                 for idx, name in enumerate(output_tensor_names):
+                     if name in tx.symbolic_locals:
+-                        tx.symbolic_locals[name] = tensor_variable.items[idx]
++                        existing = tx.symbolic_locals[name]
++                        result = tensor_variable.items[idx]
++                        if isinstance(existing, variables.NewCellVariable):
++                            tx.symbolic_locals[name] = variables.NewCellVariable(result)
++                        else:
++                            tx.symbolic_locals[name] = result
+                 for out_tensor, result_tensor in zip(
+                     kwargs["out"].items, tensor_variable.items
+                 ):
+@@ -1019,7 +1024,11 @@ Either create the tensor outside the compiled region, or do not set the tensor t
+                     )
+                 name = tx.find_symbolic_locals_name(kwargs["out"])
+                 if name in tx.symbolic_locals:
+-                    tx.symbolic_locals[name] = tensor_variable
++                    existing = tx.symbolic_locals[name]
++                    if isinstance(existing, variables.NewCellVariable):
++                        tx.symbolic_locals[name] = variables.NewCellVariable(tensor_variable)
++                    else:
++                        tx.symbolic_locals[name] = tensor_variable
+             elif (
+                 isinstance(tensor_variable, ConstantVariable)
+                 and tensor_variable.value is None

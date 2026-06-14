@@ -1,0 +1,14 @@
+diff --git a/torch/fx/experimental/_dynamism.py b/torch/fx/experimental/_dynamism.py
+index b6cfdef6147..38ae4949ab7 100644
+--- a/torch/fx/experimental/_dynamism.py
++++ b/torch/fx/experimental/_dynamism.py
+@@ -29,7 +29,8 @@ def module_to_nested_dict(module: torch.nn.Module) -> dict[str, Any]:
+     self_dict["_modules"] = {}
+ 
+     for attr_name in dir(module):
+-        if not attr_name.startswith("_") and not callable(getattr(module, attr_name)):
++        if not attr_name.startswith("_") and not callable(getattr(module, attr_name, None)):
++
+             attr_value = getattr(module, attr_name)
+             if (
+                 not isinstance(attr_value, torch.nn.Module)

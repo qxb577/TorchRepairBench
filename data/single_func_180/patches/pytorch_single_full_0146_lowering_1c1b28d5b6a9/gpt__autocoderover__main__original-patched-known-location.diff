@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index f691e2b46db..b03f6ca149b 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2997,8 +2997,9 @@ def select_scatter(x, src, dim: int, index: int):
+     def inner_fn(idx):
+         return ops.where(
+             ops.eq(
+-                ops.index_expr(idx[dim], torch.int32),
+-                ops.index_expr(index, torch.int32),
++                ops.index_expr(idx[dim], x.get_dtype()),
++                ops.index_expr(index, x.get_dtype()),
++
+             ),
+             src_loader(idx),
+             x_loader(idx),

@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 0a9d010b608..f375c1f3b3d 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -1249,7 +1249,8 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+                 return ConstantVariable.create(None)
+ 
+             if is_standard_setattr(method) or isinstance(self.value, threading.local):
+-                return self.method_setattr_standard(tx, *args, **kwargs)
++                if args and isinstance(args[0], str) and args[0]
++
+ 
+             if is_standard_delattr(method):
+                 return self.method_setattr_standard(

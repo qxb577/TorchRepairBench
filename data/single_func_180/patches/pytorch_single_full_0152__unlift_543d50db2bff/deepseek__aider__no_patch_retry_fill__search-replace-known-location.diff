@@ -1,0 +1,23 @@
+diff --git a/torch/export/_unlift.py b/torch/export/_unlift.py
+index ae4c09b7c8c..dd7213fd10c 100644
+--- a/torch/export/_unlift.py
++++ b/torch/export/_unlift.py
+@@ -51,6 +51,18 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+             return True
+         if _normalize_type(a.type) != _normalize_type(b.type):
+             return False
++        # dict keys order should not matter for equality
++        if a.type is dict and b.type is dict:
++            a_keys = a.context
++            b_keys = b.context
++            if set(a_keys) != set(b_keys):
++                return False
++            a_key_to_child = dict(zip(a_keys, a.children_specs))
++            b_key_to_child = dict(zip(b_keys, b.children_specs))
++            for k in a_keys:
++                if not _match_normalized_structure(a_key_to_child[k], b_key_to_child[k]):
++                    return False
++            return True
+         if a.context != b.context:
+             return False
+         if len(a.children_specs) != len(b.children_specs):

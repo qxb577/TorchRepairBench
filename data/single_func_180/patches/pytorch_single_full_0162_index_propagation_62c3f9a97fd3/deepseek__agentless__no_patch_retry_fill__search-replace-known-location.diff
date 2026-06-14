@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index e73272c655f..b99efcd8193 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -68,6 +68,10 @@ class TypedExpr:
+             expr = self.expr
+             if isinstance(expr, sympy.Expr):
+                 expr = expr.expand(identity=True)
++            if self.dtype in (torch.uint8, torch.uint16, torch.uint32, torch.uint64):
++                # unsigned integer overflow: wrap around
++                bits = torch.iinfo(self.dtype).bits
++                expr = expr % (2**bits)
+             self.expr = dtype_to_type(self.dtype)(expr)
+ 
+ 

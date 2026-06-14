@@ -1,0 +1,17 @@
+diff --git a/torch/_functorch/_aot_autograd/subclass_utils.py b/torch/_functorch/_aot_autograd/subclass_utils.py
+index cc657ce7f57..b026409907e 100644
+--- a/torch/_functorch/_aot_autograd/subclass_utils.py
++++ b/torch/_functorch/_aot_autograd/subclass_utils.py
+@@ -29,8 +29,11 @@ def requires_subclass_dispatch(args, fw_metadata: ViewAndMutationMeta) -> bool:
+         for x in fw_metadata.traced_tangents
+         if isinstance(x, Tensor)
+     )
++    # Also check if any graph outputs are subclasses, as that requires runtime wrapping.
++    any_subclass_graph_outputs = len(fw_metadata.subclass_fw_graph_out_meta) > 0
+     # This tells us whether or not we need to perform any unwrapping/wrapping of tensor subclasses at runtime.
+-    return any_subclass_args or any_subclass_outputs
++    return any_subclass_args or any_subclass_outputs or any_subclass_graph_outputs
++
+ 
+ 
+ # Given a flat list of arguments, some of which may be tensor subclasses,

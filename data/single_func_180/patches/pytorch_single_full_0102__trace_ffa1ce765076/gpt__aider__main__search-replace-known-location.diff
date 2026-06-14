@@ -1,0 +1,13 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..b52377bcb7c 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -383,7 +383,7 @@ def _get_param_buffer_mapping(
+ 
+     param_lookup: dict[int, str] = {}
+     buffer_lookup: dict[int, str] = {}
+-    for name, param in original_module.named_parameters(remove_duplicate=False):
++    for name, param in original_module.named_parameters(remove_duplicate=True):
+         param_lookup[id(param)] = name
+     for name, buffer in original_module.named_buffers(remove_duplicate=False):
+         buffer_lookup[id(buffer)] = name

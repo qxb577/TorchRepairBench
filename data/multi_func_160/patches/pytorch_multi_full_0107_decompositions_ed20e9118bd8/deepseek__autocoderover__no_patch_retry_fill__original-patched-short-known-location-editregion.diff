@@ -1,0 +1,16 @@
+diff --git a/torch/_functorch/compile_utils.py b/torch/_functorch/compile_utils.py
+index a5c3201c4ce..919155596a2 100644
+--- a/torch/_functorch/compile_utils.py
++++ b/torch/_functorch/compile_utils.py
+@@ -54,9 +54,10 @@ def fx_graph_cse(fx_g: torch.fx.graph.Graph):
+                      "kwargs": kwargs, "kwargs_spec": kwargs_spec}
+ 
+             # hash substituted args to a number, do not hash specs because specs are not hashable
+-            hash_arg = hash((args, kwargs))
++            hash_arg = hash((args, kwargs, tuple(map(type, args)), tuple(map(type, kwargs.values()))))
+             hash_val = (n.target, hash_arg)
+ 
++
+             # check if a node has a substitute and can be eliminated
+             hash_val_in_hash_env = hash_val in hash_env
+             if hash_val_in_hash_env and token_map[hash_val] == token:

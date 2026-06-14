@@ -1,0 +1,18 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index d7d861ba515..d2f8bf09a22 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -750,9 +750,10 @@ def set_default_tensor_type(t):
+ def set_default_dtype(d):
+     r"""
+ 
+-    Sets the default floating point dtype to :attr:`d`. Supports torch.float32
+-    and torch.float64 as inputs. Other dtypes may be accepted without complaint
+-    but are not supported and are unlikely to work as expected.
++    Sets the default floating point dtype to :attr:`d`. Supports torch.float32,
++    torch.float64, and torch.float16 as inputs. Other dtypes may be accepted without
++    complaint but are not supported and are unlikely to work as expected.
++
+ 
+     When PyTorch is initialized its default floating point dtype is torch.float32,
+     and the intent of set_default_dtype(torch.float64) is to facilitate NumPy-like

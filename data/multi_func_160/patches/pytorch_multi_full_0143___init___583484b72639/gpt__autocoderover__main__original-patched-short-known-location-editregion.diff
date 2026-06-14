@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/polyfills/__init__.py b/torch/_dynamo/polyfills/__init__.py
+index fc30d5a759e..f197f81865c 100644
+--- a/torch/_dynamo/polyfills/__init__.py
++++ b/torch/_dynamo/polyfills/__init__.py
+@@ -101,12 +101,11 @@ def set_intersection(set1, set2):
+ 
+ def set_union(set1, set2):
+     union_set = set1.copy()
+-    for x in set2:
+-        if x not in union_set:
+-            union_set.add(x)
++    union_set.update(set2)
+     return union_set
+ 
+ 
++
+ def set_difference(set1, set2):
+     difference_set = set()
+     for x in set1:

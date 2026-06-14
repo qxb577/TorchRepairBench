@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index bcded32ab4f..bdc0a914b9b 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -222,11 +222,14 @@ class NNModuleVariable(VariableTracker):
+         if object_member:
+             return VariableBuilder(tx, NNModuleSource(source))(subobj)
+         else:
++            if name == "forward" and self.source:
++                self.source.make_guard(GuardBuilder.NOT_PRESENT_IN_GENERIC_DICT, "forward")
+             if istype(subobj, property):
+                 if self.source:
+                     # Read the class attribute to reach the property
+                     source = AttrSource(AttrSource(self.source, "__class__"), name)
+                     # Get the getter function
++
+                     source = AttrSource(source, "fget")
+                 return variables.UserFunctionVariable(
+                     subobj.fget,

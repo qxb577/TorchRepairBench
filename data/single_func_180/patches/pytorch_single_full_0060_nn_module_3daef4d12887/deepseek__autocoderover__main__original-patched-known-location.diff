@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 3ca91814b8a..7ade81b3244 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -905,9 +905,13 @@ class UnspecializedNNModuleVariable(UserDefinedObjectVariable):
+     def set_nn_module_stack_source(self, source):
+         self.nn_module_stack_source = source
+ 
++    def var_delattr(self, tx, name):
++        return self.call_method(tx, "__delattr__", [variables.ConstantVariable(name)], {})
++
+     @staticmethod
+     @functools.cache
+     def _nn_module_method_ids():
++
+         # Allow __setattr__ to fall through to base class handler
+         supported = {torch.nn.Module.__setattr__, torch.nn.Module.__init__}
+         return {

@@ -1,0 +1,29 @@
+{
+  "name": "TorchRepairBench",
+  "generated_from": "local TorchRepairBench workspace",
+  "datasets": [
+    {
+      "dataset": "single_func_180",
+      "canonical_rows": 1435,
+      "tasks": 180,
+      "validation_rows": 1441,
+      "copied_patch_files": 1108,
+      "validation_source": "benchmark_pilot/single_func_180/allruns_patch_test_validation_corrected562.csv"
+    },
+    {
+      "dataset": "multi_func_160",
+      "canonical_rows": 1280,
+      "tasks": 160,
+      "validation_rows": 89,
+      "copied_patch_files": 958,
+      "validation_source": "benchmark_pilot/multi_func_160/allruns_multi_patch_test_validation_corrected22.csv"
+    }
+  ],
+  "excluded": [
+    "API keys and local env files",
+    "raw third-party agent repos",
+    "PyTorch build worktrees",
+    "large logs",
+    "private paper/reference PDFs"
+  ]
+}

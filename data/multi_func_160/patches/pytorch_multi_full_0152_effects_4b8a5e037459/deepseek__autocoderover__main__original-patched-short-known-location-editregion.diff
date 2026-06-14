@@ -1,0 +1,18 @@
+diff --git a/torch/_higher_order_ops/effects.py b/torch/_higher_order_ops/effects.py
+index 826932c8482..1a071492527 100644
+--- a/torch/_higher_order_ops/effects.py
++++ b/torch/_higher_order_ops/effects.py
+@@ -165,11 +165,13 @@ def with_effects_proxy(
+         with_effects,
+         (proxy_token, op, *proxy_args),
+         proxy_kwargs,
++        is_effect=True,
+     )
+     result = track_tensor_tree(out, out_proxy, constant=None, tracer=mode.tracer)
+     return result
+ 
+ 
++
+ with_effects.fallthrough(DispatchKey.AutogradCPU)
+ with_effects.fallthrough(DispatchKey.AutogradCUDA)
+ 

@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 37279cd1030..7f2dca3b991 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1329,7 +1329,8 @@ def split(x, sizes, dim=0, clamp=True):
+     if isinstance(sizes, sympy.Expr):
+         # TODO: We don't have to guard on sizes per se, but the number
+         # of splits must stay constant
+-        sizes = V.graph.sizevars.evaluate_static_shape(sizes)
++        sizes = V.graph.sizevars.evaluate_static_shape(sizes).item() if isinstance(sizes, torch.Tensor) else V.graph.sizevars.evaluate_static_shape(sizes)
++
+     if isinstance(sizes, (int, sympy.Integer)):
+         sizes = [sizes] * ((x_size + sizes - 1) // sizes)
+     result = []

@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 7f25baa8e61..783cd1ecde1 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -2126,12 +2126,14 @@ class OutputGraph(OutputGraphCommon):
+                 # are out of sync. This only happens for `get_attr` nodes, so
+                 # here we clean up the get_attr nodes that are unused.
+                 self.remove_unused_get_attr_nodes()
+-                insert_deferred_runtime_asserts(
+-                    fx.GraphModule(root, self.graph),
+-                    self.shape_env,
+-                    name,
+-                    export=self.export,
+-                )
++                if not self.export:
++                    insert_deferred_runtime_asserts(
++                        fx.GraphModule(root, self.graph),
++                        self.shape_env,
++                        name,
++                        export=self.export,
++                    )
++
+             # NB: deferred runtime asserts can keep graphargs live, so make sure
+             # those are inserted before pruning
+             self.remove_unused_graphargs()

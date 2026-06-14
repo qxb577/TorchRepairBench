@@ -1,0 +1,42 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index da63d88313c..0529758a90f 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -133,6 +133,7 @@ from .utils import (
+     tuple_iterator_len,
+     unpatched_nn_module_getattr,
+     verify_guard_fn_signature,
++    normalize_range_iter,
+ )
+ 
+ 
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 303f0b028b5..ae14a3aaff5 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1834,6 +1834,12 @@ def dict_keys_getitem(d, n):
+     return next(itertools.islice(iter(d), n, n + 1))
+ 
+ 
++def normalize_range_iter(it):
++    # normalize a range_iterator to a tuple of (start, stop, step, index)
++    _, (range_obj, index) = it.__reduce__()
++    return (range_obj.start, range_obj.stop, range_obj.step, index)
++
++
+ def enum_repr(value, local):
+     # enum class can override __str__ method. Use __class__ and name attribute
+     # to extract the class name and key name.
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 4b37ed87226..2f68c90d053 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1346,7 +1346,7 @@ class VariableBuilder:
+         return self.set_source_and_track_mutable(value, result)
+ 
+     def wrap_range_iterator(self, value: range_iterator):
+-        self.install_guards(GuardBuilder.TYPE_MATCH)
++        self.install_guards(GuardBuilder.RANGE_ITERATOR_MATCH)
+         # Get all the values from the range iterator
+         items = [ConstantVariable.create(v) for v in copy.deepcopy(value)]
+         return ListIteratorVariable(items, mutation_type=ValueMutationNew())

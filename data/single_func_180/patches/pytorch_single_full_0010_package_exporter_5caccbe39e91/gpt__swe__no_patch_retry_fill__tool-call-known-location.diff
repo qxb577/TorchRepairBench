@@ -1,0 +1,14 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..d6ddd8b02e0 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -196,7 +196,8 @@ class PackageExporter:
+         # - Each node is a module name (or a pickle name that looks like '<foo.obj.pkl>')
+         # - Each directed edge (u, v) means u depends on v.
+         # - Nodes may contain metadata that describe how to write the thing to the zipfile.
+-        self.dependency_graph = DiGraph()
++        self.dependency_graph = DiGraph(error_context=None)
++
+         self.verbose = verbose
+         self.script_module_serializer = torch._C.ScriptModuleSerializer(self.zip_file)
+ 

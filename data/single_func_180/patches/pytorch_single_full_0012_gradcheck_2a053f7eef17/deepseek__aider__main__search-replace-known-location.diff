@@ -1,0 +1,15 @@
+diff --git a/torch/autograd/gradcheck.py b/torch/autograd/gradcheck.py
+index bb08382608b..75314e4a045 100644
+--- a/torch/autograd/gradcheck.py
++++ b/torch/autograd/gradcheck.py
+@@ -1752,8 +1752,8 @@ def _adjusted_atol(atol, u, v):
+     # matrix): v^T M u = \sum_{i} \sum_{j} u_i * v_j = (\sum_{i} u_i)(\sum_{i} v_i)
+     # TODO: properly handle case when u is tuple instead of only taking first element
+     u = u[0] if isinstance(u, tuple) else u
+-    sum_u = u.sum()
+-    sum_v = 1.0 if v is None else v.sum()
++    sum_u = u.abs().sum()
++    sum_v = 1.0 if v is None else v.abs().sum()
+     return atol * float(sum_u) * float(sum_v)
+ 
+ 

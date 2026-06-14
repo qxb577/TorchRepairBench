@@ -1,0 +1,14 @@
+diff --git a/torch/fx/passes/runtime_assert.py b/torch/fx/passes/runtime_assert.py
+index f8c12327f31..dd58e98e727 100644
+--- a/torch/fx/passes/runtime_assert.py
++++ b/torch/fx/passes/runtime_assert.py
+@@ -335,7 +335,8 @@ def insert_deferred_runtime_asserts(
+             ):
+                 if (
+                     node.args[0] == True  # noqa: E712
+-                    or (assert_expr := _get_sym_val(node.args[0])) in expr_to_proxy
++                    or (assert_expr := _get_sym_val(node.args[0])) in expr_to_proxy and not _is_bound_expr_for_symbol(assert_expr)
++
+                     or (
+                         assert_expr is not None
+                         and _is_bound_expr_for_symbol(assert_expr)

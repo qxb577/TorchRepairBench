@@ -1,0 +1,14 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 60c864b43b7..3795484450a 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -381,7 +381,8 @@ class CodeGen:
+         free_vars: List[str] = []
+         body: List[str] = []
+         globals_: Dict[str, Any] = {}
+-        wrapped_fns: Dict[str, None] = {}
++        wrapped_fns: Dict[str, Any] = {}
++
+ 
+         # Wrap string in list to pass by reference
+         maybe_return_annotation : List[str] = ['']

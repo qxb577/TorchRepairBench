@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 1a78724ec06..71b1cfd13d7 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2158,7 +2158,7 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+         super().__init__(value, **kwargs)
+         self.generic_dict_vt = variables.ConstDictVariable({})
+         self.mutation_type = (
+-            AttributeMutationExisting() if self.source else AttributeMutationNew()
++            AttributeMutationExisting(self.source) if self.source else AttributeMutationNew()
+         )
+ 
+     def var_getattr(self, tx: "InstructionTranslator", name: str) -> "VariableTracker":

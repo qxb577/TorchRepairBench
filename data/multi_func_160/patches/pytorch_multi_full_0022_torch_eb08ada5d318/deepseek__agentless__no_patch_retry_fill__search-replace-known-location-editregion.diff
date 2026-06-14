@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index a507a9dff36..8f7f0df6882 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -987,22 +987,7 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+ 
+         if self.nonstrict_traceable:
+             import torch._higher_order_ops.flat_apply as flat_apply
+-            from torch._higher_order_ops.flat_apply import (
+-                func_to_graphable,
+-                is_graphable_type,
+-            )
+-            from torch.utils._pytree import tree_flatten
+-
+-            fn = self.value
+-            # 1. Convert `args, kwargs` into pytree-flattened proxy forms.
+-            #
+-            # Rather than reconstructing `args, kwargs` into python objects and
+-            # then tree_flatten them, we just let Dynamo symbolically interpret
+-            # `tree_flatten((args, kwargs))`. This saves us from having to
+-            # worry about the reconstruction logic, side effects, and guards.
+-            packed_input_vt = TupleVariable.build(
+-                tx, (TupleVariable.build(tx, args), ConstDictVariable.build(tx, kwargs))
+-            )
++            from
+             out_vt = variables.UserFunctionVariable(tree_flatten).call_function(
+                 tx, [packed_input_vt], {}
+             )

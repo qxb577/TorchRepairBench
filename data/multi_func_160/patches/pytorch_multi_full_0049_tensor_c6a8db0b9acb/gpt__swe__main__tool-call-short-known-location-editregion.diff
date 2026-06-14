@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 6df8f06cc02..24e2011e650 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1981,7 +1981,8 @@ def select(x, dim, idx):
+ 
+     new_size = x.get_size()
+     new_stride = x.get_stride()
+-    new_storage_offset = unbacked_offset_sym
++    new_storage_offset = x.get_layout().offset + new_stride[dim] * unbacked_offset_sym
++
+     buffer = ir.DynamicSelectStorageOffset(
+         unbacked_offset_sym,
+         idx,

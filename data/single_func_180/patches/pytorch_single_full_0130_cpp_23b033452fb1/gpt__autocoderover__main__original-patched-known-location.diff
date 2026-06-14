@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index d2606aeea18..fbcc52b8386 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -4714,7 +4714,8 @@ class CppScheduling(BaseScheduling):
+                         comp_buffer = node.node
+                         assert isinstance(comp_buffer, ir.ComputedBuffer)
+                         _, body, _ = comp_buffer.get_default_sizes_body()
+-                        return body.var_ranges, list(body.indexing_exprs.values())
++                        return body.var_ranges, list(body.indexing_exprs.keys())
++
+ 
+                 node_to_recomp = node1 if len(vars1) < len(vars2) else node2
+                 assert isinstance(node_to_recomp, SchedulerNode)

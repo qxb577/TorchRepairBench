@@ -1,0 +1,37 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0b000cfa1a9..4c55d8054f9 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -1329,27 +1329,16 @@ def make_fast_binary_impl(
+         # compute_types
+         cpu = torch.device("cpu")
+         common_device = cpu
+-        common_dtype = None
+-        has_different_input_dtypes = False
+         for op in operands:
+             if not isinstance(op, torch.Tensor):
+-                # Use elementwise_dtypes for the tricky case
+-                has_different_input_dtypes = True
+                 continue
+             if common_device == cpu and op.device.type != "cpu":
+                 common_device = op.device
+-            # Slightly simplified here as target_dtype cannot vary
+-            if common_dtype is None:
+-                common_dtype = op.dtype
+-            elif common_dtype != op.dtype:
+-                has_different_input_dtypes = True
+-
+-        if has_different_input_dtypes:
+-            # compute promotion
+-            # TODO: we don't need the compute type
+-            _, common_dtype = elementwise_dtypes(
+-                *operands, type_promotion_kind=type_promotion_kind
+-            )
++
++        # compute promotion
++        _, common_dtype = elementwise_dtypes(
++            *operands, type_promotion_kind=type_promotion_kind
++        )
+ 
+         # check all tensors on same device
+         # cpu scalars are assumed allow

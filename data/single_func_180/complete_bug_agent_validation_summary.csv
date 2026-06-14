@@ -1,0 +1,9 @@
+model_agent,attempted_patches_on_complete_bugs,pass,fail,patch_success_rate
+deepseek/agentless,53,25,28,0.472
+deepseek/aider,54,21,33,0.389
+deepseek/autocoderover,51,22,29,0.431
+deepseek/swe,49,17,32,0.347
+gpt/agentless,65,14,51,0.215
+gpt/aider,66,14,52,0.212
+gpt/autocoderover,61,8,53,0.131
+gpt/swe,62,13,49,0.210

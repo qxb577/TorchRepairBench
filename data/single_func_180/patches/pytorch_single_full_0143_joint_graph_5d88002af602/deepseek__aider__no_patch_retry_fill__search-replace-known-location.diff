@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index 0f1b6179410..48d8fe38fdd 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -287,6 +287,8 @@ class UniformValueConstantFolder(ConstantFolder):
+             and len(node.args) == 2
+         ):
+             args, kwargs = self.fetch_args_kwargs_from_env(node)
++            if isinstance(args[1], torch.SymInt):
++                return self.unknown_value
+             new_args = [[1], args[1]]
+             return aten.full.default(*new_args, **node.kwargs)
+ 

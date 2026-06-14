@@ -1,0 +1,24 @@
+diff --git a/torch/autograd/__init__.py b/torch/autograd/__init__.py
+index 05f2c2f6c62..210c53f9200 100644
+--- a/torch/autograd/__init__.py
++++ b/torch/autograd/__init__.py
+@@ -336,7 +336,19 @@ def backward(
+                 "use `grad_tensors`."
+             )
+ 
++    if torch.overrides.has_torch_function_variadic(tensors, grad_tensors, inputs):
++        return torch.overrides.handle_torch_function(
++            backward,
++            (tensors, grad_tensors, inputs),
++            tensors,
++            grad_tensors,
++            retain_graph=retain_graph,
++            create_graph=create_graph,
++            inputs=inputs,
++        )
++
+     inputs_tuple: tuple[Union[torch.Tensor, graph.GradientEdge], ...]
++
+     if inputs is None:
+         inputs_tuple = ()
+     elif isinstance(inputs, (torch.Tensor, graph.GradientEdge)):

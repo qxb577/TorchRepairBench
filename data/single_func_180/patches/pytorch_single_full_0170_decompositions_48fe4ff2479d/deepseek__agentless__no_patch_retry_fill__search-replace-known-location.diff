@@ -1,0 +1,17 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 634c4b6b495..7590711d2f1 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -5066,6 +5066,12 @@ def scaled_dot_product_flash_attention_for_cpu(
+         lambda: "q, k, v should have the same head size",
+     )
+ 
++    # Expand key and value to match query heads for GQA
++    if key.shape[1] != query.shape[1]:
++        n_groups = query.shape[1] // key.shape[1]
++        key = key.unsqueeze(2).expand(-1, -1, n_groups, -1, -1).contiguous().view(query.shape)
++        value = value.unsqueeze(2).expand(-1, -1, n_groups, -1, -1).contiguous().view(query.shape)
++
+     output, attn = aten._scaled_dot_product_attention_math.default(
+         query,
+         key,

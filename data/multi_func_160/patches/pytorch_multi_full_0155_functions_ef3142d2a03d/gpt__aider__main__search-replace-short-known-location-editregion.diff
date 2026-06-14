@@ -1,0 +1,27 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 6c1e4a13c94..0e4273ffce1 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -1144,5 +1144,9 @@ class TritonKernelVariable(VariableTracker):
+         elif name == "run":
+             return dynamo_triton_hopifier_singleton.call_run(self, args, kwargs, tx)
+ 
++        # Handle triton_op specialization
++        if name == "specialize_symbolic":
++            return dynamo_triton_hopifier_singleton.specialize_symbolic(self, args, kwargs, tx)
++
+         # Bail out to parent's implementation
+         return super().call_method(tx, name, args, kwargs)
+diff --git a/torch/_higher_order_ops/triton_kernel_wrap.py b/torch/_higher_order_ops/triton_kernel_wrap.py
+index 52c433290fe..8af77853c45 100644
+--- a/torch/_higher_order_ops/triton_kernel_wrap.py
++++ b/torch/_higher_order_ops/triton_kernel_wrap.py
+@@ -882,7 +882,7 @@ class TritonHOPifier:
+         )
+ 
+     def call_triton_kernel(self, variable, args, kwargs, tx):
+-        from triton import JITFunction
++        from triton import JITFunction, tl
+         from triton.runtime.autotuner import autotune, Autotuner, Config
+ 
+         from torch._dynamo.variables.constant import ConstantVariable

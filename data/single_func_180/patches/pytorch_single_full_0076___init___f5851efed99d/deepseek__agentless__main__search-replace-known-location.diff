@@ -1,0 +1,17 @@
+diff --git a/torch/autograd/__init__.py b/torch/autograd/__init__.py
+index c370a0368d7..8d619d1763b 100644
+--- a/torch/autograd/__init__.py
++++ b/torch/autograd/__init__.py
+@@ -341,6 +341,12 @@ def backward(
+         if inputs is not None
+         else ()
+     )
++    for inp in inputs:
++        if not isinstance(inp, (torch.Tensor, graph.GradientEdge)):
++            raise TypeError(
++                "Each element of `inputs` must be a Tensor or GradientEdge, but got "
++                + type(inp).__name__
++            )
+ 
+     grad_tensors_ = _tensor_or_tensors_to_tuple(grad_tensors, len(tensors))
+     grad_tensors_ = _make_grads(tensors, grad_tensors_, is_grads_batched=False)

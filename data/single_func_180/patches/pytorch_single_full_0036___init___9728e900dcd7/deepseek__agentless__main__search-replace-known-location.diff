@@ -1,0 +1,13 @@
+diff --git a/torch/_refs/special/__init__.py b/torch/_refs/special/__init__.py
+index 3599f2fd85c..dcf0681990e 100644
+--- a/torch/_refs/special/__init__.py
++++ b/torch/_refs/special/__init__.py
+@@ -134,7 +134,7 @@ def log_ndtr(a: TensorLikeType) -> TensorLikeType:
+ )
+ def logit(self: TensorLikeType, eps: Optional[float] = None) -> TensorLikeType:
+     if eps is None:
+-        eps = -1.0
++        eps = torch.finfo(self.dtype).eps
+     lo = eps
+     hi = 1 - eps
+     self = torch.clamp(self, lo, hi)

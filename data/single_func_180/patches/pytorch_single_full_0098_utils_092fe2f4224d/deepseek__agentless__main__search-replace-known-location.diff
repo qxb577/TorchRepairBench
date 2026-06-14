@@ -1,0 +1,13 @@
+diff --git a/torch/_library/utils.py b/torch/_library/utils.py
+index 4e66a25406c..a5118f43f2e 100644
+--- a/torch/_library/utils.py
++++ b/torch/_library/utils.py
+@@ -386,7 +386,7 @@ class MutationChecker:
+             for a in self.flat_args
+         ]
+         was_mutated = [
+-            not torch.equal(pre, post)
++            not torch.equal(pre, post) and not (pre.isnan().item() and post.isnan().item())
+             if isinstance(pre, torch.Tensor) and isinstance(post, torch.Tensor)
+             else None
+             for pre, post in zip(self.real_pre_hashes, real_post_hashes)

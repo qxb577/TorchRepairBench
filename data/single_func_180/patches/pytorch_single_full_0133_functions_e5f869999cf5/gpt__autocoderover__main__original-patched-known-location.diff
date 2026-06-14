@@ -1,0 +1,14 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index 23d0bc24bf1..83a566c4010 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -321,7 +321,8 @@ class ModularIndexing(sympy.Function):
+             return (base // divisor) % modulus
+ 
+         try:
+-            if divisor != 1:
++            if divisor != 1 and sympy.gcd(divisor, modulus) == 1:
++
+                 gcd = sympy.gcd(base, divisor)
+                 if gcd != 1:
+                     return ModularIndexing(

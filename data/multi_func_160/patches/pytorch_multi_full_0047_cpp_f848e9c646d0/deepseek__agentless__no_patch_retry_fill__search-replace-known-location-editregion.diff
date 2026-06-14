@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 50aadf80895..bdf17abec57 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1070,8 +1070,8 @@ def quantized_decomposed_quantize_per_channel(
+         channel_idx = (idx[axis],)
+ 
+         input = input_loader(idx)
+-        scale = scales_loader(channel_idx)
+-        zero_point = zero_points_loader(channel_idx)
++        scale = ops.to_dtype(scales_loader(channel_idx), torch.float32)
++        zero_point = ops.to_dtype(zero_points_loader(channel_idx), torch.float32)
+         qmin, qmax = _create_constants(quant_min, quant_max, dtype=torch.float32)
+ 
+         inv_scale = ops.reciprocal(scale)
+@@ -1116,8 +1116,8 @@ def quantized_decomposed_dequantize_per_channel(
+         channel_idx = (idx[axis],)
+ 
+         input = input_loader(idx)
+-        scale = scales_loader(channel_idx)
+-        zero_point = zero_points_loader(channel_idx)
++        scale = ops.to_dtype(scales_loader(channel_idx), torch.float32)
++        zero_point = ops.to_dtype(zero_points_loader(channel_idx), torch.float32)
+ 
+         val = ops.sub(ops.to_dtype(input, torch.float32), zero_point) * scale
+         return val

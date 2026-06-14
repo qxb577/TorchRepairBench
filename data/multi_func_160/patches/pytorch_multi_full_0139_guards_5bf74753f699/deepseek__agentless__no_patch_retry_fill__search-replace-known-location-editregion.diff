@@ -1,0 +1,53 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 5765dedb97e..c668f1daa92 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -60,6 +60,7 @@ from torch._C._dynamo.guards import (
+ )
+ from torch._dynamo.source import (
+     get_global_source_name,
++    get_local_source_name,
+     IndexedSource,
+     is_from_flatten_script_object_source,
+     is_from_local_source,
+@@ -2868,6 +2869,21 @@ class CheckFunctionManager:
+                     assert isinstance(name, str)
+                     used_global_vars.add(name)
+ 
++            # Only serialize the local variables that are actually used in guards.
++            used_local_vars = set()
++            for guard in sorted_guards:
++                if name := get_local_source_name(guard.originating_source):
++                    assert isinstance(name, str)
++                    used_local_vars.add(name)
++            for source in self.output_graph.guard_on_key_order:
++                if name := get_local_source_name(source):
++                    assert isinstance(name, str)
++                    used_local_vars.add(name)
++            local_state = output_graph_guards_state.get("local_state", {})
++            output_graph_guards_state["local_state"] = {
++                k: v for k, v in local_state.items() if k in used_local_vars
++            }
++
+             def normalize_create_fn(x):
+                 if isinstance(x, functools.partial):
+ 
+diff --git a/torch/_dynamo/source.py b/torch/_dynamo/source.py
+index b5b73c0c684..fb581f3d2a3 100644
+--- a/torch/_dynamo/source.py
++++ b/torch/_dynamo/source.py
+@@ -869,6 +869,14 @@ def is_from_local_source(source: Source, *, only_allow_input=False):
+     return True
+ 
+ 
++def get_local_source_name(source: Source) -> Optional[str]:
++    if isinstance(source, ChainedSource):
++        return get_local_source_name(source.base)
++    if not isinstance(source, LocalSource):
++        return None
++    return source.name()
++
++
+ def is_from_global_source(source: Source) -> bool:
+     return get_global_source_name(source) is not None
+ 

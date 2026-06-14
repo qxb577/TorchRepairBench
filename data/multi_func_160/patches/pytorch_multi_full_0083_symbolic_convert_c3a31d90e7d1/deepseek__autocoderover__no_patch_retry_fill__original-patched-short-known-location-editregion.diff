@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 80430aa973a..b2b9ddf6dde 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3253,11 +3253,9 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+             if isinstance(value, RemovableHandleVariable):
+                 unimplemented("Storing handles in globals - NYI")
+             name = inst.argval
+-            fglobals_value, fglobals_vt, _ = self.get_globals_source_and_value(name)
+-            fglobals_vt = self.output.side_effects.track_object_existing(
+-                fglobals_value, fglobals_vt
+-            )
+-            self.output.side_effects.store_attr(fglobals_vt, name, value)
++            _, _, source = self.get_globals_source_and_value(name)
++            self.output.side_effects.store_global(source, name, value)
++
+ 
+ 
+ class InliningGeneratorInstructionTranslator(InliningInstructionTranslator):

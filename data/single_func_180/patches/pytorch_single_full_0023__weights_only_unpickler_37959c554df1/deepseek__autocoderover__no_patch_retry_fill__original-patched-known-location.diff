@@ -1,0 +1,16 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 9a146632ded..692b7075b61 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -175,7 +175,11 @@ def _get_allowed_globals():
+         rc[str(t)] = t
+     for t in torch.storage._new_dtypes():
+         rc[str(t)] = t
++    # Explicitly add float8 dtypes to avoid missing globals during weights_only unpickling
++    rc['torch.float8_e4m3fn'] = torch.float8_e4m3fn
++    rc['torch.float8_e5m2'] = torch.float8_e5m2
+     # Tensor classes
++
+     for tt in torch._tensor_classes:
+         rc[f"{tt.__module__}.{tt.__name__}"] = tt
+     # Storage classes

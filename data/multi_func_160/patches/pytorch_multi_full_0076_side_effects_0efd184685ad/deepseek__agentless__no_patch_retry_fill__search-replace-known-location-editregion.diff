@@ -1,0 +1,32 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index 2cf79ebbd66..4807133f344 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -756,6 +756,14 @@ class SideEffects:
+                     cg(var.source)  # type: ignore[attr-defined]
+                     cg.call_function(1, False)
+                     cg.pop_top()
++            elif isinstance(var, variables.ListIteratorVariable):
++                for _ in range(var.index):
++                    cg.add_push_null(
++                        lambda: cg.load_import_from(utils.__name__, "iter_next")
++                    )
++                    cg(var.source)  # type: ignore[attr-defined]
++                    cg.call_function(1, False)
++                    cg.pop_top()
+             elif isinstance(var, variables.RandomVariable):
+                 # set correct random seed state
+                 def gen_fn():
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index d62dbe6d1f3..84a9b3cab3a 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1350,7 +1350,7 @@ class VariableBuilder:
+         # Get all the values from the range iterator; no need to install guards
+         # on items since `RANGE_ITERATOR_MATCH` guarantees the same items.
+         items = [ConstantVariable.create(v) for v in copy.deepcopy(value)]
+-        return ListIteratorVariable(items, mutation_type=ValueMutationNew())
++        return ListIteratorVariable(items, mutation_type=ValueMutationNew(), source=self.source)
+ 
+     def wrap_slice_range(self, value: Union[slice, range]):
+         items = [

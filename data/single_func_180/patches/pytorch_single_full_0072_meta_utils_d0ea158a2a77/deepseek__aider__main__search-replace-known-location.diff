@@ -1,0 +1,20 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index 879e0f5f93a..825b821f92b 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -775,13 +775,13 @@ class MetaTensorDesc(Generic[_TensorT]):
+ # to do this would be to not use no_dispatch and instead just disable fake
+ # tensor mode only (allowing for subclass dispatch to occur)
+ def _safe_copy(dst: torch.Tensor, src: Optional[torch.Tensor]) -> None:
+-    if type(src) is not torch.Tensor:
++    if not isinstance(src, torch.Tensor):
+         return
+     dst.copy_(src)
+ 
+ 
+ def _safe_clone(src: torch.Tensor) -> Optional[torch.Tensor]:
+-    if type(src) is not torch.Tensor:
++    if not isinstance(src, torch.Tensor):
+         return None
+     return src.clone()
+ 

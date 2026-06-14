@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index a7a40549c06..30e0ce6f774 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -4122,6 +4122,9 @@ class SourcelessBuilder:
+             return FunctoolsWrapsVariable(value)
+         elif isinstance(value, re.Pattern):
+             return ConstantLikeVariable(value)
++        elif isinstance(value, inspect.Parameter):
++            return ConstantLikeVariable(value)
++
+         elif isinstance(value, torch._dynamo.variables.lazy.LazySymNodeFormatString):
+             return ConstantVariable.create(str(value))
+         elif isinstance(value, type(torch._higher_order_ops.flex_attention_backward)):

@@ -1,0 +1,21 @@
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index 7e9c7cff9f3..8c339bba795 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -3299,10 +3299,13 @@ def native_layer_norm(
+     elif weight is not None and bias is not None:
+         out = out * weight + bias
+ 
+-    out = _maybe_convert_to_dtype(out, input.dtype)  # type: ignore[assignment]
+     if input.device.type == "cpu":
+-        mean = _maybe_convert_to_dtype(mean, input.dtype)  # type: ignore[assignment]
+-        rstd = _maybe_convert_to_dtype(rstd, input.dtype)  # type: ignore[assignment]
++        out = _maybe_convert_to_dtype(out, torch.float32)  # type: ignore[assignment]
++        mean = _maybe_convert_to_dtype(mean, torch.float32)  # type: ignore[assignment]
++        rstd = _maybe_convert_to_dtype(rstd, torch.float32)  # type: ignore[assignment]
++    else:
++        out = _maybe_convert_to_dtype(out, input.dtype)  # type: ignore[assignment]
++
+     return (out, mean, rstd)
+ 
+ 

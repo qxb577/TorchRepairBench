@@ -1,0 +1,29 @@
+diff --git a/torch/_dynamo/polyfills/__init__.py b/torch/_dynamo/polyfills/__init__.py
+index 4b3d911e202..3e119eb8244 100644
+--- a/torch/_dynamo/polyfills/__init__.py
++++ b/torch/_dynamo/polyfills/__init__.py
+@@ -227,7 +227,7 @@ def construct_dict(cls, /, *args, **kwargs):
+         src = args[0]
+ 
+         # Ensure that the overridden __iter__ method is invoked
+-        if isinstance(src, (dict, MutableMapping)):
++        if isinstance(src, (dict, MutableMapping)) or hasattr(src, 'keys'):
+             for key in src:
+                 # This will inline the __getitem__ of the src object
+                 dst[key] = src[key]
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 038e16cd879..b491d06cecb 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -619,6 +619,11 @@ class MappingProxyVariable(VariableTracker):
+         assert isinstance(dv_dict, ConstDictVariable)
+         self.dv_dict = dv_dict
+ 
++    @property
++    def python_type(self):
++        import types
++        return types.MappingProxyType
++
+     def unpack_var_sequence(self, tx):
+         return self.dv_dict.unpack_var_sequence(tx)
+ 

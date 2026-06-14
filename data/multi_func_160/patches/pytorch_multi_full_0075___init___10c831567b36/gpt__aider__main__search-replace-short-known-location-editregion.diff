@@ -1,0 +1,20 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index a6c731cd2c1..7213e721b6f 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -504,6 +504,15 @@ class SymInt:
+     def __neg__(self):
+         raise TypeError("type stub not overridden")
+ 
++    def _sympy_(self):
++        return self.node.expr
++
++    def _sympy_(self):
++        return self.node.expr
++
++    def _sympy_(self):
++        return self.node.expr
++
+     def __repr__(self):
+         return str(self.node)
+ 

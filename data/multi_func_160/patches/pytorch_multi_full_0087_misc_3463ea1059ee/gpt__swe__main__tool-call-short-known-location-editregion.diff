@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index c6a2124c871..9e745265eec 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -288,7 +288,8 @@ class SuperVariable(VariableTracker):
+ 
+             output_old = tx.output.torch_function_enabled
+             tx_old = tx.symbolic_torch_function_state.torch_function_subclass_enabled
+-            tx.output.torch_function_enabled = False
++            tx.output.torch_function_enabled = True
++
+             tx.symbolic_torch_function_state.torch_function_subclass_enabled = False
+             try:
+                 return func.call_function(tx, tf_args, tf_kwargs)

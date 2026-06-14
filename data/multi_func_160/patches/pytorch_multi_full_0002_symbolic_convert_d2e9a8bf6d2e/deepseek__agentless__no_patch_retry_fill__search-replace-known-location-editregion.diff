@@ -1,0 +1,32 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index a15eb092b2b..a7c3e98ec28 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3250,18 +3250,15 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+                 self.push(VariableBuilder(self, global_source)(value))
+ 
+     def STORE_GLOBAL(self, inst):
+-        if self.f_globals is self.parent.f_globals:
+-            super().STORE_GLOBAL(inst)
+-        else:
+-            value = self.pop()
+-            if isinstance(value, RemovableHandleVariable):
+-                unimplemented("Storing handles in globals - NYI")
+-            name = inst.argval
+-            fglobals_value, fglobals_vt, _ = self.get_globals_source_and_value(name)
+-            fglobals_vt = self.output.side_effects.track_object_existing(
+-                fglobals_value, fglobals_vt
+-            )
+-            self.output.side_effects.store_attr(fglobals_vt, name, value)
++        value = self.pop()
++        if isinstance(value, RemovableHandleVariable):
++            unimplemented("Storing handles in globals - NYI")
++        name = inst.argval
++        fglobals_value, fglobals_vt, _ = self.get_globals_source_and_value(name)
++        fglobals_vt = self.output.side_effects.track_object_existing(
++            fglobals_value, fglobals_vt
++        )
++        self.output.side_effects.store_attr(fglobals_vt, name, value)
+ 
+ 
+ class InliningGeneratorInstructionTranslator(InliningInstructionTranslator):

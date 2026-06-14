@@ -1,0 +1,27 @@
+diff --git a/torch/_dynamo/pgo.py b/torch/_dynamo/pgo.py
+index 23ae3b545e9..eb28cbb0a4f 100644
+--- a/torch/_dynamo/pgo.py
++++ b/torch/_dynamo/pgo.py
+@@ -203,7 +203,8 @@ class FrameStateSizeEntry:
+             return True
+         if self.size is auto_unset:
+             return False
+-        return self.size[dim] is auto_dynamic
++        return self.size[dim] is auto_dynamic or not isinstance(self.size[dim], int)
++
+ 
+     def is_stride_dynamic(self, dim: int) -> bool:
+         # At the moment, dynamic strides is a bit buggy.  Good test case
+@@ -240,8 +241,12 @@ class FrameStateSizeEntry:
+     def make_tensor(
+         size: Tuple[int, ...], stride: Tuple[int, ...]
+     ) -> FrameStateSizeEntry:
++        # Replace non-integer sizes/stride with auto_dynamic for pickling
++        size = tuple(s if isinstance(s, int) else auto_dynamic for s in size)
++        stride = tuple(s if isinstance(s, int) else auto_dynamic for s in stride)
+         return FrameStateSizeEntry(scalar=auto_dynamic, size=size, stride=stride)
+ 
++
+     @staticmethod
+     def _merge_atom(x: _T, y: _T) -> Union[AutoDynamic, _T]:
+         if x is auto_unset:

@@ -1,0 +1,14 @@
+diff --git a/torch/_functorch/compile_utils.py b/torch/_functorch/compile_utils.py
+index 1ce1f1baf65..57897b0b485 100644
+--- a/torch/_functorch/compile_utils.py
++++ b/torch/_functorch/compile_utils.py
+@@ -90,7 +90,8 @@ def fx_graph_cse(fx_g: torch.fx.graph.Graph):
+ 
+             # check if a node has a substitute and can be eliminated
+             hash_val_in_hash_env = hash_val in hash_env
+-            if hash_val_in_hash_env and token_map[hash_val] == token:
++            if hash_val_in_hash_env and token_map[hash_val] == token and not is_mutation_op(n):
++
+                 env[n] = hash_env[hash_val]
+                 continue
+ 

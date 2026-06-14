@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 52cb8af69fd..f29efcbc3de 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7010,6 +7010,7 @@ class DeviceCopy(ExternKernelOut):
+                 device=device,
+                 dtype=x.get_dtype(),
+                 size=x.get_size(),
++                layout=x.get_layout(),
+             ),
+             [cls.realize_input(x)],
+             constant_args,

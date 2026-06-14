@@ -1,0 +1,26 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index fffe85beb46..47eec042baa 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -190,7 +190,7 @@ def fakify(
+         else:
+             return t.val
+ 
+-    if not isinstance(t, torch.Tensor):
++    if not isinstance(t, (torch.Tensor, torch._subclasses.FakeTensor)):
+         raise ValueError(
+             f"Unsupported input type {type(t)}. "
+             "Export only supports pytree containers of basic types (Tensor, int, float, ...) as input. "
+diff --git a/torch/_guards.py b/torch/_guards.py
+index d6537f8d371..57c5a1ed586 100644
+--- a/torch/_guards.py
++++ b/torch/_guards.py
+@@ -1130,7 +1130,7 @@ def detect_fake_mode(inputs: Any = None) -> Optional[FakeTensorMode]:
+         - Fake mode associated with passed in tensors (inputs does not
+           have to be flattened)
+     """
+-    from torch._subclasses.fake_tensor import FakeTensor, FakeTensorMode
++    from torch._subclasses.fake_tensor import FakeTensorMode
+ 
+     fake_modes = []
+ 

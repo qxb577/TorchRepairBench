@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index bae75aae249..07c11baa20a 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -393,6 +393,8 @@ def reinplace_inplaceable_ops_core(graph: torch.fx.Graph) -> None:
+             "get_attr",
+         ):
+             dst = node.args[0]
++            if not any(node_order.get(u, -1) > node_order[node] for u in dst.users):
++                continue
+             src = node.args[1]
+             # If the target is a getitem and it indexes a possible clone,
+             # then skip over it

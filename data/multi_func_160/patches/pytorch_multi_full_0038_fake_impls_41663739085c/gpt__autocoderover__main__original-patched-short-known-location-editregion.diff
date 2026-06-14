@@ -1,0 +1,14 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0bb1abfe6f7..1ad463eada8 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -921,7 +921,8 @@ def infer_size(a, b):
+             f"must match the size of tensor b ({sizeB}) "
+             f"at non-singleton dimension {i})",
+         )
+-        expandedSizes[i] = sizeB if guard_size_oblivious(sizeA == 1) else sizeA
++        expandedSizes[i] = sizeB if guard_size_oblivious(sizeA == 1) else (sizeA if guard_size_oblivious(sizeB == 1) else sizeA)
++
+     return tuple(expandedSizes)
+ 
+ 

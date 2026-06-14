@@ -1,0 +1,13 @@
+diff --git a/torch/fx/passes/split_module.py b/torch/fx/passes/split_module.py
+index 0495a9520f6..375cc8146c7 100644
+--- a/torch/fx/passes/split_module.py
++++ b/torch/fx/passes/split_module.py
+@@ -164,7 +164,7 @@ def split_module(
+         base_mod_env: Dict[str, Node],
+         base_mod_attrs: Dict[str, torch.fx.graph_module.GraphModule],
+     ):
+-        if node.op == "placeholder":
++        if node.op == "placeholder" or node.op == "output":
+             default_value = (
+                 node.args[0] if len(node.args) > 0 else inspect.Signature.empty
+             )

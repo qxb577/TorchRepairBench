@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index 2ec43bce36f..3b82c548843 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -193,8 +193,9 @@ class IndexPropagation:
+             return bound_sympy(v).upper if isinstance(v, sympy.Expr) else v
+ 
+         var_to_range = {
+-            k: ValueRanges(0, upper_bound(v) - 1) for k, v in iter_ranges.items()
++            k: ValueRanges(0, upper_bound(v)) for k, v in iter_ranges.items()
+         }
++
+         self.var_to_range = tuple(
+             itertools.chain(self.shape_env.var_to_range.items(), var_to_range.items())
+         )

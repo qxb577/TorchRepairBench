@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index d98c090543b..9d1dd03cf40 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1943,7 +1943,11 @@ def get_real_value(node, tracer):
+         lambda n: get_real_value(n, tracer),
+     )
+ 
++    if op == "placeholder":
++        raise TorchRuntimeError("Cannot get real value for placeholder node")
++
+     if op == "call_module":
++
+         nn_module = tracer.output_graph.nn_modules[node.target]
+         if not is_lazy_module(nn_module):
+             nn_module = copy.deepcopy(nn_module)

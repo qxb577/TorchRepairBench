@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 20b8f09a761..242a2f9cf6b 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -728,7 +728,8 @@ class FunctoolsPartialVariable(VariableTracker):
+     ) -> "VariableTracker":
+         merged_args = self.args + args
+         merged_kwargs = {**self.keywords, **kwargs}
+-        return self.func.call_function(tx, merged_args, merged_kwargs)
++        return self.get_function().call_function(tx, merged_args, merged_kwargs)
++
+ 
+     def call_hasattr(self, tx, name: str) -> VariableTracker:
+         # functools.partial uses slots, so attributes are constant
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index e57e4bde90d..cca07871dde 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -557,7 +557,8 @@ class NamedTupleVariable(TupleVariable):
+         return self.python_type()(*[x.as_python_constant() for x in self.items])
+ 
+     def reconstruct(self, codegen):
+-        create_fn = getattr(self.tuple_cls, "_make", self.tuple_cls)
++        create_fn = self.tuple_cls._make if hasattr(self.tuple_cls, "_make") else self.tuple_cls
++
+         codegen.append_output(codegen._create_load_const(create_fn))
+         codegen.foreach(self.items)
+         return [

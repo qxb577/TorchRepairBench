@@ -1,0 +1,31 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 6bee49d99f1..689c5dc0563 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -1614,17 +1614,25 @@ class Graph:
+         # DCE below will not behave as expected.
+         self.lint()
+ 
++        def has_side_effects(node):
++            if node.is_impure():
++                return True
++            if node.op == "call_function" and isinstance(node.target, torch._ops.OpOverload):
++                return node.target._schema.is_mutable
++            return False
++
+         # Reverse iterate so that when we remove a node, any nodes used as an
+         # input to that node have an updated user count that no longer reflects
+         # the removed node.
+         changed = False
+         for node in reversed(self.nodes):
+-            if not node.is_impure() and len(node.users) == 0:
++            if not has_side_effects(node) and len(node.users) == 0:
+                 self.erase_node(node)
+                 changed = True
+ 
+         return changed
+ 
++
+     @compatibility(is_backward_compatible=False)
+     def set_codegen(self, codegen: CodeGen):
+         self._codegen = codegen

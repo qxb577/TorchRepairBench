@@ -1,0 +1,31 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 5d667040f5e..e617dbb60a1 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1917,7 +1917,10 @@ def _warn_complex_not_supported():
+ # output.
+ def unsupported_input_tensor(t: torch.Tensor, parent=None, node=None):
+     "Do not support reading or writing to this tensor"
++    if t.device.type == "meta":
++        return True
+     if t.is_complex():
++
+         # Complex views are supported with IR ComplexView
+         if parent and parent.target in (
+             torch.ops.aten.view.dtype,
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 66f6b08c9c4..e906cb59e82 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -4394,9 +4394,10 @@ class Scheduler:
+ 
+             if not isinstance(node, NopKernelSchedulerNode):
+                 device = node.get_device()
+-                if device is not None and self.get_backend(device).ready_to_flush():
++                if device is not None and device.type != "meta" and self.get_backend(device).ready_to_flush():
+                     self.flush()
+ 
++
+         if self.current_device and device_need_guard(self.current_device.type):
+             # exit the outermost CUDA device guard. this is
+             # important for nested indentation codegen-ing.

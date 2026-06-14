@@ -1,0 +1,18 @@
+diff --git a/torch/package/importer.py b/torch/package/importer.py
+index 3ae277d431e..31681ac66cf 100644
+--- a/torch/package/importer.py
++++ b/torch/package/importer.py
+@@ -152,7 +152,12 @@ class _SysImporter(Importer):
+         return importlib.import_module(module_name)
+ 
+     def whichmodule(self, obj: Any, name: str) -> str:
+-        return _pickle_whichmodule(obj, name)
++        for importer in self._importers:
++            module_name = importer.whichmodule(obj, name)
++            if module_name != "__main__":
++                return module_name
++        return "__main__\"
++
+ 
+ 
+ sys_importer = _SysImporter()

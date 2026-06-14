@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 60a585e80d3..28c4991aba5 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -259,6 +259,7 @@ class BaseSchedulerNode:
+     ) -> None:
+         used_buffers = self.used_or_aliased_buffer_names()
+         used_buffers = {mutation_real_name.get(k, k) for k in used_buffers}
++        future_used_buffers = {mutation_real_name.get(k, k) for k in future_used_buffers}
+         self.last_usage = used_buffers - future_used_buffers
+ 
+     def mark_run(self) -> None:

@@ -1,0 +1,45 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index e927a3df47d..dd4838deb74 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -844,7 +844,15 @@ class BuiltinVariable(VariableTracker):
+         )
+         return abs_method.call_function(tx, [], {})
+ 
++    def call_pos(self, tx, arg: "VariableTracker"):
++        # Call arg.__pos__()
++        pos_method = BuiltinVariable(getattr).call_function(
++            tx, [arg, ConstantVariable.create("__pos__")], {}
++        )
++        return pos_method.call_function(tx, [], {})
++
+     def call_round(self, tx, arg, *args, **kwargs):
++
+         # Call arg.__round__()
+         round_method = BuiltinVariable(getattr).call_function(
+             tx, [arg, ConstantVariable.create("__round__")], {}
+diff --git a/torch/fx/experimental/sym_node.py b/torch/fx/experimental/sym_node.py
+index 3bc3aae1cf1..03ab1ebc535 100644
+--- a/torch/fx/experimental/sym_node.py
++++ b/torch/fx/experimental/sym_node.py
+@@ -218,7 +218,11 @@ class SymNode:
+     def abs(self) -> "SymNode":
+         return self._abs()  # type: ignore[attr-defined]
+ 
++    def pos(self) -> "SymNode":
++        return self._pos()  # type: ignore[attr-defined]
++
+     def round(self, ndigits=None) -> "SymNode":
++
+         return self._round(ndigits)  # type: ignore[attr-defined]
+ 
+     def add(self, other) -> "SymNode":
+@@ -408,6 +412,8 @@ class SymNode:
+ # TODO: this probably needs the sizes-strides eval functions
+ METHOD_TO_OPERATOR = {
+     "abs": operator.abs,
++    "pos": operator.pos,
++
+     "add": operator.add,
+     "and": operator.and_,
+     "ceil": math.ceil,

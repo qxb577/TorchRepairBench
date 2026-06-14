@@ -1,0 +1,47 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 6eb7d0666cd..ee8f4db77eb 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -271,11 +271,31 @@ def init_cellvars(parent, result: dict[str, VariableTracker], code):
+         result[name] = new_cell
+ 
+ 
++class CreateNestedFnCache:
++    _cache: dict = {}
++
++    @classmethod
++    def get(cls, code):
++        return cls._cache.get(id(code))
++
++    @classmethod
++    def set(cls, code, fn):
++        cls._cache[id(code)] = fn
++
++    @classmethod
++    def clear(cls):
++        cls._cache.clear()
++
++
+ def _create_nested_fn(
+     code, f_globals, name, defaults, closure, kwdefaults, annotations
+ ):
+     from types import FunctionType
+ 
++    cached = CreateNestedFnCache.get(code)
++    if cached is not None:
++        return cached
++
+     func = FunctionType(code, f_globals, name, defaults, closure)
+     func.__kwdefaults__ = kwdefaults
+ 
+@@ -288,6 +308,10 @@ def _create_nested_fn(
+     assert annotations is None or isinstance(annotations, dict)
+     func.__annotations__ = annotations
+ 
++    CreateNestedFnCache.set(code, func)
++    return func
++
++
+     return func
+ 
+ 

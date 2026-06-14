@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index b3879b19d2d..de54025b401 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -792,14 +792,21 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+                 return self.odict_getitem(tx, args[0])
+ 
+             if (
+-                method in (object.__ne__, object.__eq__)
++                method is object.__eq__
+                 and len(args) == 1
+                 and not kwargs
+                 and hasattr(args[0], "value")
+             ):
+-                return ConstantVariable(
+-                    (self.value is args[0].value) is (method is object.__eq__)
+-                )
++                return ConstantVariable(self.value is args[0].value)
++            if (
++                method is object.__ne__
++                and len(args) == 1
++                and not kwargs
++                and hasattr(args[0], "value")
++                and type(self.value).__eq__ is object.__eq__
++            ):
++                return ConstantVariable(self.value is not args[0].value)
++
+ 
+             # check for methods implemented in C++
+             if isinstance(method, types.FunctionType):

@@ -1,0 +1,29 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index 5a7d06734da..c30dff95b67 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -3587,9 +3587,9 @@ class LocalMapWrappedHigherOrderVariable(WrapHigherOrderVariable):
+         )
+ 
+         # Validate
+-        expected_num_inputs = len(in_placements.value)
++        expected_num_inputs = len(in_placements)
+         actual_num_inputs = len(body_gmod.graph.find_nodes(op="placeholder"))
+-        expected_num_outputs = len(out_placements.value)
++        expected_num_outputs = len(out_placements)
+         assert len(body_gmod.graph.find_nodes(op="output")) == 1
+         actual_num_outputs = len(body_gmod.graph.find_nodes(op="output")[0].args[0])
+ 
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 5eb176a6c24..2c3928c1218 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1099,7 +1099,7 @@ class TensorVariable(VariableTracker):
+             with torch._dynamo.utils._disable_saved_tensors_hooks_during_tracing():
+                 get_fake_value(proxy.node, tx, allow_non_graph_fake=False)
+ 
+-            example_value = self.proxy.node.meta.get("example_value")
++            example_value = self.proxy.node.meta.get("val")
+             from .builder import get_specialized_props, infer_subclass_type
+ 
+             if isinstance(value, variables.lazy.LazyVariableTracker):

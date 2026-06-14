@@ -1,0 +1,13 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index 23d0bc24bf1..38a235714a2 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -310,7 +310,7 @@ class ModularIndexing(sympy.Function):
+     def eval(
+         cls, base: sympy.Integer, divisor: sympy.Integer, modulus: sympy.Integer
+     ) -> Optional[sympy.Basic]:
+-        if base == 0 or modulus == 1:
++        if base == 0 or divisor == 1:
+             return sympy.S.Zero
+ 
+         if (

@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/base.py b/torch/_dynamo/variables/base.py
+index 13a174a0a9a..30fefbfbac4 100644
+--- a/torch/_dynamo/variables/base.py
++++ b/torch/_dynamo/variables/base.py
+@@ -487,7 +487,8 @@ class VariableTracker(metaclass=VariableTrackerMeta):
+             and args[0].is_python_constant()
+             and not kwargs
+         ):
+-            return self.var_getattr(tx, args[0].as_python_constant())
++            return self.var_getattr(tx, str(args[0].as_python_constant()))
++
+         elif (
+             name in cmp_name_to_op_mapping
+             and len(args) == 1

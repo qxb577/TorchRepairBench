@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index da63d88313c..33653ba1a16 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -138,6 +138,10 @@ from .utils import (
+ 
+ guard_manager_testing_hook_fn: Optional[Callable[[Any, Any], Any]] = None
+ 
++def RANGE_ITERATOR_MATCH():
++    return "RANGE_ITERATOR_MATCH"
++
++
+ try:
+     import numpy as np
+ except ModuleNotFoundError:
+@@ -421,6 +425,8 @@ def _get_closure_vars():
+             "___tuple_iterator_len": tuple_iterator_len,
+             "___tuple_iterator_getitem": tuple_iterator_getitem,
+             "___get_torch_function_mode_stack_at": get_torch_function_mode_stack_at,
++            "___range_iterator_len": range_iterator_len,
++
+             "__math_isnan": math.isnan,
+             "__numpy_isnan": None if np is None else np.isnan,
+             "inf": float("inf"),
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 303f0b028b5..d6c3517d446 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1823,9 +1823,13 @@ def tuple_iterator_getitem(it, index):
+     return obj[start + index]
+ 
+ 
++def range_iterator_len(it):
++    return len(list(it))
++
+ iter_next = next
+ 
+ 
++
+ def to_subclass(t, cls):
+     return t.as_subclass(cls)
+ 
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 4b37ed87226..b38266bc302 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -485,7 +485,8 @@ class VariableBuilder:
+         return RegexPatternVariable(value)
+ 
+     def wrap_weakref(self, value: weakref.ReferenceType):
+-        self.install_guards(GuardBuilder.TYPE_MATCH)
++        self.install_guards(GuardBuilder.RANGE_ITERATOR_MATCH)
++
+         return WeakRefVariable.build(self.tx, value, source=self.source)
+ 
+     def wrap_removable_handle(self, value):

@@ -1,0 +1,29 @@
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index 3a490090054..75787180762 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -24,7 +24,10 @@ from torch._inductor.lowering import (
+     inplaceable_foreach_ops as inplaceable_foreach_ops_lowerings,
+ )
+ from torch._inductor.virtualized import V
+-from torch.fx.experimental.symbolic_shapes import GuardOnDataDependentSymNode
++from torch.fx.experimental.symbolic_shapes import (
++    free_unbacked_symbols,
++    GuardOnDataDependentSymNode,
++)
+ from torch.fx.immutable_collections import immutable_dict, immutable_list
+ from torch.fx.passes.reinplace import _is_view_op
+ from torch.utils import _pytree as pytree
+@@ -61,6 +64,12 @@ def graph_call_function(graph: torch.fx.Graph, fn, *args, **kwargs):
+ 
+     node = graph.call_function(fn, args, kwargs)
+     node.meta["val"] = fake_result
++    if isinstance(fake_result, torch.Tensor):
++        shape_env = V.fake_mode.shape_env
++        node.meta["unbacked_bindings"] = {
++            s: shape_env.unbacked_symint_bindings[s]
++            for s in free_unbacked_symbols(shape_env, fake_result)
++        }
+     return node
+ 
+ 

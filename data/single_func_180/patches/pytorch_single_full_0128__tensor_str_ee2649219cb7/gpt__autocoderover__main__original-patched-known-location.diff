@@ -1,0 +1,14 @@
+diff --git a/torch/_tensor_str.py b/torch/_tensor_str.py
+index 921e97be233..f48a462cf09 100644
+--- a/torch/_tensor_str.py
++++ b/torch/_tensor_str.py
+@@ -192,7 +192,8 @@ class _Formatter:
+                 else:
+                     for value in nonzero_finite_vals:
+                         value_str = f"{value:.0f}"
+-                        self.max_width = max(self.max_width, len(value_str) + 1)
++                        self.max_width = max(self.max_width, len(value_str))
++
+             else:
+                 # Check if scientific representation should be used.
+                 if (

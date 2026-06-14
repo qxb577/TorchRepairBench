@@ -1,0 +1,25 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..cd1f712137c 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -11,12 +11,17 @@ from . import _dtypes_impl
+ # ### Scalar types ###
+ 
+ 
++class ClassPropertyDescriptor:
++    def __get__(self, obj, objtype=None):
++        if objtype is None:
++            objtype = type(obj)
++        return objtype.__name__
++
+ class generic:
+-    @property
+-    def name(self):
+-        return self.__class__.__name__
++    name = ClassPropertyDescriptor()
+ 
+     def __new__(cls, value):
++
+         # NumPy scalars are modelled as 0-D arrays
+         # so a call to np.float32(4) produces a 0-D array.
+ 

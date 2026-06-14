@@ -1,0 +1,27 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index a417dd0b6b3..400ee62a477 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -330,7 +330,7 @@ class SizeVarAllocator:
+ 
+     def expect_true(self, expr: Expr, *, msg: str) -> None:
+         expr = sympy_subs(expr, self.inv_precomputed_replacements)
+-        self.shape_env.defer_runtime_assert(expr, msg, fx_node=V.graph.current_node)
++        self.shape_env.defer_runtime_assert(expr, msg)
+ 
+     def expect_equals(self, left: Expr, right: Expr, *, msg: str) -> Expr:
+         # Prefer returning the expression without unbacked symints
+diff --git a/torch/fx/experimental/recording.py b/torch/fx/experimental/recording.py
+index 9fdc9e1e310..eb3c76fff37 100644
+--- a/torch/fx/experimental/recording.py
++++ b/torch/fx/experimental/recording.py
+@@ -118,7 +118,8 @@ class ShapeEnvEvent:
+             # If, at some point, we created an FX node, it means that translation validation is on.
+             # It also means we are building an FX graph for symbolic shapes at shape_env.graph, and
+             # we are tracking node names at shape_env.name_to_node.
+-            assert hasattr(shape_env, "name_to_node")
++            if not hasattr(shape_env, "name_to_node"):
++                return x
+             name_to_node = shape_env.name_to_node  # type: ignore[attr-defined]
+             assert x.name in name_to_node
+             return name_to_node[x.name]

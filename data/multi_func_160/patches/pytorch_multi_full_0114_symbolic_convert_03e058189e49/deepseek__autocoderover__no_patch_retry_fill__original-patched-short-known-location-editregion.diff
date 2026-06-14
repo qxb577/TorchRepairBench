@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index c1bc2ae9607..b5de00308de 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1590,6 +1590,13 @@ class InstructionTranslatorBase(
+         ) and argsvars.has_force_unpack_var_sequence(self):
+             argsvars = TupleVariable(argsvars.force_unpack_var_sequence(self))
+ 
++        from collections.abc import MutableMapping
++
++        if isinstance(kwargsvars, variables.UserDefinedObjectVariable) and isinstance(
++            kwargsvars.value, MutableMapping
++        ):
++            kwargsvars = BuiltinVariable.call_custom_dict(tx, dict, kwargsvars)
++
+         if not isinstance(argsvars, BaseListVariable) or not isinstance(
+             kwargsvars, ConstDictVariable
+         ):
+@@ -1599,6 +1606,7 @@ class InstructionTranslatorBase(
+         kwargsvars = kwargsvars.keys_as_python_constant()
+         self.call_function(fn, argsvars.items, kwargsvars)
+ 
++
+     @break_graph_if_unsupported(push=1)
+     def CALL_FUNCTION_KW(self, inst):
+         argnames = self.pop()

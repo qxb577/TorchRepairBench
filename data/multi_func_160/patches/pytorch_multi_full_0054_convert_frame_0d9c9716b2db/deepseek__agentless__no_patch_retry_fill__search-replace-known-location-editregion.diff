@@ -1,0 +1,33 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 722a7c88dbe..e6d9b07e442 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1127,6 +1127,7 @@ class OutputGraph:
+             self.codegen_suffix(tx, stack_values, pass2)
+ 
+             stored_graph_output_var = False
++            self.run_compiler_collective(tx)
+             output = []
+             if count_calls(self.graph) != 0 or len(pass2.graph_outputs) != 0:
+                 output.extend(
+@@ -1261,20 +1262,6 @@ class OutputGraph:
+         call that generated code.
+         """
+         from .decorators import disable
+-
+-        if (ds := tx.distributed_state) is not None and ds.all_states is None:
+-            compile_pg = ds.compile_pg
+-            log.info("compiler_collective %s", ds.local_state)
+-            torch._logging.trace_structured(
+-                "artifact",
+-                metadata_fn=lambda: {
+-                    "name": "compiler_collective",
+-                    "encoding": "json",
+-                },
+-                payload_fn=lambda: json.dumps(
+-                    dataclasses.asdict(ds.local_state),
+-                ),
+-            )
+             with torch.cuda.device(compile_pg.rank() % torch.cuda.device_count()):
+                 all_states = [None] * compile_pg.size()
+                 dist.all_gather_object(all_states, ds.local_state, group=compile_pg)

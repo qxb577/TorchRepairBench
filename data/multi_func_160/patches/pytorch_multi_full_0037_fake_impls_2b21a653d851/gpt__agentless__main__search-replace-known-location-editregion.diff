@@ -1,0 +1,35 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 8e6a3c1f2fa..872135f5b03 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -142,7 +142,7 @@ def register_op_impl(run_impl_check: Union[Callable[[OpOverload], bool], OpOverl
+     return impl_decorator
+ 
+ 
+-@register_op_impl(op_implementations_dict.__contains__)
++@register_op_impl(FakeTensorMode)
+ def dispatch_to_op_implementations_dict(fake_mode, func, *args, **kwargs):
+     return op_implementations_dict[func](fake_mode, func, *args, **kwargs)
+ 
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 4a64032347c..de07be7acc0 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -25,7 +25,7 @@ from typing import (
+ 
+ from torch._higher_order_ops.utils import autograd_not_implemented
+ from torch._library.fake_class_registry import FakeScriptObject, maybe_to_fake_obj
+-from torch._subclasses.fake_tensor import FakeTensorMode
++from torch._subclasses.fake_impls import register_op_impl
+ from torch.fx._utils import first_call_function_nn_module_stack
+ from torch.fx.graph import _PyTreeCodeGen, _PyTreeInfo
+ from torch.fx.immutable_collections import immutable_dict, immutable_list
+@@ -219,7 +219,7 @@ def _override_composite_implicit_decomp(cia_ops_to_callable, safe=True):
+         if torch._C.DispatchKey.CompositeImplicitAutograd in op_overload.py_kernels:
+             del op_overload.py_kernels[torch._C.DispatchKey.CompositeImplicitAutograd]
+ 
+-        if safe:
++        if safe or isinstance(fake_mode, FakeTensorMode):
+             op_overload.py_impl(torch._C.DispatchKey.CompositeImplicitAutograd)(
+                 decomp_callable
+             )

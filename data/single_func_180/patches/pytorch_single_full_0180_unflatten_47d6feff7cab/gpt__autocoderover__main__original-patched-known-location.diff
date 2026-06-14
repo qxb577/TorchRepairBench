@@ -1,0 +1,14 @@
+diff --git a/torch/export/unflatten.py b/torch/export/unflatten.py
+index 519883bb576..ba65966e5f5 100644
+--- a/torch/export/unflatten.py
++++ b/torch/export/unflatten.py
+@@ -1599,7 +1599,8 @@ def _sink_params(
+     assert isinstance(graph, torch.fx.Graph)
+ 
+     inputs = list(filter(lambda n: n.op == "placeholder", graph.nodes))
+-    the_last_input = inputs[-1]
++    the_last_input = inputs[-1] if inputs else None
++
+ 
+     # Also remove from call_module nodes
+     call_module_nodes = filter(lambda n: n.op == "call_module", graph.nodes)

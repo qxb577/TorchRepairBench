@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 7914fe6f462..da684c74018 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1121,8 +1121,22 @@ class OutputGraph(OutputGraphGuardsState):
+ 
+         # realize any unrealized tensor VTs in case they
+         # need to be added to self.nn_modules as attributes
++        def _realize_recursive(v, seen):
++            if id(v) in seen:
++                return
++            seen.add(id(v))
++            v.realize()
++            try:
++                items = v.unpack_var_sequence(tx)
++            except NotImplementedError:
++                pass
++            else:
++                for item in items:
++                    _realize_recursive(item, seen)
++
++        seen = set()
+         for value in stack_values:
+-            value.realize()
++            _realize_recursive(value, seen)
+ 
+         # Use nn.Module "proxies" in the constructed GraphModule so that
+         # the resulting GM does not hold additional strong references to the original modules.

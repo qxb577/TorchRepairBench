@@ -1,0 +1,67 @@
+diff --git a/torch/_tensor_str.py b/torch/_tensor_str.py
+index 921e97be233..0c92d492aa1 100644
+--- a/torch/_tensor_str.py
++++ b/torch/_tensor_str.py
+@@ -178,14 +178,30 @@ class _Formatter:
+                     self.int_mode = False
+                     break
+ 
++            # Determine if scientific notation should be used, respecting user setting
++            if PRINT_OPTS.sci_mode is not None:
++                self.sci_mode = PRINT_OPTS.sci_mode
++            else:
++                if self.int_mode:
++                    # in int_mode for floats, all numbers are integers, and we append a decimal to nonfinites
++                    # to indicate that the tensor is of floating type. add 1 to the len to account for this.
++                    if (
++                        nonzero_finite_max / nonzero_finite_min > 1000.0
++                        or nonzero_finite_max > 1.0e8
++                    ):
++                        self.sci_mode = True
++                else:
++                    # Check if scientific representation should be used.
++                    if (
++                        nonzero_finite_max / nonzero_finite_min > 1000.0
++                        or nonzero_finite_max > 1.0e8
++                        or nonzero_finite_min < 1.0e-4
++                    ):
++                        self.sci_mode = True
++
++            # Now compute max_width according to chosen formatting
+             if self.int_mode:
+-                # in int_mode for floats, all numbers are integers, and we append a decimal to nonfinites
+-                # to indicate that the tensor is of floating type. add 1 to the len to account for this.
+-                if (
+-                    nonzero_finite_max / nonzero_finite_min > 1000.0
+-                    or nonzero_finite_max > 1.0e8
+-                ):
+-                    self.sci_mode = True
++                if self.sci_mode:
+                     for value in nonzero_finite_vals:
+                         value_str = f"{{:.{PRINT_OPTS.precision}e}}".format(value)
+                         self.max_width = max(self.max_width, len(value_str))
+@@ -194,13 +210,7 @@ class _Formatter:
+                         value_str = f"{value:.0f}"
+                         self.max_width = max(self.max_width, len(value_str) + 1)
+             else:
+-                # Check if scientific representation should be used.
+-                if (
+-                    nonzero_finite_max / nonzero_finite_min > 1000.0
+-                    or nonzero_finite_max > 1.0e8
+-                    or nonzero_finite_min < 1.0e-4
+-                ):
+-                    self.sci_mode = True
++                if self.sci_mode:
+                     for value in nonzero_finite_vals:
+                         value_str = f"{{:.{PRINT_OPTS.precision}e}}".format(value)
+                         self.max_width = max(self.max_width, len(value_str))
+@@ -209,9 +219,6 @@ class _Formatter:
+                         value_str = f"{{:.{PRINT_OPTS.precision}f}}".format(value)
+                         self.max_width = max(self.max_width, len(value_str))
+ 
+-        if PRINT_OPTS.sci_mode is not None:
+-            self.sci_mode = PRINT_OPTS.sci_mode
+-
+     def width(self):
+         return self.max_width
+ 

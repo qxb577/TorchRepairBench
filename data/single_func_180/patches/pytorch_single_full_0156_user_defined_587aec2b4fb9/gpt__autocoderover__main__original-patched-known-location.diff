@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index fc39d238f30..f9581602cde 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -841,7 +841,8 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+     def _maybe_get_baseclass_method(self, name):
+         if name not in getattr(self.value, "__dict__", {}):
+             try:
+-                return inspect.getattr_static(type(self.value), name)
++                return inspect.getattr_static(self.value.__self__, name)
++
+             except AttributeError:
+                 pass
+         return None

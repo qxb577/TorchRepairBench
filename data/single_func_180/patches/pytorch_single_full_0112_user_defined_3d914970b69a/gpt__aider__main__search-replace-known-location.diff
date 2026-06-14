@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index ef80a55dd02..8e55c5cd288 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2753,7 +2753,7 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+             dict.get,
+         ):
+             return variables.UserMethodVariable(polyfills.mapping_get, self)
+-        elif name == "__dict__" and self.source:
++        elif name == "__dict__":
+             self.generic_dict_vt = variables.LazyVariableTracker.create(  # type: ignore[assignment]
+                 self.value.__dict__, AttrSource(self.source, "__dict__")
+             )

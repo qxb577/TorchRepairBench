@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/optim/named_optimizer.py b/torch/distributed/optim/named_optimizer.py
+index 79de2316781..6ace75537a2 100644
+--- a/torch/distributed/optim/named_optimizer.py
++++ b/torch/distributed/optim/named_optimizer.py
+@@ -69,7 +69,8 @@ class _NamedOptimizer(optim.Optimizer):
+         **kwargs,
+     ) -> None:
+         torch._C._log_api_usage_once("torch.distributed.optim._NamedOptimizer")
+-        self.param_groups: Collection[Mapping[str, Any]] = param_groups  # type: ignore[assignment]
++        self.param_groups: Collection[Mapping[str, Any]] = param_groups if param_groups is not None else []  # type: ignore[assignment]
++
+         self._param_groups_check()
+         self.named_parameters = dict(named_parameters)
+         params_for_optimizer = (

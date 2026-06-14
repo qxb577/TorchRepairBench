@@ -1,0 +1,14 @@
+diff --git a/torch/fx/experimental/const_fold.py b/torch/fx/experimental/const_fold.py
+index 554395f37f2..238b98a6dd9 100644
+--- a/torch/fx/experimental/const_fold.py
++++ b/torch/fx/experimental/const_fold.py
+@@ -160,7 +160,8 @@ def split_const_subgraphs(
+     def mod_partition(node: torch.fx.Node):
+         return 0 if node in const_nodes else 1
+ 
+-    split = split_module(mod_traced, module, mod_partition)
++    split = split_module(mod_traced, mod_traced, mod_partition)
++
+ 
+     const_gm, non_const_gm = split.submod_0, split.submod_1
+     const_mod_name, non_const_mod_name = "submod_0", "submod_1"

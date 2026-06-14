@@ -1,0 +1,36 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 152a9736923..b593f348081 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1435,9 +1435,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+                                 torch.ops.aten.scalar_tensor.default, (res,)
+                             )
+                             self.graph.call_function(
+-                                torch.ops.aten._assert_async.msg,
+-                                # TODO: use ra.msg here, but it's pretty
+-                                # useless right now
++                                torch.ops.aten._assert_scalar.default,
+                                 (
+                                     res2,
+                                     f"Deferred runtime assertion failed {ra.expr}",
+diff --git a/torch/_inductor/decomposition.py b/torch/_inductor/decomposition.py
+index 132996dcc56..5597837f639 100644
+--- a/torch/_inductor/decomposition.py
++++ b/torch/_inductor/decomposition.py
+@@ -95,14 +95,8 @@ def register_decomposition(ops):
+ 
+ # TODO: for now, inductor doesn't handle asserts
+ # because the condition is symbool -> tensor in the graph.
+-@register_decomposition([aten._assert_async.msg])
+-def assert_async_msg_decomp(tensor, msg):
+-    return
+-
+-
+-# Following `assert_async_msg_decomp` and implement as non-op.
+-@register_decomposition([aten._functional_assert_async.msg])
+-def functional_assert_async_msg_decomp(tensor, msg):
++@register_decomposition([aten._assert_scalar.default])
++def assert_scalar_decomp(tensor, msg):
+     return
+ 
+ 

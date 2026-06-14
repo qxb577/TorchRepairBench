@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codecache.py b/torch/_inductor/codecache.py
+index a28ca5b19aa..22cec70e018 100644
+--- a/torch/_inductor/codecache.py
++++ b/torch/_inductor/codecache.py
+@@ -3263,6 +3263,8 @@ class PyCodeCache:
+         if path not in cls.linemaps:
+             return None
+         # [(starting_line, <fx node>), ...]
++        if not cls.linemaps[path]:
++            return None
+         lines, nodes = cls.linemaps[path]
+         p = bisect_right(lines, lineno)
+         if p == 0:

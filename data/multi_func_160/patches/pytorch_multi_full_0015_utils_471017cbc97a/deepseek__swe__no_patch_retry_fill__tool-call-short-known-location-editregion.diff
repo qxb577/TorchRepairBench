@@ -1,0 +1,32 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index 3f91ee87b3a..d8640eef633 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -2146,22 +2146,22 @@ def set_tracing_context_output_strides(example_inputs, compiled_graph):
+     if context is not None and context.output_strides is not None:
+         assert len(context.output_strides) == 0
+         shape_env = shape_env_from_inputs(example_inputs)
++        # Avoid specializing strides when dynamic shapes are present (e.g., DDPOptimizer + inductor)
++        if shape_env is not None:
++            return
+         for exprs in compiled_graph.output_strides:
+             if exprs is None:
+                 context.output_strides.append(None)
+             else:
+                 context.output_strides.append(
+                     tuple(
+-                        (
+-                            shape_env.evaluate_symexpr(e)
+-                            if shape_env is not None
+-                            else int(e)
+-                        )
++                        int(e)
+                         for e in exprs
+                     )
+                 )
+ 
+ 
++
+ def should_use_remote_fx_graph_cache():
+     if config.fx_graph_remote_cache is not None:
+         return config.fx_graph_remote_cache

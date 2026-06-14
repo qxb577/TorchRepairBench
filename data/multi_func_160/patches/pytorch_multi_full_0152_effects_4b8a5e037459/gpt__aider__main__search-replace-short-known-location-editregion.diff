@@ -1,0 +1,26 @@
+diff --git a/torch/_higher_order_ops/effects.py b/torch/_higher_order_ops/effects.py
+index 826932c8482..3a008af0e62 100644
+--- a/torch/_higher_order_ops/effects.py
++++ b/torch/_higher_order_ops/effects.py
+@@ -165,6 +165,7 @@ def with_effects_proxy(
+         with_effects,
+         (proxy_token, op, *proxy_args),
+         proxy_kwargs,
++        has_effect=True,
+     )
+     result = track_tensor_tree(out, out_proxy, constant=None, tracer=mode.tracer)
+     return result
+diff --git a/torch/export/_remove_effect_tokens_pass.py b/torch/export/_remove_effect_tokens_pass.py
+index b85912246c0..f3b3481bbb6 100644
+--- a/torch/export/_remove_effect_tokens_pass.py
++++ b/torch/export/_remove_effect_tokens_pass.py
+@@ -114,7 +114,8 @@ def _remove_effect_tokens_from_graph_helper(
+         assert inp_token.name in input_token_names
+         ep.graph.erase_node(inp_token)
+ 
+-    ep.graph.eliminate_dead_code()
++    # Ensure nodes with effects are not eliminated
++    ep.graph.eliminate_dead_code(keep_effect_nodes=True)
+ 
+ 
+ def _remove_effect_tokens(ep: ExportedProgram) -> ExportedProgram:

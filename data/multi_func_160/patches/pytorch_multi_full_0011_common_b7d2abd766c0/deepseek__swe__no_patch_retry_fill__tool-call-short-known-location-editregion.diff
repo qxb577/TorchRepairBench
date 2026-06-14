@@ -1,0 +1,24 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index b2829e3be41..9512b585a59 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -2596,7 +2596,6 @@ class CppVecKernel(CppKernel):
+             raise NotImplementedError
+ 
+     def indirect_assert(self, var, lower, upper, mask=None):
+-        assert not mask, "do not support mask in indirect_indexing assertion"
+         assert isinstance(var, CppCSEVariable)
+         assert var.dtype is not None
+         if not var.is_vec:
+@@ -2609,7 +2608,10 @@ class CppVecKernel(CppKernel):
+             upper = f"{self._get_vec_type(var.dtype)}({upper})"
+         if lower and upper:
+             cond = f"({lower} <= {var}) & ({var} < {upper})"
+-            cond_print = f"{lower_scalar} <= {var} < {upper_scalar}"
++            if mask:
++                cond = f"({mask}) & {cond}"
++            cond_print = f"{lower_scalar} <= {var} < {upper_scalar}
++"
+         elif lower:
+             cond = f"{lower} <= {var}"
+             cond_print = f"{lower_scalar} <= {var}"

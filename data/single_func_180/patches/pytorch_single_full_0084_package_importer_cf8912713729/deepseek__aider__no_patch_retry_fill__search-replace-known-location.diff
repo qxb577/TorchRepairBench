@@ -1,0 +1,15 @@
+diff --git a/torch/package/package_importer.py b/torch/package/package_importer.py
+index 72bde854cba..8311fc4efbe 100644
+--- a/torch/package/package_importer.py
++++ b/torch/package/package_importer.py
+@@ -163,6 +163,10 @@ class PackageImporter(Importer):
+         # used for torch.serialization._load
+         self.Unpickler = lambda *args, **kwargs: PackageUnpickler(self, *args, **kwargs)
+ 
++        # Register UntypedStorage for dtypes that lack a dedicated storage class
++        for dtype in [torch.float8_e4m3fn, torch.float8_e5m2]:
++            torch.serialization._dtype_to_storage_type_map.setdefault(dtype, torch.UntypedStorage)
++
+     def import_module(self, name: str, package=None):
+         """Load a module from the package if it hasn't already been loaded, and then return
+         the module. Modules are loaded locally

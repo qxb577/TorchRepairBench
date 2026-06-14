@@ -1,0 +1,14 @@
+diff --git a/torch/_utils.py b/torch/_utils.py
+index 3315d6548d1..84251c5c660 100644
+--- a/torch/_utils.py
++++ b/torch/_utils.py
+@@ -175,7 +175,8 @@ def _get_async_or_non_blocking(function_name, non_blocking, kwargs):
+ 
+ # TODO: Once we decide to break serialization FC, `storage` no longer needs to
+ # be a TypedStorage
+-def _rebuild_tensor(storage, storage_offset, size, stride):
++def _rebuild_tensor(storage, storage_offset, size, stride, requires_grad=False):
++
+     # first construct a tensor with the correct dtype/device
+     t = torch.tensor([], dtype=storage.dtype, device=storage._untyped_storage.device)
+     return t.set_(storage._untyped_storage, storage_offset, size, stride)

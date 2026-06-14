@@ -1,0 +1,18 @@
+diff --git a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+index 20bd13c3800..006260b8895 100644
+--- a/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
++++ b/torch/distributed/fsdp/_fully_shard/_fsdp_param.py
+@@ -419,9 +419,13 @@ class FSDPParam:
+         if param_dtype == self.orig_dtype:
+             param_dtype = None
+         self.param_dtype = param_dtype
++        # Clamp `reduce_dtype` to `None` if no casting is required
++        if reduce_dtype == self.param_dtype:
++            reduce_dtype = None
+         self.reduce_dtype = reduce_dtype
+         # None indicates that the mixed precision is not enabled
+ 
++
+     def _init_extensions(self) -> None:
+         inner_tensor = self._sharded_local_tensor
+         has_fsdp_pre_all_gather = hasattr(inner_tensor, "fsdp_pre_all_gather")

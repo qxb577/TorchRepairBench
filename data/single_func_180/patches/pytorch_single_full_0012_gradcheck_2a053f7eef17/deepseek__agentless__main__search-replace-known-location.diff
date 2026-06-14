@@ -1,0 +1,24 @@
+diff --git a/torch/autograd/gradcheck.py b/torch/autograd/gradcheck.py
+index bb08382608b..1b2a7ec9cb6 100644
+--- a/torch/autograd/gradcheck.py
++++ b/torch/autograd/gradcheck.py
+@@ -1753,8 +1753,17 @@ def _adjusted_atol(atol, u, v):
+     # TODO: properly handle case when u is tuple instead of only taking first element
+     u = u[0] if isinstance(u, tuple) else u
+     sum_u = u.sum()
+-    sum_v = 1.0 if v is None else v.sum()
+-    return atol * float(sum_u) * float(sum_v)
++    if sum_u.is_complex():
++        sum_u = sum_u.abs()
++    sum_u = float(sum_u)
++    if v is None:
++        sum_v = 1.0
++    else:
++        sum_v = v.sum()
++        if sum_v.is_complex():
++            sum_v = sum_v.abs()
++        sum_v = float(sum_v)
++    return atol * sum_u * sum_v
+ 
+ 
+ FAST_FAIL_SLOW_OK_MSG = """

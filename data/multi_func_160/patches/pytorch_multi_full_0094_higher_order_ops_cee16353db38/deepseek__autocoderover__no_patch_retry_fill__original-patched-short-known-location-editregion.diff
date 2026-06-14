@@ -1,0 +1,35 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index f20b32b0da9..35e529364ae 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -1578,17 +1578,19 @@ class AutogradFunctionApplyVariable(VariableTracker):
+             unimplemented("non-function or method")
+ 
+         with tx.output.subtracer(fwd_fn, fwd_tracer):
+-            (bwd_out, _), bwd_graph, bwd_freevars = speculate_subgraph(
+-                tx,
+-                bwd_fn,
+-                bwd_args,
+-                kwargs,
+-                "autograd.Function",
+-                enable_grad=False,
+-                set_subgraph_inputs="manual",
+-                restore_side_effects=False,
+-                tracer=bwd_tracer,
+-            )
++            with tx.strict_translation_mode():
++                (bwd_out, _), bwd_graph, bwd_freevars = speculate_subgraph(
++                    tx,
++                    bwd_fn,
++                    bwd_args,
++                    kwargs,
++                    "autograd.Function",
++                    enable_grad=False,
++                    set_subgraph_inputs="manual",
++                    restore_side_effects=False,
++                    tracer=bwd_tracer,
++                )
++
+ 
+         # TODO: assert that bwd_graph didn't capture values that were
+         # not created inside fwd_graph.

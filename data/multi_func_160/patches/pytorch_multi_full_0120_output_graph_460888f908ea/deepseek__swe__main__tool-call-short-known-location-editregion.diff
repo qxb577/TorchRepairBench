@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 4276f5c20c2..b1cac171e7e 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1122,7 +1122,8 @@ class OutputGraph(OutputGraphGuardsState):
+         # realize any unrealized tensor VTs in case they
+         # need to be added to self.nn_modules as attributes
+         for value in stack_values:
+-            value.realize()
++            value.realize_all()
++
+ 
+         # Use nn.Module "proxies" in the constructed GraphModule so that
+         # the resulting GM does not hold additional strong references to the original modules.

@@ -1,0 +1,28 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index c145c3deb7f..a1bfa2d71cf 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -186,20 +186,9 @@ def _get_flattened_mesh_by_layout(
+     # Convert mesh dim indices to dim names
+     dim_names = tuple(mesh_dim_names[i] for i in mesh_dims)
+ 
+-    # Get the submesh for these dimensions
+-    submesh = mesh[dim_names]
+-
+-    # Compute expected flattened layout
+-    expected_layout = submesh._layout.coalesce()
+-    if len(expected_layout) > 1:
+-        expected_layout = expected_layout.nest()
+-
+-    # Search existing flattened meshes by comparing layouts
+-    for flattened_mesh in root_mesh._flatten_mapping.values():
+-        if flattened_mesh._layout == expected_layout:
+-            return flattened_mesh
+-
+-    return None
++    # Directly look up the flattened mesh from the root's mapping,
++    # avoiding submesh creation which may be untraceable under compile.
++    return root_mesh._flatten_mapping.get(dim_names, None)
+ 
+ 
+ # Track (mesh_hash, mesh_dims, reason) we've already warned about to avoid repeated warnings

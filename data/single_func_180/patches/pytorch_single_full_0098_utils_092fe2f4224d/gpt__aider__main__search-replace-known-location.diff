@@ -1,0 +1,14 @@
+diff --git a/torch/_library/utils.py b/torch/_library/utils.py
+index 4e66a25406c..a582e1472cc 100644
+--- a/torch/_library/utils.py
++++ b/torch/_library/utils.py
+@@ -421,7 +421,8 @@ class MutationChecker:
+ 
+ def hash_tensor(t: torch.Tensor) -> torch.Tensor:
+     """Some inexpensive hash. Used as a quick and dirty indicator for tensor mutation"""
+-    return t.detach().float().mean()
++    mean_value = t.detach().float().mean()
++    return mean_value if not torch.isnan(mean_value) else torch.tensor(float('nan'))
+ 
+ 
+ def has_fake_kernel(op: torch._ops.OpOverload) -> bool:

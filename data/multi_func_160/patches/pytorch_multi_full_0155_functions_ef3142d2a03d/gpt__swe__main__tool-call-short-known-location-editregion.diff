@@ -1,0 +1,14 @@
+diff --git a/torch/_higher_order_ops/triton_kernel_wrap.py b/torch/_higher_order_ops/triton_kernel_wrap.py
+index 52c433290fe..eca46bf0102 100644
+--- a/torch/_higher_order_ops/triton_kernel_wrap.py
++++ b/torch/_higher_order_ops/triton_kernel_wrap.py
+@@ -882,7 +882,8 @@ class TritonHOPifier:
+         )
+ 
+     def call_triton_kernel(self, variable, args, kwargs, tx):
+-        from triton import JITFunction
++        from triton import jit as JITFunction
++
+         from triton.runtime.autotuner import autotune, Autotuner, Config
+ 
+         from torch._dynamo.variables.constant import ConstantVariable

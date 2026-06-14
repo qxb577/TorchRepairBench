@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index c6b061f42b1..6861bf0438c 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -3002,7 +3002,8 @@ def handle_traced_output(example_value, tx, proxy, options, subclass_type, targe
+     ):
+         set_example_value(proxy.node, example_value)
+         return ConstantVariable.create(example_value, **options)
+-    elif isinstance(example_value, float) or proxy.node.target in ["hex", "__round__"]:
++    elif isinstance(example_value, (int, float, bool)) or proxy.node.target in ["hex", "__round__"]:
++
+         set_example_value(proxy.node, example_value)
+         return ConstantVariable.create(example_value, **options)
+     else:
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 72b2e3dc132..b5f3ffc3626 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1360,7 +1360,8 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+             # the call and wrap output into a VariableTracker.
+             proxy = tx.output.create_proxy("call_function", flat_apply, all_args, {})
+             out_vt = wrap_fx_proxy(tx, proxy)
+-            # TODO support more output types
++            if isinstance(out_vt, (int, float, bool, torch.Tensor)):
++
+             # Q: flat_apply will likely pytree_flatten the output for this, then
+             # how do we intercept the output before flatten, and wrap those?
+             # - Maybe we can have `flat_apply` return the output spec, so that

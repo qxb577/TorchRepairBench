@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 83619731f7f..2bc54d42a90 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4061,7 +4061,8 @@ def is_rng_state_getter_or_setter(value):
+         torch.set_rng_state,
+         torch.cuda.set_rng_state,
+     )
+-    return value in (*setters, *getters)
++    return value in (*setters, *getters) or is_tensor_base_attr_getter(value)
++
+ 
+ 
+ def is_tensor_base_attr_getter(value):

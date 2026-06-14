@@ -1,0 +1,26 @@
+diff --git a/torch/_subclasses/meta_utils.py b/torch/_subclasses/meta_utils.py
+index d02030d5deb..61ac16cce97 100644
+--- a/torch/_subclasses/meta_utils.py
++++ b/torch/_subclasses/meta_utils.py
+@@ -1727,6 +1727,13 @@ class MetaConverter(Generic[_TensorT]):
+                         base_symbolic_context,
+                     )
+ 
++                    # Compute unbacked bindings for the view to ensure
++                    # unbacked symbols are properly bound to the base's symbols.
++                    from torch.fx.experimental.symbolic_shapes import compute_unbacked_bindings
++                    unbacked_bindings = compute_unbacked_bindings(shape_env, t, base)
++                    if unbacked_bindings is not None:
++                        symbolic_context.unbacked_bindings = unbacked_bindings
++
+                     def is_c_of_r(
+                         complex_dtype: torch.dtype, real_dtype: torch.dtype
+                     ) -> bool:
+@@ -1737,6 +1744,7 @@ class MetaConverter(Generic[_TensorT]):
+                         )
+ 
+                     # In some situations, MetaConverter may be called in a
++
+                     # context where autograd is disabled.  For the _is_view
+                     # assert to pass, we have to setup the autograd view
+                     # metadata anyway.  Do this by reenabling the

@@ -1,0 +1,17 @@
+diff --git a/torch/_dynamo/eval_frame.py b/torch/_dynamo/eval_frame.py
+index 7c6a244e8ae..3607ad3e6d9 100644
+--- a/torch/_dynamo/eval_frame.py
++++ b/torch/_dynamo/eval_frame.py
+@@ -171,6 +171,12 @@ class OptimizedModule(torch.nn.Module):
+             attr for attr in super().__dir__() if attr not in orig_mod_attrs
+         ]
+ 
++    def __setattr__(self, name, value):
++        if name in ["_orig_mod", "dynamo_ctx", "_torchdynamo_orig_callable", "get_compiler_config"]:
++            super().__setattr__(name, value)
++        else:
++            setattr(self._orig_mod, name, value)
++
+ 
+ def remove_from_cache(f):
+     """

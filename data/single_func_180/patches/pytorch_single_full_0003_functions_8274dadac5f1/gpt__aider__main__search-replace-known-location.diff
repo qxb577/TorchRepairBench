@@ -1,0 +1,13 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index b369673d921..5d9ff8d4780 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -1165,7 +1165,7 @@ class Identity(sympy.Function):
+ 
+ 
+ def make_opaque_unary_fn(name):
+-    class OpaqueUnaryFn(sympy.Function):
++    class OpaqueUnaryFn(sympy.Function, sympy.Basic):
+         """
+         Unlike the builtin sympy functions on real numbers like sympy.sqrt,
+         these equivalents do not do any nontrivial reasoning besides

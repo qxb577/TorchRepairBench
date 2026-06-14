@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 452b3164c22..5f208f8c121 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -2386,7 +2386,7 @@ class TMACompatibilityChecker:
+             )
+             if not V.graph.sizevars.statically_known_geq(
+                 innermost_block_bytes, sympy.Integer(16)
+-            ):
++            ) or persistent_rblock < 32:
+                 log.debug(
+                     "%s persistent reduction innermost block shape cannot load 16 bytes. Block shape: %s, persistent RBLOCK: %d",
+                     self.failed_debug_prefix,
+diff --git a/torch/_inductor/runtime/triton_heuristics.py b/torch/_inductor/runtime/triton_heuristics.py
+index 3954ac7ef05..23e97e037d1 100644
+--- a/torch/_inductor/runtime/triton_heuristics.py
++++ b/torch/_inductor/runtime/triton_heuristics.py
+@@ -3541,7 +3541,7 @@ def persistent_reduction(
+         min_x_block = 1
+         if rnumel_hint <= 512:
+             min_x_block = 4
+-        x_block = min(max(rsplit_size // 32, min_x_block), 16)
++        x_block = min(max(rsplit_size // 32, min_x_block), 32)
+         for c in configs:
+             c.kwargs["RSPLIT_SIZE"] = rsplit_size
+             # small XBLOCK to use less registers/smem

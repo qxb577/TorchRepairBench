@@ -1,0 +1,26 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 6bee49d99f1..1194165ff19 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -900,7 +900,11 @@ class Graph:
+         """
+         return _node_list(self)
+ 
+-    @compatibility(is_backward_compatible=False)
++    def eliminate_dead_code.has_side_effect(self, node):
++        if node.op == "call_function" and hasattr(node.target, "_schema"):
++            return any(arg.name == "out" for arg in node.target._schema.arguments)
++        return node.is_impure()
++
+     def find_nodes(self, *, op: str, target: Optional['Target'] = None, sort: bool = True):
+         """
+         Allows for fast query of nodes
+@@ -1619,7 +1623,7 @@ class Graph:
+         # the removed node.
+         changed = False
+         for node in reversed(self.nodes):
+-            if not node.is_impure() and len(node.users) == 0:
++            if not self.eliminate_dead_code.has_side_effect(node) and len(node.users) == 0:
+                 self.erase_node(node)
+                 changed = True
+ 

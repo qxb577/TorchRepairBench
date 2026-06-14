@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index d62dbe6d1f3..d37fcd857a9 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1349,7 +1349,8 @@ class VariableBuilder:
+         self.install_guards(GuardBuilder.RANGE_ITERATOR_MATCH)
+         # Get all the values from the range iterator; no need to install guards
+         # on items since `RANGE_ITERATOR_MATCH` guarantees the same items.
+-        items = [ConstantVariable.create(v) for v in copy.deepcopy(value)]
++        items = [ConstantVariable.create(v) for v in value]
++
+         return ListIteratorVariable(items, mutation_type=ValueMutationNew())
+ 
+     def wrap_slice_range(self, value: Union[slice, range]):

@@ -1,0 +1,12 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index e8323ec6f70..64ac79499d2 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -140,6 +140,7 @@ class ConstDictVariable(VariableTracker):
+             and isinstance(v, VariableTracker)
+             for x, v in items.items()
+         )
++        self.items = items
+ 
+         def make_hashable(key):
+             return key if isinstance(key, Hashable) else Hashable(key)

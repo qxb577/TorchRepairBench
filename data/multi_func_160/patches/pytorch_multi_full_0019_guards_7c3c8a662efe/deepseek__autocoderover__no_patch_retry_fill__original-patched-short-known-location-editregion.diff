@@ -1,0 +1,42 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 303f0b028b5..bd49fdf0a85 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1823,9 +1823,20 @@ def tuple_iterator_getitem(it, index):
+     return obj[start + index]
+ 
+ 
++def normalize_range_iter(iter):
++    _, (start, stop, step), idx = iter.__reduce__()
++    return start, stop, step, idx
++
++
++def range_iterator_match(it, start, stop, step, idx):
++    _, (r_start, r_stop, r_step), r_idx = it.__reduce__()
++    return r_start == start and r_stop == stop and r_step == step and r_idx == idx
++
++
+ iter_next = next
+ 
+ 
++
+ def to_subclass(t, cls):
+     return t.as_subclass(cls)
+ 
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 4b37ed87226..875ea9d986b 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1347,10 +1347,12 @@ class VariableBuilder:
+ 
+     def wrap_range_iterator(self, value: range_iterator):
+         self.install_guards(GuardBuilder.TYPE_MATCH)
++        self.install_guards(GuardBuilder.RANGE_ITERATOR_MATCH)
+         # Get all the values from the range iterator
+         items = [ConstantVariable.create(v) for v in copy.deepcopy(value)]
+         return ListIteratorVariable(items, mutation_type=ValueMutationNew())
+ 
++
+     def wrap_slice_range(self, value: Union[slice, range]):
+         items = [
+             VariableBuilder(self.tx, AttrSource(self.get_source(), k))(

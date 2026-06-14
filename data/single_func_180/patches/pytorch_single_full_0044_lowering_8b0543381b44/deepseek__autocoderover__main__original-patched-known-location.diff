@@ -1,0 +1,21 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 97aa63705f1..e66095e89ca 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1906,7 +1906,7 @@ def full(size, fill_value, **kwargs):
+ 
+ 
+ @register_lowering(aten.gather, type_promotion_kind=None)
+-def gather(x, dim, index):
++def gather(x, dim, index, *, sparse_grad=False):
+     assert isinstance(x, TensorBox)
+     assert index.get_dtype() == torch.int64
+     offset = len(x.get_size()) == 0
+@@ -1929,6 +1929,7 @@ def gather(x, dim, index):
+     )
+ 
+ 
++
+ @register_lowering(aten.embedding, type_promotion_kind=None)
+ def embedding(weight, indices, padding_idx=-1, scale_grad_by_freq=False, sparse=False):
+     assert not sparse

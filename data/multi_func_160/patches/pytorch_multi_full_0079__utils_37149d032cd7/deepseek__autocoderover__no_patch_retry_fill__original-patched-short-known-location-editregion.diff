@@ -1,0 +1,30 @@
+diff --git a/torch/_utils.py b/torch/_utils.py
+index 8273b1d7d13..414300210e1 100644
+--- a/torch/_utils.py
++++ b/torch/_utils.py
+@@ -67,11 +67,25 @@ def _to(self, device, non_blocking=False):
+     if self.device == device:
+         return self
+ 
++    if device.type == 'cpu':
++        # CPU does not have a device module, so handle the copy directly.
++        # Use non_blocking to respect pinned memory behaviour.
++        if hasattr(self, 'dtype'):
++            # TypedStorage: allocate a tensor of the same dtype on CPU.
++            new_tensor = torch.empty(self.size(), dtype=self.dtype, device='cpu')
++        else:
++            # UntypedStorage: treat as raw bytes (uint8).
++            new_tensor = torch.empty(self.size(), dtype=torch.uint8, device='cpu')
++        # Copy the underlying storage, respecting non_blocking.
++        new_tensor.storage().copy_(self, non_blocking=non_blocking)
++        return new_tensor.storage()
++
+     device_module = getattr(torch, device.type, None)
+     assert (
+         device_module is not None
+     ), f"{device.type.upper()} device module is not loaded"
+     with device_module.device(device):
++
+         if self.is_sparse and hasattr(device_module, "sparse"):
+             new_type = getattr(device_module.sparse, self.__class__.__name__)
+             indices = getattr(torch.Tensor._indices(self), device.type)(

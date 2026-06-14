@@ -1,0 +1,74 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index cdb4e5334c5..7e428728cfd 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1925,13 +1925,17 @@ def wrap_fx_proxy_cls(
+             example_value = wrap_to_fake_tensor_and_record(
+                 example_value, tx=tx, **kwargs
+             )
+-        if isinstance(example_value, torch.Tensor) and (
+-            maybe_get_fake_mode(example_value) is not tx.fake_mode
+-        ):
+-            raise InternalTorchDynamoError(
+-                "`example_value` needs to be a `FakeTensor`"
+-                f"wrapped by this instance of Dynamo. Found: {example_value}"
+-            )
++        if isinstance(example_value, torch.Tensor):
++            if maybe_get_fake_mode(example_value) is not tx.fake_mode:
++                if not isinstance(example_value, torch._subclasses.fake_tensor.FakeTensor):
++                    example_value = torch._subclasses.fake_tensor.FakeTensor.from_tensor(
++                        example_value, tx.fake_mode
++                    )
++                else:
++                    raise InternalTorchDynamoError(
++                        "`example_value` needs to be a `FakeTensor`"
++                        f"wrapped by this instance of Dynamo. Found: {example_value}"
++                    )
+ 
+     if isinstance(example_value, torch.Tensor):
+         is_parameter = isinstance(example_value, torch.nn.Parameter)
+diff --git a/torch/multiprocessing/reductions.py b/torch/multiprocessing/reductions.py
+index 727b4f3fc37..233a355304d 100644
+--- a/torch/multiprocessing/reductions.py
++++ b/torch/multiprocessing/reductions.py
+@@ -120,6 +120,28 @@ def rebuild_tensor(cls, storage, metadata):
+     return t
+ 
+ 
++def rebuild_meta_tensor(
++    tensor_cls,
++    dtype,
++    tensor_size,
++    tensor_stride,
++    requires_grad,
++    storage_offset=None,
++):
++    t = torch.empty_strided(
++        tensor_size,
++        tensor_stride,
++        dtype=dtype,
++        device='meta',
++        requires_grad=requires_grad,
++    )
++    if tensor_cls == torch.nn.parameter.Parameter:
++        t = torch.nn.parameter.Parameter(t, requires_grad=requires_grad)
++    else:
++        t.requires_grad = requires_grad
++    return t
++
++
+ def rebuild_cuda_tensor(
+     tensor_cls,
+     tensor_size,
+@@ -346,6 +368,11 @@ def reduce_tensor(tensor):
+         )
+ 
+     # _backward_hooks purposely omitted here, see Note [Don't serialize hooks]
++    if tensor.device.type == 'meta':
++        return (
++            rebuild_meta_tensor,
++            (type(tensor), tensor.dtype, tensor.size(), tensor.stride(), tensor.requires_grad),
++        )
+     metadata = (
+         tensor.storage_offset(),
+         tensor.size(),

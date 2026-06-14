@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 93fe130c708..53c6edb892c 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -555,6 +555,7 @@ def is_function(value):
+ 
+ 
+ def unwrap_if_wrapper(fn):
++    wrapper = fn
+     if isinstance(fn, functools._lru_cache_wrapper):
+         fn = inspect.getattr_static(fn, "__wrapped__")
+     # unpack @torch._dynamo.optimize()(fn) wrapped function
+@@ -562,9 +563,17 @@ def unwrap_if_wrapper(fn):
+     # unpack torch.jit.script_if_tracing
+     if inspect.getattr_static(fn, "__script_if_tracing_wrapper", False):
+         fn = inspect.getattr_static(fn, "__original_fn", fn)
++    # Copy __defaults__ and __kwdefaults__ from the original wrapper to the unwrapped function.
++    # This is necessary for correct guards when the wrapper (e.g., lru_cache, script_if_tracing)
++    # has different defaults than the unwrapped function.
++    if hasattr(wrapper, "__defaults__"):
++        fn.__defaults__ = wrapper.__defaults__
++    if hasattr(wrapper, "__kwdefaults__"):
++        fn.__kwdefaults__ = wrapper.__kwdefaults__
+     return fn
+ 
+ 
++
+ def is_numpy_ndarray(value):
+     if not np:
+         return False

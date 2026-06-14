@@ -1,0 +1,13 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 2f1a88461e4..fd4527b8373 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7769,7 +7769,7 @@ def meta__jagged_to_padded_dense_forward(
+     return values.new_empty(output_shape)
+ 
+ 
+-def _create_unary_float_meta_func(func):
++def _create_unary_float_meta_func(func, fake_impl=None):
+     @register_meta(func)
+     @out_wrapper()
+     def _f(x):

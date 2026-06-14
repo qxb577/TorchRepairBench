@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/cache_size.py b/torch/_dynamo/cache_size.py
+index ea5e2ae0ce1..151c0343015 100644
+--- a/torch/_dynamo/cache_size.py
++++ b/torch/_dynamo/cache_size.py
+@@ -159,7 +159,8 @@ def is_recompilation(cache_size: CacheSizeRelevantForFrame) -> bool:
+     # ID_MATCH guard, and each one having just 1 cache entry in the cache.  In
+     # this case, we can have 64 entries in the cache, but no recompilation
+     # because there is only one entry for each id_matched_obj.
+-    return cache_size.will_compilation_exceed(1)
++    return cache_size.will_compilation_exceed_specific_limit(1)
++
+ 
+ 
+ def exceeds_cache_size_limit(cache_size: CacheSizeRelevantForFrame) -> Tuple[bool, str]:

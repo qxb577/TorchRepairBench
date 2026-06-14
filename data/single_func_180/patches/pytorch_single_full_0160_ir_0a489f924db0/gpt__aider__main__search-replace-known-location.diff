@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9a380a797fe..e7a7596f024 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -6588,7 +6588,7 @@ class AssertScalar(ExternKernel):
+             )
+             # TODO: when we start compiling in C++20, annotate with [[unlikely]].
+             wrapper.writeline(
+-                f'if (!({sizevar})) {{ throw std::runtime_error("Expected {self.msg} but received " + {symbol_str}); }}'
++                f'if (!({sizevar}())) {{ throw std::runtime_error("Expected {self.msg} but received " + {symbol_str}); }}'
+             )
+         else:
+             sizevar = V.graph.wrapper_code.codegen_python_sizevar(

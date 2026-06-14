@@ -1,0 +1,14 @@
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 141f1d47efc..b7d36d7b274 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -888,7 +888,8 @@ def save(
+     _use_new_zipfile_serialization: bool = True,
+     _disable_byteorder_record: bool = False,
+ ) -> None:
+-    # Reference: https://github.com/pytorch/pytorch/issues/54354
++    if weights_only and isinstance(f, (str, os.PathLike)) and zipfile.is_zipfile(f):
++        raise RuntimeError("Cannot use ``weights_only=True`` with TorchScript archives passed to ``torch.load``")
+     # The first line of this docstring overrides the one Sphinx generates for the
+     # documentation. We need it so that Sphinx doesn't leak `pickle`s path from
+     # the build environment (e.g. `<module 'pickle' from '/leaked/path').

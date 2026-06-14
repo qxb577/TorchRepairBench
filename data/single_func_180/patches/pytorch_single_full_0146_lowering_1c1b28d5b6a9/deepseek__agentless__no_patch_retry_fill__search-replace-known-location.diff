@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index f691e2b46db..72bd45864bb 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2984,7 +2984,7 @@ def iota(
+ 
+ @register_lowering(aten.select_scatter, type_promotion_kind=None)
+ def select_scatter(x, src, dim: int, index: int):
+-    assert x.get_dtype() == src.get_dtype()
++    src = to_dtype(src, x.get_dtype())
+     x_loader = x.make_loader()
+     dim = _validate_dim(x, dim, 0)
+     if V.graph.sizevars.evaluate_expr(sympy.Lt(index, 0)):

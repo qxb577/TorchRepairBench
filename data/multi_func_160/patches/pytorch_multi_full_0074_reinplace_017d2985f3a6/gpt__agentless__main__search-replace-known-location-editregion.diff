@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/fx_passes/reinplace.py b/torch/_inductor/fx_passes/reinplace.py
+index 3a490090054..06f8f2cf233 100644
+--- a/torch/_inductor/fx_passes/reinplace.py
++++ b/torch/_inductor/fx_passes/reinplace.py
+@@ -61,6 +61,8 @@ def graph_call_function(graph: torch.fx.Graph, fn, *args, **kwargs):
+ 
+     node = graph.call_function(fn, args, kwargs)
+     node.meta["val"] = fake_result
++    node.meta["val"] = fake_result
++    node.meta["unbacked"] = True
+     return node
+ 
+ 

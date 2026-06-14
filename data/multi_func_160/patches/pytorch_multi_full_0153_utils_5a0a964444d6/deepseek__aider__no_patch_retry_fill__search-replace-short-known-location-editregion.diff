@@ -1,0 +1,12 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index c5744d8b43f..0d7a135f7f2 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -709,6 +709,7 @@ class VariableBuilder:
+             self.install_guards(GuardBuilder.FUNCTION_MATCH)
+             return TorchCtxManagerClassVariable(value, source=self.source)
+         elif is_function_or_wrapper(value):
++            self.install_guards(GuardBuilder.FUNCTION_MATCH)
+             value = unwrap_if_wrapper(value)
+             return trace_rules.lookup(value).create_with_source(
+                 value, source=self.source

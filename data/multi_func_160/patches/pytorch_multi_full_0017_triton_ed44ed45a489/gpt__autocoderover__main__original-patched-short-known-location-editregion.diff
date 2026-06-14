@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 452b3164c22..dd841a4f3b3 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -2386,7 +2386,8 @@ class TMACompatibilityChecker:
+             )
+             if not V.graph.sizevars.statically_known_geq(
+                 innermost_block_bytes, sympy.Integer(16)
+-            ):
++            ) or innermost_block_bytes < 16:
++
+                 log.debug(
+                     "%s persistent reduction innermost block shape cannot load 16 bytes. Block shape: %s, persistent RBLOCK: %d",
+                     self.failed_debug_prefix,

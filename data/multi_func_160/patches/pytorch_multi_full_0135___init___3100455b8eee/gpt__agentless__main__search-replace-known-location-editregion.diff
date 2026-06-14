@@ -1,0 +1,19 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index 42d51661a69..8e98f7d907d 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -510,12 +510,8 @@ class SymInt:
+     def _sympy_(self):
+         return self.node.expr
+ 
+-    def __hash__(self) -> builtins.int:
+-        if self.node.is_nested_int():
+-            return hash(self.node.nested_int())
+-        else:
+-            # Force specialization
+-            return hash(builtins.int(self))
++    def __hash__(self):
++        raise TypeError(f"unhashable type: '{type(self).__name__}'")
+ 
+ 
+ class SymFloat:

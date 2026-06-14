@@ -1,0 +1,22 @@
+diff --git a/torch/utils/_sympy/printers.py b/torch/utils/_sympy/printers.py
+index 60e6b37f134..b5f8075705a 100644
+--- a/torch/utils/_sympy/printers.py
++++ b/torch/utils/_sympy/printers.py
+@@ -418,7 +418,7 @@ class CppPrinter(ExprPrinter):
+             return f"std::min(static_cast<{INDEX_TYPE}>({args[0]}), static_cast<{INDEX_TYPE}>({args[1]}))"
+         else:
+             # Initializer list overload
+-            il = "{" + ", ".join(args) + "}"
++            il = "{" + ", ".join(f"static_cast<{INDEX_TYPE}>({a})" for a in args) + "}"
+             return f"std::min({il})"
+ 
+     def _print_Max(self, expr: sympy.Expr) -> str:
+@@ -427,7 +427,7 @@ class CppPrinter(ExprPrinter):
+             return f"std::max(static_cast<{INDEX_TYPE}>({args[0]}), static_cast<{INDEX_TYPE}>({args[1]}))"
+         else:
+             # Initializer list overload
+-            il = "{" + ", ".join(args) + "}"
++            il = "{" + ", ".join(f"static_cast<{INDEX_TYPE}>({a})" for a in args) + "}"
+             return f"std::max({il})"
+ 
+     def _print_Abs(self, expr: sympy.Expr) -> str:

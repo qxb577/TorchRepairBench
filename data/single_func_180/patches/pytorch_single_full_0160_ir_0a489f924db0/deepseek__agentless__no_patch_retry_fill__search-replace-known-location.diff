@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9a380a797fe..94b66d77daa 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -6594,7 +6594,7 @@ class AssertScalar(ExternKernel):
+             sizevar = V.graph.wrapper_code.codegen_python_sizevar(
+                 self.scalar, simplify=False
+             )
+-            wrapper.writeline(f"if not {sizevar}:")
++            wrapper.writeline(f"if not ({sizevar}):")
+             wrapper.writeline(f"    raise RuntimeError({repr(self.msg)})")
+             # No one should ever use this buffer, but for uniformity
+             # define the variable and assign it None

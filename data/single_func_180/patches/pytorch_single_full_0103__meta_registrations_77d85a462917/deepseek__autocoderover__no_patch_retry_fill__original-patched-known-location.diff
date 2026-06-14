@@ -1,0 +1,20 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index c590e4d0dfb..15791d902bd 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -2167,13 +2167,10 @@ def meta__pdist_backward(grad: Tensor, self: Tensor, p: float, pdist: Tensor) ->
+ @register_meta([aten.baddbmm.default, aten.baddbmm.out])
+ @out_wrapper(exact_dtype=True)
+ def meta_baddbmm(self, batch1, batch2, *, beta=1, alpha=1):
+-    dim1 = batch1.size(0)
+-    dim2 = batch1.size(1)
+-    dim3 = batch2.size(2)
+-    if self.shape != (dim1, dim2, dim3):
+-        self = self.expand((dim1, dim2, dim3))
++    self = self.expand((batch1.shape[0], batch1.shape[1], batch2.shape[2]))
+     torch._check(batch1.dim() == 3, lambda: "batch1 must be a 3D tensor")
+     torch._check(batch2.dim() == 3, lambda: "batch2 must be a 3D tensor")
++
+     if not exp_config.skip_dtype_check_in_meta_registrations:
+         torch._check(
+             self.dtype == batch1.dtype == batch2.dtype,

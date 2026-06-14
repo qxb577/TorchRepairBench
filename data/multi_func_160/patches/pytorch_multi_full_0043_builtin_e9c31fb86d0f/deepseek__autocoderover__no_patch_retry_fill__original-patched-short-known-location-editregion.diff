@@ -1,0 +1,65 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index d2d00c18ebf..6e2086e9593 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2234,7 +2234,8 @@ class BuiltinVariable(VariableTracker):
+         obj: VariableTracker,
+         name_var: VariableTracker,
+     ):
+-        return self.call_setattr(tx, obj, name_var, variables.DeletedVariable())
++        return obj.call_method(tx, "__delattr__", (name_var,), {})
++
+ 
+     def call_type(self, tx: "InstructionTranslator", obj: VariableTracker):
+         try:
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 86d706a24fb..c2267179002 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1421,7 +1421,11 @@ class NumpyNdarrayVariable(TensorVariable):
+             return super().call_method(tx, name, args, kwargs)
+         if name in ("tostring", "tobytes"):
+             unimplemented(f"{name} is not modelled in torch._numpy")
+-        proxy = tx.output.create_proxy(
++        if name == "__delattr__":
++            name_var = args[0]
++            name = name_var.as_python_constant()
++            tx.output.side_effects.delete_attr(self.as_proxy(), name
++
+             "call_function",
+             numpy_method_wrapper(name),
+             *proxy_args_kwargs([self] + list(args), kwargs),
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index bf3b37e3b15..6359a5fb06f 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -105,8 +105,12 @@ if TYPE_CHECKING:
+ def is_standard_setattr(val):
+     return val in (object.__setattr__, BaseException.__setattr__)
+ 
++def is_standard_delattr(val):
++    return val in (object.__delattr__, BaseException.__delattr__)
++
+ 
+ def is_forbidden_context_manager(ctx):
++
+     f_ctxs = []
+ 
+     try:
+@@ -874,7 +878,16 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+             if is_standard_setattr(method) or isinstance(self.value, threading.local):
+                 return self.method_setattr_standard(tx, *args, **kwargs)
+ 
++            if is_standard_delattr(method) or isinstance(self.value, threading.local):
++                name_var = args[0]
++                name = name_var.as_python_constant()
++                self.install_guards(tx)
++                tx.output.side_effects.delete_attr(self.as_proxy(), name)
++                self.var_setattr(tx, name, variables.DeletedVariable())
++                return ConstantVariable.create(None)
++
+             if method is object.__eq__ and len(args) == 1 and not kwargs:
++
+                 other = args[0]
+                 if not isinstance(other, UserDefinedObjectVariable):
+                     return variables.ConstantVariable.create(NotImplemented)

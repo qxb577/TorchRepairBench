@@ -1,0 +1,28 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 86685968ac9..e4f36659d95 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -5069,7 +5069,8 @@ def meta__scaled_dot_product_flash(
+     dropout_p: float = 0.0,
+     is_causal: bool = False,
+     return_debug_mask: bool = False,
+-    scale: Optional[float] = None,
++    scale: Optional[float],
++
+ ):
+     batch_size = query.size(0)
+     num_heads = query.size(1)
+diff --git a/torch/nested/_internal/sdpa.py b/torch/nested/_internal/sdpa.py
+index 5a2ce0ada12..8b6a9565d8d 100644
+--- a/torch/nested/_internal/sdpa.py
++++ b/torch/nested/_internal/sdpa.py
+@@ -604,7 +604,8 @@ def _pad_last_dim(
+ 
+ # TODO: coalesce with torch/nn/utils/attention.py
+ def _calculate_scale(query, scale):
+-    softmax_scale = scale if scale is not None else math.sqrt(1.0 / query.size(-1))
++    softmax_scale = scale if scale is not None else 1.0 / math.sqrt(query.size(-1))
++
+     return softmax_scale
+ 
+ 

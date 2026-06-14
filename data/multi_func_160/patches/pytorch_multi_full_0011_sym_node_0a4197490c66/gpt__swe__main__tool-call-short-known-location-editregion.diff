@@ -1,0 +1,21 @@
+diff --git a/torch/fx/experimental/symbolic_shapes.py b/torch/fx/experimental/symbolic_shapes.py
+index 2b1992fbecb..4035e3e31ec 100644
+--- a/torch/fx/experimental/symbolic_shapes.py
++++ b/torch/fx/experimental/symbolic_shapes.py
+@@ -1796,6 +1796,8 @@ def _fast_expand(expr: _SympyT) -> _SympyT:
+ def safe_expand(r: _SympyT) -> _SympyT:
+     if hasattr(r, "expand"):
+         try:
++            if isinstance(r, (Mul, Pow)):
++                return r
+             return _fast_expand(r)
+         except RecursionError:
+             log.warning("RecursionError in _fast_expand(%s)", r)
+@@ -1804,6 +1806,7 @@ def safe_expand(r: _SympyT) -> _SympyT:
+         return r
+ 
+ 
++
+ @lru_cache(None)
+ def _maybe_evaluate_static_worker(
+     expr: _SympyT,

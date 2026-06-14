@@ -1,0 +1,18 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..270233bf4ed 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -246,7 +246,12 @@ class PackageExporter:
+         package_name = (
+             module_name if is_package else module_name.rsplit(".", maxsplit=1)[0]
+         )
+-        dep_pairs = find_files_source_depends_on(src, package_name)
++        try:
++            dep_pairs = find_files_source_depends_on(src, package_name)
++        except Exception as e:
++            if self.verbose:
++                print(f"Warning: could not analyze dependencies for {module_name}: {e}")
++            return []
+         # Use a dict to get uniquing but also deterministic order
+         dependencies = {}
+         for dep_module_name, dep_module_obj in dep_pairs:

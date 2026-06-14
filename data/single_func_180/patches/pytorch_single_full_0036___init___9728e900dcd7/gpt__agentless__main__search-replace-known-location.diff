@@ -1,0 +1,17 @@
+diff --git a/torch/_refs/special/__init__.py b/torch/_refs/special/__init__.py
+index 3599f2fd85c..73cbd18b876 100644
+--- a/torch/_refs/special/__init__.py
++++ b/torch/_refs/special/__init__.py
+@@ -133,10 +133,8 @@ def log_ndtr(a: TensorLikeType) -> TensorLikeType:
+     type_promotion_kind=utils.ELEMENTWISE_TYPE_PROMOTION_KIND.INT_TO_FLOAT,
+ )
+ def logit(self: TensorLikeType, eps: Optional[float] = None) -> TensorLikeType:
+-    if eps is None:
+-        eps = -1.0
+-    lo = eps
+-    hi = 1 - eps
++    lo = eps if eps is not None else 0.0
++    hi = 1 - lo
+     self = torch.clamp(self, lo, hi)
+     return torch.log(torch.true_divide(self, torch.sub(1, self)))
+ 

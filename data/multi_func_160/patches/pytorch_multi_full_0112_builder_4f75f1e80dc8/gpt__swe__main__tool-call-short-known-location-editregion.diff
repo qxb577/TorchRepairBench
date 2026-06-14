@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 3dd41a1d91f..32f0ac2a53f 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -575,7 +575,8 @@ class VariableBuilder:
+             value, config.traceable_tensor_subclasses
+         ):
+             return self.wrap_tensor(value)
+-        elif is_namedtuple(value):
++        elif is_namedtuple(value) and not isinstance(value, torch.return_types.max):
++
+             return self.wrap_listlike(value)
+ 
+         elif value is torch.utils._pytree.SUPPORTED_NODES:

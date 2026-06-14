@@ -1,0 +1,42 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 304daf3dc53..71132bbf8d5 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -793,11 +793,8 @@ class TensorVariable(VariableTracker):
+             # defines a constructor, but if only a __torch_function__ impl is defined, this is okay to call.
+             # It is up to the user whether this is correct behavior or not.
+             py_cls = cls.as_python_constant()
+-            torch_fn = VariableTracker.build(
+-                tx,
+-                py_cls.__torch_function__.__func__,
+-                AttrSource(AttrSource(cls.source, "__torch_function__"), "__func__"),
+-            )
++            torch_fn = build_torch_function_fn(tx, py_cls, cls.source)
++
+ 
+             return TensorWithTFOverrideVariable.from_tensor_var(
+                 tx, self, py_cls, torch_fn
+@@ -1457,7 +1454,8 @@ class TensorSubclassVariable(VariableTracker):
+             from .torch_function import TensorWithTFOverrideVariable
+ 
+             source = AttrSource(self.source, "__torch_function__")
+-            torch_fn = VariableTracker.build(tx, self.value.__torch_function__, source)
++            torch_fn = build_torch_function_fn(tx, self.value, self.source)
++
+ 
+             return TensorWithTFOverrideVariable.from_tensor_var(
+                 tx, args[0], self.value, torch_fn
+diff --git a/torch/_dynamo/variables/torch_function.py b/torch/_dynamo/variables/torch_function.py
+index fc662faf1e3..1ba8b233218 100644
+--- a/torch/_dynamo/variables/torch_function.py
++++ b/torch/_dynamo/variables/torch_function.py
+@@ -519,7 +519,8 @@ def call_torch_function(
+ def build_torch_function_fn(tx: "InstructionTranslator", value, source):
+     from types import FunctionType
+ 
+-    func = value.__torch_function__.__func__
++    func = value.__torch_function__
++
+ 
+     if not isinstance(func, FunctionType):
+         unimplemented("Builtin/C++ torch function implementations NYI")

@@ -1,0 +1,9 @@
+model_agent,complete_bug_experiment_units,patch_generated,applicable_patch,validated_patch,pass,fail_including_no_patch,agent_repair_success_rate
+deepseek/agentless,71,54,53,53,25,46,0.352
+deepseek/aider,71,54,54,54,21,50,0.296
+deepseek/autocoderover,71,54,51,51,22,49,0.310
+deepseek/swe,71,49,49,49,17,54,0.239
+gpt/agentless,71,66,65,65,14,57,0.197
+gpt/aider,71,66,66,66,14,57,0.197
+gpt/autocoderover,66,63,61,61,8,58,0.121
+gpt/swe,71,62,62,62,13,58,0.183

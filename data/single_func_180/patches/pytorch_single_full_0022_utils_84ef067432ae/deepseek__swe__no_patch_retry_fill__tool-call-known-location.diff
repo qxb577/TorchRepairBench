@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index e729afbde61..0de200d9bb9 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -208,7 +208,7 @@ class ReinplaceCounters:
+     @classmethod
+     def add_missed_opportunities(cls, trigger: ReInplaceTrigger, count: int) -> None:
+         if count != 0:
+-            cls._values[f"missed_tensors_{trigger}"] += count
++            cls._values[f"missed_tensors_{trigger.name}"] += count
+ 
+     @classmethod
+     def clear(cls) -> None:
+@@ -218,7 +218,7 @@ class ReinplaceCounters:
+     def get_total_missed(cls) -> int:
+         sum = 0
+         for trigger in ReInplaceTrigger:
+-            sum += cls._values.get(f"missed_tensors_{trigger}", 0)
++            sum += cls._values.get(f"missed_tensors_{trigger.name}", 0)
+         return sum
+ 
+     @classmethod
+@@ -235,6 +235,7 @@ class ReinplaceCounters:
+             signpost_event("inductor", "reinplace_counters", cls._values)
+ 
+ 
++
+ def tabulate(
+     rows: Union[list[tuple[str, Any]], list[list[Any]]],
+     headers: Union[tuple[str, ...], list[str]],

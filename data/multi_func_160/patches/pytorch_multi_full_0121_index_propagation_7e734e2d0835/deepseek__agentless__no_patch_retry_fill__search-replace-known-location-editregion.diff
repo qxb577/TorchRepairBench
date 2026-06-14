@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index 2ec43bce36f..9c6a9bba3a2 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -190,7 +190,12 @@ class IndexPropagation:
+         self.shape_env = V.graph.sizevars.shape_env
+ 
+         def upper_bound(v):
+-            return bound_sympy(v).upper if isinstance(v, sympy.Expr) else v
++            if isinstance(v, sympy.Expr):
++                concrete = self.shape_env._maybe_evaluate_static(v)
++                if concrete is not None:
++                    return concrete
++                return bound_sympy(v).upper
++            return v
+ 
+         var_to_range = {
+             k: ValueRanges(0, upper_bound(v) - 1) for k, v in iter_ranges.items()

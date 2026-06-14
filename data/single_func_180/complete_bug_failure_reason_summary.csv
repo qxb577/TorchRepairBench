@@ -1,0 +1,5 @@
+reason,count
+Bug-revealing test failed,200
+Pytest collection/harness error,108
+Import/version/build environment problem,13
+Fail/env error unspecified,6

@@ -1,0 +1,19 @@
+diff --git a/torch/nn/modules/module.py b/torch/nn/modules/module.py
+index 2764dc27bb3..c85511fcb9b 100644
+--- a/torch/nn/modules/module.py
++++ b/torch/nn/modules/module.py
+@@ -568,11 +568,12 @@ class Module:
+             raise KeyError('buffer name can\'t be empty string ""')
+         elif hasattr(self, name) and name not in self._buffers:
+             raise KeyError(f"attribute '{name}' already exists")
+-        elif tensor is not None and not isinstance(tensor, torch.Tensor):
++        elif tensor is not None and not torch.overrides.is_tensor_like(tensor):
+             raise TypeError(
+                 f"cannot assign '{torch.typename(tensor)}' object to buffer '{name}' "
+-                "(torch Tensor or None required)"
++                "(torch Tensor, Tensor-like, or None required)"
+             )
++
+         else:
+             for hook in _global_buffer_registration_hooks.values():
+                 output = hook(self, name, tensor)

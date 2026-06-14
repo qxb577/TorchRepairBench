@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 86e40908f46..32c13a76759 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -2880,7 +2880,7 @@ def handle_traced_output(example_value, tx, proxy, options, subclass_type, targe
+     import torch._subclasses.fake_tensor
+     import torch._utils
+ 
+-    if isinstance(example_value, torch.Tensor):
++    if isinstance(example_value, torch.Tensor) and not example_value.is_sparse:
+         var = construct_tensor_variable(
+             target_cls, tx, proxy, example_value, subclass_type, options
+         )
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 7001fe6a66d..66cb1b68d0d 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2138,7 +2138,7 @@ def unsupported_input_tensor(t: torch.Tensor, node=None):
+         _warn_complex_not_supported()
+         return True
+ 
+-    if t.is_meta:
++    if t.is_meta or t.is_sparse:
+         return True
+ 
+     if t.dtype == torch.float8_e8m0fnu:

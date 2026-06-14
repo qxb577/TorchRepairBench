@@ -1,0 +1,23 @@
+diff --git a/torch/_higher_order_ops/torchbind.py b/torch/_higher_order_ops/torchbind.py
+index deaf9d503b5..5b54af8db91 100644
+--- a/torch/_higher_order_ops/torchbind.py
++++ b/torch/_higher_order_ops/torchbind.py
+@@ -43,12 +43,13 @@ class CallTorchBind(HigherOrderOperator):
+         schema = val._get_method(method).schema
+         schema_str = str(schema)
+         new_schema_str = (
+-            "call_torchbind(" + str(schema.arguments[0].real_type) + " obj,"
+-        )
+-        first_comma_index = schema_str.find(",")
+-        new_schema_str = (
+-            new_schema_str + " str method," + schema_str[first_comma_index + 1 :]
++            "call_torchbind(" + str(schema.arguments[0].real_type) + " obj, str method"
+         )
++        if len(schema.arguments) > 1:
++            first_comma_index = schema_str.find(",")
++            new_schema_str += "," + schema_str[first_comma_index + 1 :]
++        else:
++            new_schema_str += ")" + schema_str[schema_str.find(" -> "):]
+         new_schema = torch._C.parse_schema(new_schema_str)
+         return new_schema
+ 

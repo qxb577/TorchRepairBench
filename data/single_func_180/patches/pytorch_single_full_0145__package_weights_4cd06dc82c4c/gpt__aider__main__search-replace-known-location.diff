@@ -1,0 +1,12 @@
+diff --git a/torch/export/pt2_archive/_package_weights.py b/torch/export/pt2_archive/_package_weights.py
+index 314f1550cb6..965cffc0b41 100644
+--- a/torch/export/pt2_archive/_package_weights.py
++++ b/torch/export/pt2_archive/_package_weights.py
+@@ -127,6 +127,6 @@ def group_weights(all_weights: dict[str, Weights]) -> list[OrderedSet[tuple[str,
+ 
+     for model_name, weights in all_weights.items():
+         for weight_name, (_, properties) in weights.items():
+-            weights_dict[properties.storage_ptr].add((model_name, weight_name))
++            weights_dict[(properties.storage_ptr, properties.dtype)].add((model_name, weight_name))
+ 
+     return list(weights_dict.values())

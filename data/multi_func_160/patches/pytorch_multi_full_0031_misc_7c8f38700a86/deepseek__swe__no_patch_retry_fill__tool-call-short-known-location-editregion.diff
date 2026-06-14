@@ -1,0 +1,34 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..d1e801c1c4a 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -75,6 +75,29 @@ class int8(signedinteger):
+     torch_dtype = torch.int8
+ 
+ 
++def issubdtype(arg1, arg2):
++    from . import _dtypes_impl
++
++    if isinstance(arg1, type) and issubclass(arg1, generic):
++        abstract1 = arg1
++    else:
++        try:
++            dt = _dtypes_impl.dtype(arg1)
++        except TypeError:
++            return False
++        abstract1 = type(dt)
++    if isinstance(arg2, type) and issubclass(arg2, generic):
++        abstract2 = arg2
++    else:
++        try:
++            dt = _dtypes_impl.dtype(arg2)
++        except TypeError:
++            return False
++        abstract2 = type(dt)
++    return issubclass(abstract1, abstract2)
++
++
++
+ class int16(signedinteger):
+     name = "int16"
+     typecode = "h"

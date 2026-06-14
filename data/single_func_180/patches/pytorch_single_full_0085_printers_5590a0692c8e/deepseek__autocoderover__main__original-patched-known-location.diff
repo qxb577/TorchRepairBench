@@ -1,0 +1,27 @@
+diff --git a/torch/utils/_sympy/printers.py b/torch/utils/_sympy/printers.py
+index 60e6b37f134..14e0b3efaab 100644
+--- a/torch/utils/_sympy/printers.py
++++ b/torch/utils/_sympy/printers.py
+@@ -418,18 +418,20 @@ class CppPrinter(ExprPrinter):
+             return f"std::min(static_cast<{INDEX_TYPE}>({args[0]}), static_cast<{INDEX_TYPE}>({args[1]}))"
+         else:
+             # Initializer list overload
+-            il = "{" + ", ".join(args) + "}"
++            il = "{" + ", ".join(f"static_cast<{INDEX_TYPE}>({a})" for a in args) + "}"
+             return f"std::min({il})"
+ 
++
+     def _print_Max(self, expr: sympy.Expr) -> str:
+         args = [self._print(a) for a in expr.args]
+         if len(args) == 2:
+             return f"std::max(static_cast<{INDEX_TYPE}>({args[0]}), static_cast<{INDEX_TYPE}>({args[1]}))"
+         else:
+             # Initializer list overload
+-            il = "{" + ", ".join(args) + "}"
++            il = "{" + ", ".join(f"static_cast<{INDEX_TYPE}>({a})" for a in args) + "}"
+             return f"std::max({il})"
+ 
++
+     def _print_Abs(self, expr: sympy.Expr) -> str:
+         assert len(expr.args) == 1
+         return f"std::abs({self._print(expr.args[0])})"

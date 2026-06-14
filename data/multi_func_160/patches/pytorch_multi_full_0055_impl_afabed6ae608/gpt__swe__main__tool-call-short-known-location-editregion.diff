@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index a36c2e32e3f..1e65a0b9e49 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -55,7 +55,9 @@ from .lowering import (
+     make_fallback,
+     needs_realized_inputs,
+     unsupported_output_tensor,
++    get_custom_op_layout_constraints,
+ )
++
+ from .sizevars import SizeVarAllocator
+ from .utils import convert_shape_to_inductor, gather_origins, get_sympy_Expr_dtype
+ from .virtualized import V

@@ -1,0 +1,43 @@
+diff --git a/torch/_functorch/_aot_autograd/collect_metadata_analysis.py b/torch/_functorch/_aot_autograd/collect_metadata_analysis.py
+index 4ff5c1e89ba..e9ac654c939 100644
+--- a/torch/_functorch/_aot_autograd/collect_metadata_analysis.py
++++ b/torch/_functorch/_aot_autograd/collect_metadata_analysis.py
+@@ -125,16 +125,16 @@ def run_functionalized_fw_and_collect_metadata(
+                 new_arg = arg
+             else:
+                 new_arg = from_fun(f_arg)
++            mutates_storage_metadata = has_metadata_mutation(
++                f_arg, arg, check_only_storage_mutation=True
++            )
+             mutates_metadata = has_metadata_mutation(
+                 f_arg, arg, check_only_storage_mutation=False
+             )
+-            if mutates_metadata and is_traceable_wrapper_subclass(arg):
++            if mutates_storage_metadata and is_traceable_wrapper_subclass(arg):
+                 raise RuntimeError(
+                     "Metadata mutations are currently not allowed on tensor subclasses"
+                 )
+-            mutates_storage_metadata = has_metadata_mutation(
+-                f_arg, arg, check_only_storage_mutation=True
+-            )
+             mutates_data = has_data_mutation(f_arg)
+             mutations_hidden_from_autograd = are_all_mutations_hidden_from_autograd(
+                 f_arg
+diff --git a/torch/utils/_python_dispatch.py b/torch/utils/_python_dispatch.py
+index 434a88ab292..755f95b6110 100644
+--- a/torch/utils/_python_dispatch.py
++++ b/torch/utils/_python_dispatch.py
+@@ -268,11 +268,11 @@ and output of type {type(ret)}. But expected types to match."""
+ 
+                 if isinstance(ret, list):
+                     for r in ret:
+-                        torch.ops.aten.set_.source_Storage_storage_offset(r, arg.untyped_storage(), r.storage_offset(), r.shape)
++                        torch.ops.aten.set_.source_Storage_storage_offset(r, arg.untyped_storage(), r.storage_offset(), r.shape, r.stride())
+                 else:
+                     assert isinstance(ret, torch.Tensor), f"type: {type(ret)}"
+                     torch.ops.aten.set_.source_Storage_storage_offset(
+-                        ret, arg.untyped_storage(), ret.storage_offset(), ret.shape
++                        ret, arg.untyped_storage(), ret.storage_offset(), ret.shape, ret.stride()
+                     )
+             finally:
+                 torch._C._set_meta_in_tls_dispatch_include(meta_in_tls)

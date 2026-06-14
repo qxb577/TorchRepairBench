@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/tensor/_redistribute.py b/torch/distributed/tensor/_redistribute.py
+index a540a763bb6..1e13243045a 100644
+--- a/torch/distributed/tensor/_redistribute.py
++++ b/torch/distributed/tensor/_redistribute.py
+@@ -187,7 +187,8 @@ def _get_flattened_mesh_by_layout(
+     dim_names = tuple(mesh_dim_names[i] for i in mesh_dims)
+ 
+     # Get the submesh for these dimensions
+-    submesh = mesh[dim_names]
++    submesh = root_mesh[dim_names]
++
+ 
+     # Compute expected flattened layout
+     expected_layout = submesh._layout.coalesce()

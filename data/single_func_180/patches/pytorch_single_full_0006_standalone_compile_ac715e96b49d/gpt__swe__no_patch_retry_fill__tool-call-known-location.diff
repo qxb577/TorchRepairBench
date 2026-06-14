@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/standalone_compile.py b/torch/_inductor/standalone_compile.py
+index 1ea0f271671..2c41694a667 100644
+--- a/torch/_inductor/standalone_compile.py
++++ b/torch/_inductor/standalone_compile.py
+@@ -88,7 +88,9 @@ class CompiledArtifact:
+                     file.write(writer.to_bytes())
+             else:
+                 assert format == "unpacked"
++                if os.path.exists(path):
+                 assert os.path.isdir(path)
++
+                 shutil.rmtree(path, ignore_errors=True)
+ 
+                 with temporary_cache_dir(path):

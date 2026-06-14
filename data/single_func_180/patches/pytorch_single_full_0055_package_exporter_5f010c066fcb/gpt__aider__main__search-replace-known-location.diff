@@ -1,0 +1,13 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index 9444fae168f..38f9aae288e 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -190,7 +190,7 @@ class PackageExporter:
+             self.buffer = f
+ 
+         self.zip_file = torch._C.PyTorchFileWriter(f)
+-        self.zip_file.set_min_version(6)
++        self.zip_file.set_min_version(5)
+         self.serialized_reduces: Dict[int, Any] = {}
+         self.serialized_storages: Set[str] = set()
+ 

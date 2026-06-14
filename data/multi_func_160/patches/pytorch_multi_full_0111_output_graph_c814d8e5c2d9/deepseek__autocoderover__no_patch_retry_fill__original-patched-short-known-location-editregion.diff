@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 3e16c7a6008..509124ef30d 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -592,6 +592,11 @@ class InstructionTranslatorBase(Checkpointable[InstructionTranslatorGraphState])
+         Tuple[Callable[..., object], Tuple[object, ...], Dict[str, object]]
+     ]
+ 
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.random_calls = []
++
++
+     def mark_inconsistent_side_effects(self):
+         """
+         InstructionTranslator has encountered instructions which may cause

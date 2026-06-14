@@ -1,0 +1,39 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index c1bc2ae9607..11af8ec3e17 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1591,7 +1591,7 @@ class InstructionTranslatorBase(
+             argsvars = TupleVariable(argsvars.force_unpack_var_sequence(self))
+ 
+         if not isinstance(argsvars, BaseListVariable) or not isinstance(
+-            kwargsvars, ConstDictVariable
++            kwargsvars, (ConstDictVariable, variables.UserDefinedObjectVariable)
+         ):
+             unimplemented(f"non-static call {typestr(argsvars)} {typestr(kwargsvars)}")
+ 
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 30dd19a9607..fa4fd25fb59 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1340,7 +1340,7 @@ class BuiltinVariable(VariableTracker):
+                 out = tx.inline_user_function_return(
+                     arg.var_getattr(tx, "items"), args, kwargs
+                 )
+-                if isinstance(out, ConstDictVariable):
++                if isinstance(out, (ConstDictVariable, variables.UserDefinedObjectVariable)):
+                     return out
+                 return BuiltinVariable(user_cls).call_custom_dict(tx, user_cls, out)
+         elif not args and kwargs:
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 24b41402774..155d032f926 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -248,7 +248,7 @@ class ConstDictVariable(VariableTracker):
+         if name == "__getitem__":
+             assert len(args) == 1
+             return self.getitem_const(args[0])
+-        elif name == "items":
++        elif name == "items" or (name == "__iter__" and isinstance(self, variables.UserDefinedObjectVariable)):
+             assert not (args or kwargs)
+             if self.source:
+                 tx.output.guard_on_key_order.add(self.source.name())

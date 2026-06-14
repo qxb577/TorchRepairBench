@@ -1,0 +1,36 @@
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 2b84c1497ce..8a05021f753 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -758,7 +758,7 @@ class GetAttrVariable(VariableTracker):
+             and args[0].is_python_constant()
+             and isinstance(
+                 self.obj,
+-                (variables.UserDefinedObjectVariable, variables.NNModuleVariable),
++                (variables.UserDefinedObjectVariable, variables.NNModuleVariable, variables.UserDefinedClassVariable),
+             )
+         ):
+             obj = self.obj
+@@ -782,7 +782,7 @@ class GetAttrVariable(VariableTracker):
+             and not kwargs
+             and isinstance(
+                 self.obj,
+-                (variables.UserDefinedObjectVariable, variables.NNModuleVariable),
++                (variables.UserDefinedObjectVariable, variables.NNModuleVariable, variables.UserDefinedClassVariable),
+             )
+         ):
+             obj = self.obj
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 4f125eb617f..32eaa2b3e6c 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -109,6 +109,9 @@ class UserDefinedClassVariable(UserDefinedVariable):
+     def can_constant_fold_through(self):
+         return self.value in self._constant_fold_classes()
+ 
++    def has_key_in_generic_dict(self, tx, key):
++        return key in self.value.__dict__
++
+     def var_getattr(self, tx, name: str) -> "VariableTracker":
+         from .. import trace_rules
+         from . import ConstantVariable, EnumVariable

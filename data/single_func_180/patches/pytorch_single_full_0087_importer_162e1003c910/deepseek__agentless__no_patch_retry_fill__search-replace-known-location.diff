@@ -1,0 +1,15 @@
+diff --git a/torch/package/importer.py b/torch/package/importer.py
+index 3ae277d431e..2164dbb3b4e 100644
+--- a/torch/package/importer.py
++++ b/torch/package/importer.py
+@@ -184,3 +184,10 @@ class OrderedImporter(Importer):
+             raise last_err
+         else:
+             raise ModuleNotFoundError(module_name)
++
++    def whichmodule(self, obj: Any, name: str) -> str:
++        for importer in self._importers:
++            result = importer.whichmodule(obj, name)
++            if result != '__main__':
++                return result
++        return '__main__'

@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 6f500fff176..e41b912bd44 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1006,7 +1006,8 @@ Either create the tensor outside the compiled region, or do not set the tensor t
+                 if (
+                     kwargs["out"].source
+                     and kwargs["out"] in tx.output.graphargs
+-                    and fake_out_shape != fake_tensor.shape
++                    and fake_out.shape != fake_tensor.shape
++
+                 ):
+                     # It's hard to get out variants with resizing on graph inputs work
+                     # properly across dynamo/aot/inductor, just fall back.

@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 05e3b1b6440..4ab03467a64 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -1923,7 +1923,8 @@ class FusedSchedulerNode(BaseSchedulerNode):
+             # of the template node and its epilogue requires the same type of dependencies
+             assert isinstance(node2.node, MultiOutput)
+             assert len(node2.read_writes.writes) == 1
+-            assert isinstance(next(iter(node2.read_writes.writes)), StarDep)
++            assert isinstance(next(iter(node2.read_writes.writes)), (StarDep, MemoryDep))
++
+             name = next(iter(node2.read_writes.writes)).name
+             template_nodes = [node for node in node1.get_nodes() if node.is_template()]
+             assert len(template_nodes) == 1

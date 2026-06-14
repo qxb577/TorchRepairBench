@@ -1,0 +1,14 @@
+diff --git a/torch/fx/passes/runtime_assert.py b/torch/fx/passes/runtime_assert.py
+index f8c12327f31..8b8efa8aeed 100644
+--- a/torch/fx/passes/runtime_assert.py
++++ b/torch/fx/passes/runtime_assert.py
+@@ -339,7 +339,9 @@ def insert_deferred_runtime_asserts(
+                     or (
+                         assert_expr is not None
+                         and _is_bound_expr_for_symbol(assert_expr)
++                        and assert_expr not in added_asserts
+                     )
++
+                 ):
+                     arg = node.args[0]
+                     gm.graph.erase_node(node)

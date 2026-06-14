@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 5765dedb97e..b83823161e9 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -2860,7 +2860,8 @@ class CheckFunctionManager:
+             # Only serialize the global variables that are actually used in guards.
+             used_global_vars = set()
+             for guard in sorted_guards:
+-                if name := get_global_source_name(guard.originating_source):
++                if name := get_global_source_name(guard.originating_source) or is_from_local_source(guard.originating_source):
++
+                     assert isinstance(name, str)
+                     used_global_vars.add(name)
+             for source in self.output_graph.guard_on_key_order:

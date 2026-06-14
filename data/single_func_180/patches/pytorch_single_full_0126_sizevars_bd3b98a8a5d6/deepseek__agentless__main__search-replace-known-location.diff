@@ -1,0 +1,12 @@
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index ea7bb6baea3..8eacd665d4b 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -182,6 +182,7 @@ class SizeVarAllocator:
+                 expr,
+                 axioms=axioms,
+                 var_to_range=var_to_range_tuple,
++                size_oblivious=self.shape_env.backed_size_oblivious,
+             )
+             return bool(evaluated)
+ 

@@ -1,0 +1,16 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..4d2142c087c 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -186,7 +186,10 @@ class PackageExporter:
+         else:  # is a byte buffer
+             self.buffer = f
+ 
+-        self.zip_file = torch._C.PyTorchFileWriter(f)
++        try:
++            self.zip_file = torch._C.PyTorchFileWriter(f)
++        except Exception as e:
++            raise PackagingError(f"Failed to create PyTorchFileWriter: {e}")
+         self.zip_file.set_min_version(6)
+         self.serialized_reduces: Dict[int, Any] = {}
+         self.serialized_storages: Set[str] = set()

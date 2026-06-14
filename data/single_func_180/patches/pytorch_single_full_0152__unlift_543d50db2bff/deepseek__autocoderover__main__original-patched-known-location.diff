@@ -1,0 +1,34 @@
+diff --git a/torch/export/_unlift.py b/torch/export/_unlift.py
+index ae4c09b7c8c..1478e30a8be 100644
+--- a/torch/export/_unlift.py
++++ b/torch/export/_unlift.py
+@@ -51,6 +51,21 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+             return True
+         if _normalize_type(a.type) != _normalize_type(b.type):
+             return False
++        if _normalize_type(a.type) == dict:
++            # dict context comparison should be order-insensitive;
++            # sort keys and reorder children accordingly
++            if len(a.context) != len(b.context):
++                return False
++            a_sorted_idx = sorted(range(len(a.context)), key=lambda i: a.context[i])
++            b_sorted_idx = sorted(range(len(b.context)), key=lambda i: b.context[i])
++            if [a.context[i] for i in a_sorted_idx] != [b.context[i] for i in b_sorted_idx]:
++                return False
++            a_children = [a.children_specs[i] for i in a_sorted_idx]
++            b_children = [b.children_specs[i] for i in b_sorted_idx]
++            return all(
++                _match_normalized_structure(ac, bc)
++                for ac, bc in zip(a_children, b_children)
++            )
+         if a.context != b.context:
+             return False
+         if len(a.children_specs) != len(b.children_specs):
+@@ -63,6 +78,7 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+     return _match_normalized_structure(self, other)
+ 
+ 
++
+ def _check_inputs_match(args, kwargs, in_spec: pytree.TreeSpec) -> list:
+     reordered_kwargs = reorder_kwargs(kwargs, in_spec)
+     flat_args_with_path, received_spec = pytree.tree_flatten_with_path(

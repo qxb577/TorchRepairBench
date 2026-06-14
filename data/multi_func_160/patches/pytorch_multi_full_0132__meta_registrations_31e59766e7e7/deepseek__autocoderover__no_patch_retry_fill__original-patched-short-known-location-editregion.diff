@@ -1,0 +1,38 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 86685968ac9..03f6508fc22 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -5354,12 +5354,19 @@ def meta__flash_attention_forward(
+     return_debug_mask: bool,
+     scale: Optional[float] = None,
+ ):
+-    batch_size = query.size(0)
+-    max_seqlen_batch_q = query.size(1)
+-    num_heads = query.size(2)
+-    head_dim = query.size(3)
+-
+-    max_seqlen_batch_k = key.size(1)
++    if cum_seq_q is not None:
++        batch_size = cum_seq_q.size(0) - 1
++        max_seqlen_batch_q = max_q
++        max_seqlen_batch_k = max_k
++        # query and key are 3D: (total_seqlen, num_heads, head_dim)
++        num_heads = query.size(1)
++        head_dim = query.size(2)
++    else:
++        batch_size = query.size(0)
++        max_seqlen_batch_q = query.size(1)
++        num_heads = query.size(2)
++        head_dim = query.size(3)
++        max_seqlen_batch_k = key.size(1)
+ 
+     # Cuda Path
+     attention = torch.empty_like(query)
+@@ -5369,6 +5376,7 @@ def meta__flash_attention_forward(
+         device=query.device,
+     )
+ 
++
+     if return_debug_mask:
+         blocksize_c = 128 if head_dim > 64 else 256
+         max_seqlen_k = math.ceil(max_seqlen_batch_q / blocksize_c)

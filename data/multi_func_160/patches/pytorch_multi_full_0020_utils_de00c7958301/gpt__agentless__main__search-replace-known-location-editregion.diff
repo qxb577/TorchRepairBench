@@ -1,0 +1,39 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 1174862b3fe..c20634eea02 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -2145,6 +2145,7 @@ def tensor_always_has_static_shape(
+     if (
+         tensor_source.guard_source().is_specialized_nn_module()
+         or tensor_source.guard_source().is_unspecialized_builtin_nn_module()
++        or tensor_source.guard_source().is_local()
+     ) and config.force_nn_module_property_static_shapes:
+         return True, TensorStaticReason.NN_MODULE_PROPERTY
+ 
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index c1a75bf3f37..be6f572501e 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1360,7 +1360,7 @@ class VariableBuilder:
+         if (
+             config.inline_inbuilt_nn_modules
+             and not is_static_input
+-            and isinstance(value, torch.nn.Parameter)
++            and (isinstance(value, torch.nn.Parameter) or isinstance(value, torch.Tensor))
+         ):
+             self.mark_static_input(value, guard=False)
+ 
+diff --git a/torch/_guards.py b/torch/_guards.py
+index d4d1d6bb6a7..3af0295af87 100644
+--- a/torch/_guards.py
++++ b/torch/_guards.py
+@@ -104,7 +104,8 @@ class GuardSource(enum.Enum):
+             in (
+                 GuardSource.GLOBAL_SPECIALIZED_NN_MODULE,
+                 GuardSource.LOCAL_SPECIALIZED_NN_MODULE,
+-            )
++                GuardSource.LOCAL_UNSPECIALIZED_BUILTIN_NN_MODULE,
++        )
+             # TODO (anijain2305) - Investigate why is_fsdp_module required.
+             or self.is_fsdp_module()
+         )

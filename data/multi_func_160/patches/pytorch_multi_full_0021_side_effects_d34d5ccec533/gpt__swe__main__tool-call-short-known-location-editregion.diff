@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index a4bc4bf5a49..9494c484664 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -163,7 +163,8 @@ class SideEffects:
+         assert isinstance(cellvar, variables.NewCellVariable)
+         if self.has_pending_mutation_of_attr(cellvar, "cell_contents"):
+             return self.load_attr(cellvar, "cell_contents")
+-        if cellvar.pre_existing_contents:
++        if cellvar.pre_existing_contents is not None:
++
+             return cellvar.pre_existing_contents
+         unimplemented("cannot read uninitialized cell")
+ 

@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/aot_compile.py b/torch/_dynamo/aot_compile.py
+index 319a5ecd2bd..ca64f00da1a 100644
+--- a/torch/_dynamo/aot_compile.py
++++ b/torch/_dynamo/aot_compile.py
+@@ -51,7 +51,7 @@ class CompileArtifacts:
+             for alias, module_name in self.import_sources.items()
+         }
+         f_globals = {**import_sources, self.backend_id: self.compiled_fn}
+-        core = types.FunctionType(self.bytecode, f_globals)
++        core = types.FunctionType(self.bytecode, f_globals, closure=self.compiled_fn.__closure__)
+ 
+         def optimized_call(*args: Any, **kwargs: Any) -> Any:
+             f_locals = bind_locals(self.signature, *args, **kwargs)

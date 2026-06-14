@@ -1,0 +1,36 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 72b2e3dc132..40d5288ad59 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -1360,11 +1360,26 @@ class TorchInGraphFunctionVariable(BaseTorchVariable):
+             # the call and wrap output into a VariableTracker.
+             proxy = tx.output.create_proxy("call_function", flat_apply, all_args, {})
+             out_vt = wrap_fx_proxy(tx, proxy)
+-            # TODO support more output types
+-            # Q: flat_apply will likely pytree_flatten the output for this, then
+-            # how do we intercept the output before flatten, and wrap those?
+-            # - Maybe we can have `flat_apply` return the output spec, so that
+-            #   Dynamo can unflatten and wrap the result.
++
++            # Guard against unsupported output types in nonstrict_trace
++            from torch._dynamo.variables import ConstantVariable, TensorVariable, SymNodeVariable, ListVariable
++            from torch._dynamo.exc import Unsupported
++
++            def _is_unsupported(vt):
++                if isinstance(vt, TensorVariable):
++                    return False
++                if isinstance(vt, SymNodeVariable):
++                    return False
++                if isinstance(vt, ConstantVariable):
++                    return not isinstance(vt.value, (int, float, bool, type(None)))
++                return True  # any other type is unsupported
++
++            if isinstance(out_vt, ListVariable):
++                for item in out_vt.items:
++                    if _is_unsupported(item):
++                        raise Unsupported("Unsupported output type for nonstrict_trace-ed function")
++            elif _is_unsupported(out_vt):
++                raise Unsupported("Unsupported output type for nonstrict_trace-ed function")
+ 
+             return out_vt
+ 

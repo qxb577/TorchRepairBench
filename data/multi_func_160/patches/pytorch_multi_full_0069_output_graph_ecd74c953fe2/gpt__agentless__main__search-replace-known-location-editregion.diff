@@ -1,0 +1,47 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 7914fe6f462..b6492f1fc0a 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1117,12 +1117,14 @@ class OutputGraph(OutputGraphGuardsState):
+ 
+         self.cleanup_graph()
+         tx.prune_dead_locals()
+-        stack_values = list(tx.stack)
++        def realize_stack_values(values):
++            for value in values:
++                if isinstance(value, list):
++                    realize_stack_values(value)
++                else:
++                    value.realize()
+ 
+-        # realize any unrealized tensor VTs in case they
+-        # need to be added to self.nn_modules as attributes
+-        for value in stack_values:
+-            value.realize()
++        realize_stack_values(tx.stack)
+ 
+         # Use nn.Module "proxies" in the constructed GraphModule so that
+         # the resulting GM does not hold additional strong references to the original modules.
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 3e3579ccf33..985bde10807 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1460,9 +1460,15 @@ class VariableBuilder:
+             self.install_guards(GuardBuilder.CONSTANT_MATCH)
+             return ConstantVariable.create(value=value)
+ 
+-        # One can index a tensor with a list/tuple. Therefore, we need to
+-        # have a stricter match.
+-        self.install_guards(GuardBuilder.SEQUENCE_LENGTH)
++        # Recursively realize list/tuple elements to handle self-references
++        def realize_listlike(values):
++            for v in values:
++                if isinstance(v, (list, tuple)):
++                    realize_listlike(v)
++                else:
++                    v.realize()
++
++        realize_listlike(value)
+ 
+         # Tuples are immutable objects, so we should mark its items static. This
+         # avoids wrapping of tuple items as symints. This helps for nn module

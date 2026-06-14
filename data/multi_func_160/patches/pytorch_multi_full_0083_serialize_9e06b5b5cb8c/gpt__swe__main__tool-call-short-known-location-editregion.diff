@@ -1,0 +1,14 @@
+diff --git a/torch/_export/serde/serialize.py b/torch/_export/serde/serialize.py
+index 09c50438620..79494ffed54 100644
+--- a/torch/_export/serde/serialize.py
++++ b/torch/_export/serde/serialize.py
+@@ -1698,7 +1698,8 @@ class GraphModuleDeserializer(metaclass=Final):
+             self.deserialize_sym_op_outputs(serialized_node, fx_node)
+ 
+         elif isinstance(target, torch._ops.HigherOrderOperator):
+-            args, kwargs = self.deserialize_hoo_inputs(serialized_node.inputs)
++            args, kwargs = self.deserialize_inputs(target, serialized_node)
++
+             # If HOP returns a single tensor, name the
+             # newly-created node after it. This ensures that these tensor values
+             # have names that are consistent with serialized.

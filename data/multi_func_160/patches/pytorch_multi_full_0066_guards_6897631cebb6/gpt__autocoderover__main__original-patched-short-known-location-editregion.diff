@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 7f697bba5f0..a4415b4725d 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -980,9 +980,10 @@ class GuardBuilder(GuardBuilderBase):
+                 example_value=example_value,
+                 guard_manager_enum=guard_manager_enum,
+             )
+-        elif istype(source, ScriptObjectQualifiedNameSource):
++        elif istype(source, ScriptObjectQualifiedNameSource) or istype(source, SubclassAttrListSource):
+             assert base_guard_manager  # to make mypy happy
+             out = base_guard_manager.lambda_manager(
++
+                 python_lambda=lambda x: x._type().qualified_name(),
+                 source=source_name,
+                 example_value=example_value,

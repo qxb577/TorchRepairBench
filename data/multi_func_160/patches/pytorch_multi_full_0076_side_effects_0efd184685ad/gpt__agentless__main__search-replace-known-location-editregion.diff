@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index 2cf79ebbd66..611d0d041e2 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -748,7 +748,7 @@ class SideEffects:
+                         cg(value)
+                         cg(var.source)
+                         suffixes.append([create_instruction("STORE_ATTR", argval=name)])
+-            elif isinstance(var, variables.TupleIteratorVariable):
++            elif isinstance(var, (variables.TupleIteratorVariable, variables.RangeIteratorVariable)):
+                 for _ in range(var.index):
+                     cg.add_push_null(
+                         lambda: cg.load_import_from(utils.__name__, "iter_next")
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index d62dbe6d1f3..6d206d8a1cc 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1350,7 +1350,7 @@ class VariableBuilder:
+         # Get all the values from the range iterator; no need to install guards
+         # on items since `RANGE_ITERATOR_MATCH` guarantees the same items.
+         items = [ConstantVariable.create(v) for v in copy.deepcopy(value)]
+-        return ListIteratorVariable(items, mutation_type=ValueMutationNew())
++        return RangeIteratorVariable(items, mutation_type=ValueMutationNew())
+ 
+     def wrap_slice_range(self, value: Union[slice, range]):
+         items = [

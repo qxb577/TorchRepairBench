@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 60a585e80d3..16a55d57c5c 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -172,7 +172,8 @@ class BaseSchedulerNode:
+         ] = set()  # buffers that won't be used after this kernel
+         self.written = False
+ 
+-        self.outputs: List[SchedulerBuffer] = [
++        self.outputs: List[SchedulerBuffer] = [] if node is None else [
++
+             SchedulerBuffer(
+                 scheduler=scheduler,
+                 node=output,

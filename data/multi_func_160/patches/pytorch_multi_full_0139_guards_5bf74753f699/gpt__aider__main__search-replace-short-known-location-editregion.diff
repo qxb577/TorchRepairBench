@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/guards.py b/torch/_dynamo/guards.py
+index 5765dedb97e..cca7e2e2816 100644
+--- a/torch/_dynamo/guards.py
++++ b/torch/_dynamo/guards.py
+@@ -2863,10 +2863,14 @@ class CheckFunctionManager:
+                 if name := get_global_source_name(guard.originating_source):
+                     assert isinstance(name, str)
+                     used_global_vars.add(name)
++                elif is_from_local_source(guard.originating_source):
++                    continue
+             for source in self.output_graph.guard_on_key_order:
+                 if name := get_global_source_name(source):
+                     assert isinstance(name, str)
+                     used_global_vars.add(name)
++                elif is_from_local_source(source):
++                    continue
+ 
+             def normalize_create_fn(x):
+                 if isinstance(x, functools.partial):

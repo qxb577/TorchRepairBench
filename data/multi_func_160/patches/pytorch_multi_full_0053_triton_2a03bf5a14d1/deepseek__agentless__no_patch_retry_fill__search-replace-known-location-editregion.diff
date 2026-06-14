@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/codegen/triton.py b/torch/_inductor/codegen/triton.py
+index 785f79d9150..237e2306a12 100644
+--- a/torch/_inductor/codegen/triton.py
++++ b/torch/_inductor/codegen/triton.py
+@@ -2341,7 +2341,7 @@ class TritonKernel(SIMDKernel):
+             and not entry.has_zdim
+             and not (isinstance(entry.numel, int) and entry.numel <= get_max_y_grid())
+         ):
+-            key = f"{key} * (tl.program_id({entry.grid_dim + 1}) + 1)"
++            key = f"tl.program_id({entry.grid_dim}) + tl.program_id({entry.grid_dim + 1}) * tl.num_programs({entry.grid_dim})"
+         pid = entry.pid_cache.get(key, key)
+         if self.index_dtype != "tl.int32":
+             return f"{pid}.to({self.index_dtype})"
+diff --git a/torch/_inductor/runtime/triton_heuristics.py b/torch/_inductor/runtime/triton_heuristics.py
+index 75584a60c0f..6629e0fe5e7 100644
+--- a/torch/_inductor/runtime/triton_heuristics.py
++++ b/torch/_inductor/runtime/triton_heuristics.py
+@@ -1738,7 +1738,7 @@ def grid(*numels):
+         max_y_grid = get_max_y_grid()
+         if znumel is None:
+             div = ceildiv(y_grid, max_y_grid)
+-            y_grid = y_grid // div
++            y_grid = ceildiv(y_grid, div)
+             z_grid = div
+         else:
+             z_grid = get_grid_dim(znumel, meta.get("ZBLOCK", None))

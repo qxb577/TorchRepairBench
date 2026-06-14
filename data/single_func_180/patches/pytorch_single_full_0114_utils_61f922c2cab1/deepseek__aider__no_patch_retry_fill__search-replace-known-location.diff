@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 41131be1055..34c1e79914f 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1952,6 +1952,11 @@ def get_real_value(node, tracer):
+     else:
+         nn_module = None
+ 
++    if op == "placeholder":
++        raise TorchRuntimeError(
++            "Cannot get real value for placeholder node"
++        )
++
+     try:
+         real_value = run_node(tracer, node, args, kwargs, nn_module)
+         cache[node] = real_value

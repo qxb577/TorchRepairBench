@@ -1,0 +1,42 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 05e3b1b6440..6835713eb71 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -1922,22 +1922,24 @@ class FusedSchedulerNode(BaseSchedulerNode):
+             # Rewrite the Node2' StarDep to MemoryDep, because calculate score_fusion_memory
+             # of the template node and its epilogue requires the same type of dependencies
+             assert isinstance(node2.node, MultiOutput)
+-            assert len(node2.read_writes.writes) == 1
+-            assert isinstance(next(iter(node2.read_writes.writes)), StarDep)
+-            name = next(iter(node2.read_writes.writes)).name
+             template_nodes = [node for node in node1.get_nodes() if node.is_template()]
+             assert len(template_nodes) == 1
+             template_node = template_nodes[0]
+-            assert len(template_node.read_writes.writes) == 1
+-            write = next(iter(template_node.read_writes.writes))
+-            assert isinstance(write, MemoryDep)
+-            node2.read_writes.writes = OrderedSet(
+-                [
+-                    MemoryDep(
+-                        name, write.index, write.var_names, write.size, write.mode
+-                    ),
+-                ]
+-            )
++            # Build a name->MemoryDep mapping from the template's writes
++            template_writes_map = {
++                dep.name: dep for dep in template_node.read_writes.writes
++            }
++            new_writes = OrderedSet()
++            for star_dep in node2.read_writes.writes:
++                assert isinstance(star_dep, StarDep)
++                # Replace with corresponding MemoryDep if available, else keep StarDep
++                mem_dep = template_writes_map.get(star_dep.name)
++                if mem_dep is not None:
++                    new_writes.add(mem_dep)
++                else:
++                    new_writes.add(star_dep)
++            node2.read_writes.writes = new_writes
++
+         else:
+             assert isinstance(node2, (SchedulerNode, FusedSchedulerNode))
+         nodes = list(itertools.chain(node1.get_nodes(), node2.get_nodes()))

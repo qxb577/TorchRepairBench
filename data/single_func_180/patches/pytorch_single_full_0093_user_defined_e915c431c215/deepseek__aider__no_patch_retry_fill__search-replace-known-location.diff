@@ -1,0 +1,35 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 0a9d010b608..6b0f17cd4f0 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -1158,6 +1158,30 @@ class UserDefinedObjectVariable(UserDefinedVariable):
+     def python_type(self) -> type:
+         return self.value_type  # type: ignore[return-value]
+ 
++    def call_setattr(
++        self,
++        tx: "InstructionTranslator",
++        name: str,
++        val: "VariableTracker",
++    ) -> "VariableTracker":
++        if name == "__class__":
++            from torch._dynamo.exc import unimplemented
++            from torch._dynamo.variables.constant import ConstantVariable
++
++            if not isinstance(val, ConstantVariable) or not isinstance(val.value, type):
++                raise unimplemented("__class__ must be set to a constant type")
++            new_type = val.value
++            # Update the concrete object's class
++            self.value.__class__ = new_type
++            # Update the tracked value_type
++            self.value_type = new_type
++            # If we have a class source, update it
++            if self.cls_source is not None:
++                from torch._dynamo.source import TypeSource
++                self.cls_source = TypeSource(self.source)
++            return ConstantVariable(None)
++        return super().call_setattr(tx, name, val)
++
+     def as_python_constant(self) -> object:
+         if self.is_pytree_constant_class and self.source:
+             # NOTE pytree constants created in the torch.compile region will

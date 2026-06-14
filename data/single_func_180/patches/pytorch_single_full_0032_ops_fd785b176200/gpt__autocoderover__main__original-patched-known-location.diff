@@ -1,0 +1,15 @@
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index 35e7993454f..f36757d94a8 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -478,7 +478,10 @@ def jagged_torch_function(func, *args, **kwargs):
+         torch.ops.aten.sym_numel.default,
+         torch.ops.aten.sym_stride.default,
+         torch.ops.aten.sym_storage_offset.default,
++        torch.ops.aten._is_all_true.default,
++        torch.ops.aten._is_any_true.default,
+     ],
++
+     "self: jt_all",
+ )
+ def tensor_attr_supported_getter(func, *args, **kwargs):

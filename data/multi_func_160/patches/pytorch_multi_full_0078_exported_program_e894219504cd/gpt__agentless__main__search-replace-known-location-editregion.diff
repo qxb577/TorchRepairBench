@@ -1,0 +1,26 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 02c00002f5d..0d7dfbd6d7a 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -594,7 +594,7 @@ def _decompose_and_get_gm_with_new_signature_constants(
+ 
+     output_specs = [
+         OutputSpec(
+-            OutputKind.LOSS_OUTPUT if joint_loss_index is not None else spec.kind,
++            OutputKind.LOSS_OUTPUT if joint_loss_index == i else spec.kind,
+             update_arg(spec.arg, new_outputs[i]),
+             old_new_placeholder_map.get(spec.target, spec.target),
+         )
+diff --git a/torch/export/graph_signature.py b/torch/export/graph_signature.py
+index 4b99dc1b992..209442d75cf 100644
+--- a/torch/export/graph_signature.py
++++ b/torch/export/graph_signature.py
+@@ -287,7 +287,7 @@ class ExportGraphSignature:
+     def user_outputs(self) -> Collection[Union[int, float, bool, None, str]]:
+         user_outputs: List[Union[int, float, bool, None, str]] = []
+         for s in self.output_specs:
+-            if s.kind != OutputKind.USER_OUTPUT:
++            if s.kind not in (OutputKind.USER_OUTPUT, OutputKind.LOSS_OUTPUT):
+                 continue
+ 
+             if isinstance(s.arg, (TensorArgument, SymIntArgument, SymBoolArgument)):

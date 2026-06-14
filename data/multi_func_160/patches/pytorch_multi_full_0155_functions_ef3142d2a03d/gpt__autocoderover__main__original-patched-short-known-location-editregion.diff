@@ -1,0 +1,14 @@
+diff --git a/torch/_higher_order_ops/triton_kernel_wrap.py b/torch/_higher_order_ops/triton_kernel_wrap.py
+index 52c433290fe..85fa900f0e6 100644
+--- a/torch/_higher_order_ops/triton_kernel_wrap.py
++++ b/torch/_higher_order_ops/triton_kernel_wrap.py
+@@ -898,6 +898,9 @@ class TritonHOPifier:
+         for name in ("num_warps", "num_stages"):
+             if name in kwargs:
+                 # remove special kwargs from `kwargs`
++                if isinstance(val, SymNodeVariable):
++                    val = val.evaluate()
++
+                 val = kwargs.pop(name)
+                 special_kwargs[name] = self.get_value(val)
+ 

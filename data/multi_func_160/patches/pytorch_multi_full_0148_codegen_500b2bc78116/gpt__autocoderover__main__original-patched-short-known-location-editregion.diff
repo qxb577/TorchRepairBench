@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index c782a19d7f1..10809686316 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -1149,8 +1149,9 @@ class SymNodeVariable(VariableTracker):
+     def as_tensor(self, tx):
+         if self._tensor_var is None:
+             self._tensor_var = VariableTracker.build(
+-                tx, torch.scalar_tensor
++                tx, lambda x: torch.scalar_tensor(x, dtype=torch.float64)
+             ).call_function(tx, [self], {})
++
+         return self._tensor_var
+ 
+     def evaluate_expr(self, output_graph=None):

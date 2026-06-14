@@ -1,0 +1,13 @@
+diff --git a/torch/_tensor_str.py b/torch/_tensor_str.py
+index 921e97be233..c40ed996c39 100644
+--- a/torch/_tensor_str.py
++++ b/torch/_tensor_str.py
+@@ -187,7 +187,7 @@ class _Formatter:
+                 ):
+                     self.sci_mode = True
+                     for value in nonzero_finite_vals:
+-                        value_str = f"{{:.{PRINT_OPTS.precision}e}}".format(value)
++                        value_str = f"{value:.{PRINT_OPTS.precision}e}"
+                         self.max_width = max(self.max_width, len(value_str))
+                 else:
+                     for value in nonzero_finite_vals:

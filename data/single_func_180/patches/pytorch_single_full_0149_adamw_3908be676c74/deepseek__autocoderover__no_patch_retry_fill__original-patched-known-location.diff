@@ -1,0 +1,17 @@
+diff --git a/torch/optim/adamw.py b/torch/optim/adamw.py
+index 5588a2bc51a..2a34089cc83 100644
+--- a/torch/optim/adamw.py
++++ b/torch/optim/adamw.py
+@@ -49,6 +49,12 @@ class AdamW(Adam):
+             decoupled_weight_decay=True,
+         )
+ 
++    def load_state_dict(self, state_dict):
++        super().load_state_dict(state_dict)
++        for group in self.param_groups:
++            group['decoupled_weight_decay'] = True
++
++
+ 
+ AdamW.__doc__ = (
+     r"""Implements AdamW algorithm, where weight decay does not accumulate in the momentum nor variance.

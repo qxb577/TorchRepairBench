@@ -1,0 +1,57 @@
+diff --git a/torch/_export/serde/serialize.py b/torch/_export/serde/serialize.py
+index 09c50438620..a17a75fcda9 100644
+--- a/torch/_export/serde/serialize.py
++++ b/torch/_export/serde/serialize.py
+@@ -1705,9 +1705,9 @@ class GraphModuleDeserializer(metaclass=Final):
+             #
+             # HOPs don't have schema yet, just check the output lengths and as_tensor attribute
+             name = (
+-                serialized_node.outputs[0].as_tensor.name
++                serialized_node.outputs[0].value.as_name
+                 if len(serialized_node.outputs) == 1
+-                and hasattr(serialized_node.outputs[0], "as_tensor")
++                and hasattr(serialized_node.outputs[0], "value")
+                 else None
+             )
+             fx_node = self.graph.create_node(
+diff --git a/torch/distributed/pipelining/_unflatten.py b/torch/distributed/pipelining/_unflatten.py
+index 7c68eecb3bb..f0636c8e33a 100644
+--- a/torch/distributed/pipelining/_unflatten.py
++++ b/torch/distributed/pipelining/_unflatten.py
+@@ -12,7 +12,7 @@ def _outline_submodules(orig_graph: torch.fx.Graph):
+     new_module = torch.fx.GraphModule(torch.nn.Module(), torch.fx.Graph())
+     seen_nodes: Dict[str, torch.fx.Node] = {}
+     seen_modules: Dict[int, List[_SubmoduleEntry]] = defaultdict(list)
+-    _ModuleFrame(
++    frame = _ModuleFrame(
+         orig_graph,
+         tuple(orig_graph.nodes),
+         seen_nodes,
+@@ -22,7 +22,8 @@ def _outline_submodules(orig_graph: torch.fx.Graph):
+         "",
+         {},
+         module=new_module,
+-    ).run_outer()
++    )
++    frame.run_outer()
+     new_module.graph.lint()
+     new_module.recompile()
+     return new_module
+diff --git a/torch/export/unflatten.py b/torch/export/unflatten.py
+index 76e804716b4..146fff219b4 100644
+--- a/torch/export/unflatten.py
++++ b/torch/export/unflatten.py
+@@ -237,11 +237,11 @@ class UnflattenedModule(torch.nn.Module):
+         self.ivals = _IVals()
+         # record any intermediate value x that is used, with the modules that used it,
+         # and generate instructions to read the corresponding attribute
+-        seen_modules = _outline_submodules(export_graph, self)
++        seen_modules = _outline_submodules(export_graph)
+         # for each read intermediate value x, find the module that created it,
+         # and generate instructions to update the corresponding attribute;
+         # finally, initialize all these attributes
+-        self.ivals.create(seen_modules.values())
++        self.ivals.create(seen_modules)
+ 
+         self.range_constraints = export_module.range_constraints
+         self.equality_constraints: List = []

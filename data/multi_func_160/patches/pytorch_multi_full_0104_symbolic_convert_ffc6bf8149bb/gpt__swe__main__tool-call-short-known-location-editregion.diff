@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 2c2e824664a..91b0e140788 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1938,7 +1938,8 @@ class InstructionTranslatorBase(
+ 
+         value = self.pop()
+         if isinstance(value, SymNodeVariable):
+-            value = ConstantVariable.create(str(value.sym_num))
++            value = value.call_method(self, "__str__", [], {})
++
+         if (flags & 0x03) == 0x01:
+             value = BuiltinVariable(str).call_function(self, [value], {})  # type: ignore[arg-type]
+         elif (flags & 0x03) == 0x02:

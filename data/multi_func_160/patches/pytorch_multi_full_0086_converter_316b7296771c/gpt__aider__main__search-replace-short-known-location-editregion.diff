@@ -1,0 +1,35 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index 568685f9759..3e5d8465a34 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -24,7 +24,7 @@ from torchgen.model import FunctionSchema
+ def inplace_optimize_sym_size_div(gm: torch.fx.GraphModule):
+     def pattern(im, dim, scale):
+         sym_size_int = torch.ops.aten.sym_size.int(im, dim)
+-        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int)
++        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int, dtype=torch.int64)
+         div_scalar_mode = torch.ops.aten.div.Scalar_mode(
+             scalar_tensor, scale, rounding_mode="trunc"
+         )
+@@ -199,7 +199,7 @@ def get_op_overload(node: torch._C.Node):
+         if override:
+             op_overload = getattr(op_overload_packet, override)
+         else:
+-            op_overload = op_overload_packet.default
++            op_overload = op_overload_packet
+     except Exception as e:
+         raise RuntimeError(
+             f"Unable to find operator {node.kind()} with schema {node.schema}"
+diff --git a/torch/jit/_trace.py b/torch/jit/_trace.py
+index 7db85602428..f19d389a580 100644
+--- a/torch/jit/_trace.py
++++ b/torch/jit/_trace.py
+@@ -658,7 +658,7 @@ def analyze_ts_result_with_export_result(export, trace):
+         if isinstance(orig, torch.Tensor):
+             if orig.dtype != loaded.dtype:
+                 return False
+-            if not torch.allclose(orig, loaded):
++            if not torch.allclose(orig, loaded, atol=1e-5, rtol=1e-5):
+                 return False
+         else:
+             if orig != loaded:

@@ -1,0 +1,23 @@
+diff --git a/torch/_dynamo/aot_compile.py b/torch/_dynamo/aot_compile.py
+index 319a5ecd2bd..1196a30ff89 100644
+--- a/torch/_dynamo/aot_compile.py
++++ b/torch/_dynamo/aot_compile.py
+@@ -44,6 +44,8 @@ class CompileArtifacts:
+     backend_id: str
+     compiled_fn: SerializableCallable
+     original_code: types.CodeType
++    closure_vars: dict[str, Any]
++
+ 
+     def compiled_function(self) -> Any:
+         import_sources = {
+@@ -55,7 +57,9 @@ class CompileArtifacts:
+ 
+         def optimized_call(*args: Any, **kwargs: Any) -> Any:
+             f_locals = bind_locals(self.signature, *args, **kwargs)
++            f_locals.update(self.closure_vars)
+             assert self.guard_manager is not None
++
+             if not self.guard_manager.check(f_locals):
+                 reason = str(self.guard_manager.check_verbose(f_locals))
+                 raise RuntimeError(f"GuardManager check failed, reason: {reason}")

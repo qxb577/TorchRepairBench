@@ -1,0 +1,14 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 02c00002f5d..7d22d145a7b 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -594,7 +594,8 @@ def _decompose_and_get_gm_with_new_signature_constants(
+ 
+     output_specs = [
+         OutputSpec(
+-            OutputKind.LOSS_OUTPUT if joint_loss_index is not None else spec.kind,
++            OutputKind.LOSS_OUTPUT if joint_loss_index == i else spec.kind,
++
+             update_arg(spec.arg, new_outputs[i]),
+             old_new_placeholder_map.get(spec.target, spec.target),
+         )

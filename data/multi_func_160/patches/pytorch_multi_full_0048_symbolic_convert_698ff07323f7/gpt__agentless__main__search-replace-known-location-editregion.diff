@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index de32baa6d1b..d1783373b6a 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -314,7 +314,12 @@ class UserFunctionVariable(BaseUserFunctionVariable):
+         return result, closure_cells
+ 
+     def export_freevars(self, parent, child):
+-        pass
++        code = self.get_code()
++        for var in code.co_freevars:
++            if var in child.symbolic_locals:
++                # Avoid name collision by checking if the variable already exists
++                if var not in parent.symbolic_locals:
++                    parent.symbolic_locals[var] = child.symbolic_locals[var]
+ 
+     def var_getattr(self, tx: "InstructionTranslator", name: str):
+         source = self.source and AttrSource(self.source, name)

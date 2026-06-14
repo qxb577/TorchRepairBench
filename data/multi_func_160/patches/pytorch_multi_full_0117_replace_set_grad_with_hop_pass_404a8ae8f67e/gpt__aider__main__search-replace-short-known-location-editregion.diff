@@ -1,0 +1,26 @@
+diff --git a/torch/_export/passes/replace_set_grad_with_hop_pass.py b/torch/_export/passes/replace_set_grad_with_hop_pass.py
+index 5e47ff57428..8e9872f2cfa 100644
+--- a/torch/_export/passes/replace_set_grad_with_hop_pass.py
++++ b/torch/_export/passes/replace_set_grad_with_hop_pass.py
+@@ -142,7 +142,7 @@ def _sequential_split_and_maybe_inline_subgraphs(
+     """
+     need_replacing = any(_is_set_grad_enabled_node(node) for node in gm.graph.nodes)
+     if not need_replacing:
+-        return gm, graph_signature
++        return new_gm, new_signature
+ 
+     # sequential_split returns a new graph module that could have different output
+     # args names. We need to fix the graph signature.
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2d59a111db9..9ef598b9a40 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -780,7 +780,7 @@ def _export_to_aten_ir(
+                 node.meta.pop("stack_trace", None)
+ 
+     constants = rewrite_script_object_meta(gm)
+-    constants.update(lift_constants_pass(gm, export_graph_signature, constant_attrs))
++    constants.update(lift_constants_pass(gm, export_graph_signature))
+ 
+     # Prettify names for placeholder nodes.
+     placeholder_naming_pass(

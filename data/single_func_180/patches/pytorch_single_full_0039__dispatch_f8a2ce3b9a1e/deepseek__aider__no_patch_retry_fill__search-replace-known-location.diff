@@ -1,0 +1,15 @@
+diff --git a/torch/distributed/tensor/_dispatch.py b/torch/distributed/tensor/_dispatch.py
+index 83d0550e7f7..4f03db582c6 100644
+--- a/torch/distributed/tensor/_dispatch.py
++++ b/torch/distributed/tensor/_dispatch.py
+@@ -206,6 +206,10 @@ class OpDispatcher:
+         if participating:
+             # computation that happens in the current rank of the mesh, normal case
+             if output_sharding.needs_redistribute:
++                if op_info.schema.inplace:
++                    raise RuntimeError(
++                        "in-place operations that require placement changes are not supported"
++                    )
+                 # If sharding propagation decision needs redistribute, perform redistribute
+                 # on args first, which could potentially modify args (i.e. allgather certain arg)
+                 assert output_sharding.redistribute_schema is not None

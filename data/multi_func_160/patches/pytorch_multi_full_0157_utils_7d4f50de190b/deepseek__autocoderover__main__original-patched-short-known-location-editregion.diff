@@ -1,0 +1,17 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index bf1224e2b66..93476fb1464 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -348,10 +348,11 @@ class DefaultDictVariable(ConstDictVariable):
+     @staticmethod
+     def is_supported_arg(arg):
+         if isinstance(arg, variables.BuiltinVariable):
+-            return arg.fn in [list, tuple, dict]
++            return arg.fn in [list, tuple, dict, set]
+         else:
+             return isinstance(arg, variables.functions.BaseUserFunctionVariable)
+ 
++
+     def call_method(
+         self,
+         tx,

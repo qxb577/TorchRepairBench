@@ -1,0 +1,22 @@
+diff --git a/torch/utils/_config_module.py b/torch/utils/_config_module.py
+index 41569465d25..5c345d00b84 100644
+--- a/torch/utils/_config_module.py
++++ b/torch/utils/_config_module.py
+@@ -61,7 +61,7 @@ class Config:
+         justknob: Optional[str] = None,
+         env_name_default: Optional[str] = None,
+         env_name_force: Optional[str] = None,
+-    ):
++    ) -> None:
+         # python 3.9 does not support kw_only on the dataclass :(.
+         self.default = default
+         self.justknob = justknob
+@@ -106,7 +106,7 @@ def install_config_module(module: ModuleType) -> None:
+                 or (hasattr(value, "__module__") and value.__module__ == "typing")
+                 # Handle from torch.utils._config_module import Config
+                 or (isinstance(value, type) and issubclass(value, Config))
+-            ):
++            ) -> None:
+                 continue
+ 
+             name = f"{prefix}{key}"

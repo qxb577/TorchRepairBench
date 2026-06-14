@@ -1,0 +1,39 @@
+diff --git a/torch/_functorch/_aot_autograd/graph_compile.py b/torch/_functorch/_aot_autograd/graph_compile.py
+index dc8166d12f6..dd59d7baa0d 100644
+--- a/torch/_functorch/_aot_autograd/graph_compile.py
++++ b/torch/_functorch/_aot_autograd/graph_compile.py
+@@ -1900,7 +1900,7 @@ def _aot_stage2b_bw_compile(
+                     # decide a stride of (802816, 1, 7168, 64) for this
+                     # tensor which is wrong.
+                     # pyrefly: ignore  # bad-argument-type
+-                    placeholder_list[i] = ph_arg.as_strided(ph_arg.size(), real_stride)
++                    placeholder_list[i] = ph_arg.as_strided(ph_arg.size(), [0 if s == 0 else s for s in real_stride])
+ 
+             compiled_bw_func = None
+             if (
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index 45d2c3134e4..c67ad103aa9 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -1752,7 +1752,7 @@ class GraphLowering(torch.fx.Interpreter):
+                         ):
+                             result = ir.ExternKernel.require_stride_order(
+                                 result,
+-                                ir.get_stride_order(strides),
++                                ir.get_stride_order([0 if s == 0 else s for s in strides]),
+                                 allow_padding=allow_padding,
+                             )
+                         else:
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9e9fbb77c3d..2a1c83a70b1 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3011,7 +3011,7 @@ class SqueezeView(BaseView):
+                 if dim is None:
+                     if size != 1:
+                         new_size.append(size)
+-                        new_stride.append(stride)
++                        new_stride.append(0 if stride == 0 else stride)
+                 else:
+                     if i != dim:
+                         new_size.append(size)

@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 84bfdefa40a..ccd5da34b49 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -3973,9 +3973,10 @@ class CppScheduling(BaseScheduling):
+                 extra_indexing_constraints = get_indexing_ranges_exprs(ref_node)
+ 
+                 node_to_recomp.recompute_size_and_body(
+-                    extra_indexing_constraints=extra_indexing_constraints
++                    extra_indexing_constraints=extra_indexing_constraints[1]
+                 )
+ 
++
+                 _, (vars1, _) = node1.group
+                 _, (vars2, _) = node2.group
+                 assert vars1 == vars2, (vars1, vars2)

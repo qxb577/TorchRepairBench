@@ -1,0 +1,9 @@
+model,agent,bug_units,patch_generated_bugs,no_patch_bugs,main_patch_bugs,retry_fill_patch_bugs,patch_generation_rate
+deepseek,agentless,180,125,55,78,47,0.6944
+deepseek,aider,180,127,53,83,44,0.7056
+deepseek,autocoderover,180,127,53,87,40,0.7056
+deepseek,swe,180,114,66,62,52,0.6333
+gpt,agentless,180,159,21,159,0,0.8833
+gpt,aider,180,159,21,159,0,0.8833
+gpt,autocoderover,175,155,20,151,4,0.8857
+gpt,swe,180,151,29,143,8,0.8389

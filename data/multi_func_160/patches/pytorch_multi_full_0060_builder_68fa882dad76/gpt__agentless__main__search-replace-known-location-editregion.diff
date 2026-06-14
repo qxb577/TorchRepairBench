@@ -1,0 +1,28 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 2fbf909b509..5290bc46aa4 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -1521,7 +1521,7 @@ class VariableBuilder:
+             return self.tx.output.side_effects.track_object_existing(value, result)
+         elif issubclass(type(value), MutableMapping):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+-            return MutableMappingVariable(value, source=self.source)
++            return MutableMappingVariable(value, source=self.source, mutation_type=ValueMutationExisting())
+         elif is_frozen_dataclass(value):
+             self.install_guards(GuardBuilder.TYPE_MATCH)
+             result = FrozenDataClassVariable.create(self.tx, value, source=self.source)
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 1a78724ec06..85d901f6ba9 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2157,9 +2157,7 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+     def __init__(self, value, **kwargs):
+         super().__init__(value, **kwargs)
+         self.generic_dict_vt = variables.ConstDictVariable({})
+-        self.mutation_type = (
+-            AttributeMutationExisting() if self.source else AttributeMutationNew()
+-        )
++        self.mutation_type = kwargs.get('mutation_type', AttributeMutationNew())
+ 
+     def var_getattr(self, tx: "InstructionTranslator", name: str) -> "VariableTracker":
+         # A common pattern in the init code of MutableMapping objects is to

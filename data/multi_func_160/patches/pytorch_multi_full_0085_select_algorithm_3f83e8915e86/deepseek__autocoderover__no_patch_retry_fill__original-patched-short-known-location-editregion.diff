@@ -1,0 +1,104 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index 24de4ae373a..81b9ecd7242 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -3617,28 +3617,33 @@ class AlgorithmSelectorCache(PersistentCache):
+         # So we need call as_strided in the end to 'view' the tensor with the correct
+         # sizes/strides
+         return AlgorithmSelectorCache.generate_example_value(
+-            V.graph.sizevars.size_hints(
+-                node.get_size(),
+-                fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
++            tuple(
++                V.graph.sizevars.size_hint(
++                    sz,
++                    fallback=config.unbacked_symint_fallback,
++                    hint_override=hint_override,
++                )
++                for sz in node.get_size()
+             ),
+-            V.graph.sizevars.size_hints(
+-                node.get_stride(),
+-                fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
++            tuple(
++                V.graph.sizevars.size_hint(
++                    st,
++                    fallback=config.unbacked_symint_fallback,
++                    hint_override=hint_override,
++                )
++                for st in node.get_stride()
+             ),
+             node.get_device(),
+             node.get_dtype(),
+-            # pyrefly: ignore  # missing-attribute
+             node.layout.offset,
+-            V.graph.sizevars.size_hints(
+-                # pyrefly: ignore  # bad-argument-type
++            V.graph.sizevars.size_hint(
+                 V.graph.get_allocation_size(node),
+                 fallback=config.unbacked_symint_fallback,
+                 hint_override=hint_override,
+             ),
+         )
+ 
++
+     @staticmethod
+     def generate_example_value(
+         size, stride, device, dtype, extra_size, allocation_size=None
+@@ -3673,13 +3678,19 @@ class AlgorithmSelectorCache(PersistentCache):
+         return (
+             node.get_device().type,
+             str(node.get_dtype()),
+-            *sizevars.size_hints(
+-                node.get_size(),
+-                fallback=config.unbacked_symint_fallback,
++            *(
++                sizevars.size_hint(
++                    sz,
++                    fallback=config.unbacked_symint_fallback,
++                )
++                for sz in node.get_size()
+             ),
+-            *sizevars.size_hints(
+-                node.get_stride(),
+-                fallback=config.unbacked_symint_fallback,
++            *(
++                sizevars.size_hint(
++                    st,
++                    fallback=config.unbacked_symint_fallback,
++                )
++                for st in node.get_stride()
+             ),
+             sizevars.size_hint(
+                 node.get_layout().offset,
+@@ -3687,6 +3698,7 @@ class AlgorithmSelectorCache(PersistentCache):
+             ),
+         )
+ 
++
+     def add_feedback_saver(self, fn: FeedbackFunction):
+         self.feedback_saver_fns.append(fn)
+ 
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 44689734d80..d75d31ffc3f 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -916,7 +916,7 @@ class SizeVarAllocator:
+         if has_free_unbacked_symbols(expr):
+             # Make sure to substitute with the factored version
+             # e.g. 10*(s0 + u0) instead of 10*s0 + 10*u0
+-            expr = self._sub_unbacked_exprs(sympy.factor(expr))
++            expr = sympy.factor(expr)
+ 
+         # For multiple expressions that depend on an unbacked symint,
+         # we want to compute them consistently for a size hint we have chosen.
+@@ -930,6 +930,7 @@ class SizeVarAllocator:
+         }
+         return expr.subs(size_dict)
+ 
++
+     def offset_var(self, index: Expr, vars: Sequence[sympy.Symbol]) -> Expr:
+         """Extract offset part of an indexing expression"""
+         index = self.simplify(index)

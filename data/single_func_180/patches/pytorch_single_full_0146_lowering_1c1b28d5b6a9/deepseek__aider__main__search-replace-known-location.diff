@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index f691e2b46db..4912bdde92d 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -3031,7 +3031,7 @@ def slice_scatter(x, src, dim=0, start=None, end=None, step=1):
+             # selecting every element is the same as just src.clone()
+             return src_loader(idx)
+ 
+-        idx_dim = ops.index_expr(idx[dim], torch.int64)
++        idx_dim = ops.index_expr(idx[dim], torch.int32)
+         src_idx = list(idx)
+         src_idx[dim] = FloorDiv(idx[dim] - start, step)
+ 

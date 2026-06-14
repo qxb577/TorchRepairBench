@@ -1,0 +1,14 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 8435b80f34c..a875fc1e1e4 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -7780,6 +7780,9 @@ def meta__jagged_to_padded_dense_forward(
+ 
+ 
+ def _create_unary_float_meta_func(func):
++    if func.__name__ == "_native_multi_head_attention":
++        return register_meta(func)(lambda *args, **kwargs: NotImplemented)
++
+     @register_meta(func)
+     @out_wrapper()
+     def _f(x):

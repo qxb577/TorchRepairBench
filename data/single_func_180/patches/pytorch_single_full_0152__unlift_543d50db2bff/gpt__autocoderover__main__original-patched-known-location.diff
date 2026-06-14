@@ -1,0 +1,14 @@
+diff --git a/torch/export/_unlift.py b/torch/export/_unlift.py
+index ae4c09b7c8c..d45cae061f0 100644
+--- a/torch/export/_unlift.py
++++ b/torch/export/_unlift.py
+@@ -56,7 +56,8 @@ def eq_spec(self: pytree.TreeSpec, other: pytree.TreeSpec) -> bool:
+         if len(a.children_specs) != len(b.children_specs):
+             return False
+         return all(
+-            _match_normalized_structure(a, b)
++            _match_normalized_structure(a_child, b_child)
++
+             for a, b in zip(a.children_specs, b.children_specs)
+         )
+ 

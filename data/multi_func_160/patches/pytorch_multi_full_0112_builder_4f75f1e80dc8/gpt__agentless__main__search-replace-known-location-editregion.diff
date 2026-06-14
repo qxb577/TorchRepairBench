@@ -1,0 +1,26 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index 3dd41a1d91f..5a08f60e5ae 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -576,7 +576,7 @@ class VariableBuilder:
+         ):
+             return self.wrap_tensor(value)
+         elif is_namedtuple(value):
+-            return self.wrap_listlike(value)
++            return self.wrap_listlike(value, source=self.source)
+ 
+         elif value is torch.utils._pytree.SUPPORTED_NODES:
+             # For SUPPORTED_NODES, we guard on the dictionary version (PEP509)
+diff --git a/torch/_dynamo/variables/lists.py b/torch/_dynamo/variables/lists.py
+index af8382310d9..24478a410f2 100644
+--- a/torch/_dynamo/variables/lists.py
++++ b/torch/_dynamo/variables/lists.py
+@@ -14,7 +14,7 @@ from torch._guards import Source
+ from .. import polyfills, variables
+ from ..bytecode_transformation import create_call_function, create_instruction
+ from ..exc import raise_observed_exception, unimplemented
+-from ..source import AttrSource
++from ..source import AttrSource, ItemSource
+ from ..utils import (
+     get_fake_value,
+     guard_if_dyn,

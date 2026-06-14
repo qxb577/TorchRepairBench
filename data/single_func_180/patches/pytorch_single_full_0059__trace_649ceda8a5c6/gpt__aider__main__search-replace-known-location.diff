@@ -1,0 +1,13 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index fc3f8ed063c..f718534cf88 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -1265,6 +1265,8 @@ def _process_export_inputs(
+             f"Expecting `args` to be a tuple of example positional inputs, got {type(args)}",
+         )
+     kwargs = kwargs if kwargs is not None else {}
++    if isinstance(args, tuple) and len(args) == 1 and isinstance(args[0], tuple):
++        args = args[0]
+     _, original_in_spec = pytree.tree_flatten((args, kwargs))
+ 
+     verify_additional_inputs: Callable[[ExportedProgram], None]

@@ -1,0 +1,25 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 0bb1abfe6f7..aa39f7f6f41 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -914,17 +914,16 @@ def infer_size(a, b):
+         # were not the case, we'd need to write this using torch.sym_or() or
+         # something like that).
+         torch._check(
+-            guard_size_oblivious(sizeA == 1)
+-            or guard_size_oblivious(sizeB == 1)
+-            or sizeA == sizeB,
++            (sizeA == 1) | (sizeB == 1) | (sizeA == sizeB),
+             lambda: f"The size of tensor a ({sizeA}) "
+             f"must match the size of tensor b ({sizeB}) "
+             f"at non-singleton dimension {i})",
+         )
+-        expandedSizes[i] = sizeB if guard_size_oblivious(sizeA == 1) else sizeA
++        expandedSizes[i] = torch.sym_max(sizeA, sizeB)
+     return tuple(expandedSizes)
+ 
+ 
++
+ def make_fast_binary_impl(
+     slow_ref, type_promotion_kind=ELEMENTWISE_TYPE_PROMOTION_KIND.DEFAULT
+ ):

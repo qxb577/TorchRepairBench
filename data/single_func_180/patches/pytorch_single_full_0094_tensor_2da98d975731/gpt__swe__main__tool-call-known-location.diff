@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index 3da23d7731e..91b79f71323 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -69,7 +69,10 @@ supported_tensor_comparison_ops = {
+     "<=": operator.le,
+     "==": operator.eq,
+     "!=": operator.ne,
++    "is": operator.is_,
++    "is not": operator.is_not,
+ }
++
+ # Ops that allow tensor <op> None
+ supported_const_comparison_ops = {
+     "is": operator.is_,

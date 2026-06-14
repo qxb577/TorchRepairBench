@@ -1,0 +1,20 @@
+diff --git a/torch/_dynamo/eval_frame.py b/torch/_dynamo/eval_frame.py
+index 7c6a244e8ae..77c33cd1149 100644
+--- a/torch/_dynamo/eval_frame.py
++++ b/torch/_dynamo/eval_frame.py
+@@ -156,6 +156,15 @@ class OptimizedModule(torch.nn.Module):
+             return self._modules["_orig_mod"]
+         return getattr(self._orig_mod, name)
+ 
++    def __setattr__(self, name, value):
++        if name in ('_orig_mod', 'dynamo_ctx', '_torchdynamo_orig_callable', 'get_compiler_config'):
++            object.__setattr__(self, name, value)
++        elif '_orig_mod' in self.__dict__:
++            setattr(self._orig_mod, name, value)
++        else:
++            object.__setattr__(self, name, value)
++
++
+     def _call_lazy_check(self, *args, **kwargs):
+         if hasattr(self._orig_mod, "_initialize_hook"):
+             # In the case of a lazy module, we want to run

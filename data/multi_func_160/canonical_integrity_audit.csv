@@ -1,0 +1,12 @@
+metric,value
+dataset_commits,160
+canonical_rows,1280
+expected_rows,1280
+canonical_commits,160
+duplicate_commit_model_agent,0
+missing_or_nonunique_units,0
+patch_generated_rows,977
+existing_patch_rows,977
+missing_file_patch_rows,0
+duplicate_selected_patch_paths,0
+commits_all_8_no_patch,0

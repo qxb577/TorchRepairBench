@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 1174862b3fe..c1954765cd2 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -2145,9 +2145,11 @@ def tensor_always_has_static_shape(
+     if (
+         tensor_source.guard_source().is_specialized_nn_module()
+         or tensor_source.guard_source().is_unspecialized_builtin_nn_module()
++        or tensor_source.guard_source().is_local()
+     ) and config.force_nn_module_property_static_shapes:
+         return True, TensorStaticReason.NN_MODULE_PROPERTY
+ 
++
+     if (
+         type(tensor) is torch.nn.Parameter
+         or is_from_unspecialized_param_buffer_source(tensor_source)

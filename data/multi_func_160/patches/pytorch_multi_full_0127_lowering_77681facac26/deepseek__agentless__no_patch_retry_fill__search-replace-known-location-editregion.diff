@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 37279cd1030..94ec5a7f675 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1332,6 +1332,8 @@ def split(x, sizes, dim=0, clamp=True):
+         sizes = V.graph.sizevars.evaluate_static_shape(sizes)
+     if isinstance(sizes, (int, sympy.Integer)):
+         sizes = [sizes] * ((x_size + sizes - 1) // sizes)
++    else:
++        sizes = [V.graph.sizevars.evaluate_static_shape(s) if isinstance(s, sympy.Expr) else s for s in sizes]
+     result = []
+     start = 0
+     for size in sizes:

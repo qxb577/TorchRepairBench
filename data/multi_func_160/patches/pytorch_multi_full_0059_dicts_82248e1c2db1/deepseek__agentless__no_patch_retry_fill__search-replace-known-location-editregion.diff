@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index c7303513d6b..47f812b0a40 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -709,7 +709,7 @@ class ConstDictVariable(VariableTracker):
+                 msg = VariableTracker.build(tx, "popitem(): dictionary is empty")
+                 raise_observed_exception(KeyError, tx, args=[msg])
+ 
+-            if self.user_cls is collections.OrderedDict and (
++            if issubclass(self.user_cls, collections.OrderedDict) and (
+                 len(args) == 1 or "last" in kwargs
+             ):
+                 if len(args) == 1 and args[0].is_python_constant():

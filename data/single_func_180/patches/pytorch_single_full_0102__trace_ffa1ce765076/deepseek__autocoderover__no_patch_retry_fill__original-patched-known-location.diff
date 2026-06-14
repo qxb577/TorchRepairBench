@@ -1,0 +1,47 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 2522e6f8a90..83d6c624496 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -381,12 +381,12 @@ def _get_param_buffer_mapping(
+     of a traced module to what the original module contains.
+     """
+ 
+-    param_lookup: dict[int, str] = {}
+-    buffer_lookup: dict[int, str] = {}
++    param_lookup: dict[int, list[str]] = {}
++    buffer_lookup: dict[int, list[str]] = {}
+     for name, param in original_module.named_parameters(remove_duplicate=False):
+-        param_lookup[id(param)] = name
++        param_lookup.setdefault(id(param), []).append(name)
+     for name, buffer in original_module.named_buffers(remove_duplicate=False):
+-        buffer_lookup[id(buffer)] = name
++        buffer_lookup.setdefault(id(buffer), []).append(name)
+ 
+     param_buffer_table: dict[str, str] = {}
+     for dynamo_name, dynamo_param in traced_module.named_parameters(
+@@ -394,18 +394,23 @@ def _get_param_buffer_mapping(
+     ):
+         assert dynamo_name not in param_buffer_table
+         if id(dynamo_param) in param_lookup:
+-            param_buffer_table[dynamo_name] = param_lookup[id(dynamo_param)]
++            param_buffer_table[dynamo_name] = param_lookup[id(dynamo_param)].pop(0)
++            if not param_lookup[id(dynamo_param)]:
++                del param_lookup[id(dynamo_param)]
+ 
+     for dynamo_name, dynamo_buffer in traced_module.named_buffers(
+         remove_duplicate=False
+     ):
+         assert dynamo_name not in param_buffer_table
+         if id(dynamo_buffer) in buffer_lookup:
+-            param_buffer_table[dynamo_name] = buffer_lookup[id(dynamo_buffer)]
++            param_buffer_table[dynamo_name] = buffer_lookup[id(dynamo_buffer)].pop(0)
++            if not buffer_lookup[id(dynamo_buffer)]:
++                del buffer_lookup[id(dynamo_buffer)]
+ 
+     return param_buffer_table
+ 
+ 
++
+ def _preserve_requires_grad_pass(
+     gm: torch.fx.GraphModule,
+     sig: ExportGraphSignature,

@@ -1,0 +1,50 @@
+diff --git a/torch/_custom_op/impl.py b/torch/_custom_op/impl.py
+index a826b0246a4..d2eff7c7ca5 100644
+--- a/torch/_custom_op/impl.py
++++ b/torch/_custom_op/impl.py
+@@ -969,6 +969,7 @@ def _custom_op_with_schema(qualname, schema):
+     ophandle = find_ophandle_or_throw(ns, function_schema.name)
+     result = CustomOp(lib, ns, function_schema, name, ophandle, _private_access=True)
+     result._register_autograd_kernel_indirection()
++    torch._C._dispatch_add_tag(ophandle, torch.Tag.needs_fixed_stride_order)
+ 
+     torch._C._dispatch_set_report_error_callback(
+         ophandle, functools.partial(report_error_callback, weakref.proxy(result))
+diff --git a/torch/_inductor/graph.py b/torch/_inductor/graph.py
+index a36c2e32e3f..bf4d0b6506d 100644
+--- a/torch/_inductor/graph.py
++++ b/torch/_inductor/graph.py
+@@ -664,6 +664,21 @@ class GraphLowering(torch.fx.Interpreter):
+         return tensor
+ 
+     def call_function(self, target, args, kwargs):
++        def get_custom_op_layout_constraints(target, args, kwargs):
++            # Custom ops that have needs_fixed_stride_order tag should not be
++            # allowed to change the strides of their outputs. We infer the expected
++            # strides from the first tensor arg.
++            if any(isinstance(arg, (list, tuple)) for arg in args):
++                return None
++            for arg in args:
++                if isinstance(arg, TensorBox):
++                    return FixedLayout(
++                        arg.get_device(),
++                        arg.get_dtype(),
++                        arg.get_size(),
++                        arg.get_stride(),
++                    )
++            return None
+         if target is operator.getitem and isinstance(args[0], (list, tuple, dict)):
+             return super().call_function(target, args, kwargs)
+ 
+@@ -675,8 +690,9 @@ class GraphLowering(torch.fx.Interpreter):
+             assert isinstance(
+                 target, torch._ops.OpOverload
+             ), f"{target} is not an OpOverload"
+-            base_name = target.name().split(".")[0]
+-            if base_name in FALLBACK_ALLOW_LIST:
++            # Check if custom op requires fixed stride order
++            if torch.Tag.needs_fixed_stride_order in getattr(target, "tags", []):
++                layout = get_custom_op_layout_constraints(target,
+                 make_fallback(target)
+             elif config.implicit_fallbacks:
+                 error = (

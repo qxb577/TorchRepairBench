@@ -1,0 +1,37 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 878fa06e292..59b4aa390bf 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -853,11 +853,14 @@ class CppOverrides(OpOverrides):
+         code.writeline(f"int32_t {exponent};")
+         code.writeline(f"auto {mantissa} = std::frexp({x}, &{exponent});")
+         V.kernel.compute.splice(code)
++        mantissa.dtype = x.dtype
++        exponent.dtype = torch.int32
+         cse_vars = (mantissa, exponent)
+         for cache_key, cse_var in zip(cache_keys, cse_vars):
+             V.kernel.cse.put(cache_key, cse_var)
+         return mantissa, exponent
+ 
++
+     @staticmethod
+     def hypot(x, y):
+         return f"std::hypot({x}, {y})"
+@@ -1685,7 +1688,9 @@ class CppVecOverrides(CppOverrides):
+         exponent = V.kernel.cse.newvar()
+         mantissa = V.kernel.cse.newvar()
+         exponent.update_on_args("frexp", (x,), kwargs={})
++        exponent.dtype = torch.int32
+         mantissa.update_on_args("frexp", (x,), kwargs={})
++        mantissa.dtype = x.dtype
+         n_vec = V.kernel._get_num_vectors(x.dtype)
+         mantissa_t = (
+             f"at::vec::Vectorized<{cdtype}>"
+@@ -1693,6 +1698,7 @@ class CppVecOverrides(CppOverrides):
+             else f"at::vec::VectorizedN<{cdtype}, {n_vec}>"
+         )
+         code.writeline(
++
+             f"at::vec::Vectorized<int32_t> {exponent};"
+             if n_vec == 1
+             else f"at::vec::VectorizedN<int32_t, {n_vec}> {exponent};"

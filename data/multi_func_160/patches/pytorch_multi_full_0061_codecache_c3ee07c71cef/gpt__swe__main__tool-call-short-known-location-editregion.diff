@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codegen/cpp_wrapper_cpu.py b/torch/_inductor/codegen/cpp_wrapper_cpu.py
+index 1db5bcdd39f..928835955c8 100644
+--- a/torch/_inductor/codegen/cpp_wrapper_cpu.py
++++ b/torch/_inductor/codegen/cpp_wrapper_cpu.py
+@@ -183,6 +183,8 @@ class CppWrapperCpu(WrapperCodeGen):
+                 #include <torch/csrc/inductor/inductor_ops.h>
+                 #include <torch/types.h>
+                 #include <ATen/ops/bernoulli_native.h>
++#include <torch/csrc/profiler/collection.h>
++
+ 
+                 #define reinterpret_tensor torch::inductor::_reinterpret_tensor
+                 #define alloc_from_pool torch::inductor::_alloc_from_pool

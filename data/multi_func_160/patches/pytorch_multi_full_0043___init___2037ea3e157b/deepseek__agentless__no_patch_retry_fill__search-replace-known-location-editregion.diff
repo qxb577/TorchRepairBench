@@ -1,0 +1,19 @@
+diff --git a/torch/utils/_config_module.py b/torch/utils/_config_module.py
+index 41569465d25..2e32def1fa8 100644
+--- a/torch/utils/_config_module.py
++++ b/torch/utils/_config_module.py
+@@ -61,12 +61,14 @@ class Config:
+         justknob: Optional[str] = None,
+         env_name_default: Optional[str] = None,
+         env_name_force: Optional[str] = None,
++        type: Any = None,
+     ):
+         # python 3.9 does not support kw_only on the dataclass :(.
+         self.default = default
+         self.justknob = justknob
+         self.env_name_default = env_name_default
+         self.env_name_force = env_name_force
++        self.type = type
+ 
+ 
+ # Types saved/loaded in configs

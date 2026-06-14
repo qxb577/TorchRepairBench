@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 9e9fbb77c3d..f8d8c320d30 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3023,10 +3023,11 @@ class SqueezeView(BaseView):
+                 old_layout.device,
+                 old_layout.dtype,
+                 new_size,
+-                new_stride,
++                [0 if size == 0 else stride for size, stride in zip(new_size, new_stride)],
+                 old_layout.offset,
+                 old_layout.is_pinned,
+             )
++
+             return ReinterpretView(data=storage, layout=new_layout)
+ 
+         if dim is None:

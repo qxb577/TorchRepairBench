@@ -1,0 +1,14 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index 2798e177e6e..e0c3bd253c2 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -693,7 +693,8 @@ class AutogradFunctionApply(HigherOrderOperator):
+             @staticmethod
+             def forward(ctx, *args):
+                 nonlocal saved_values
+-                output, saved_values = fwd(None, *args)
++                output, saved_values = fwd(ctx, *args)
++
+                 return output
+ 
+             @staticmethod

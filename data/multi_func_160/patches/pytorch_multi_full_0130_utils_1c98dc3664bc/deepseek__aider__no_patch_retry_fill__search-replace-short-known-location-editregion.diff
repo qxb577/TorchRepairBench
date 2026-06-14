@@ -1,0 +1,41 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index 83619731f7f..c64a9fbd88c 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -4072,6 +4072,14 @@ def is_tensor_base_attr_getter(value):
+     )
+ 
+ 
++def is_tensor_getset_descriptor(value):
++    return (
++        type(value).__name__ == "getset_descriptor"
++        and hasattr(value, "__objclass__")
++        and value.__objclass__ is torch._C._TensorBase  # type: ignore[attr-defined]
++    )
++
++
+ def is_torch_function_object(value):
+     return hasattr(value, "__torch_function__")
+ 
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 653bcaf4ba3..0695e241b70 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -48,6 +48,7 @@ from ..utils import (
+     extract_fake_example_value,
+     get_fake_value,
+     guard_if_dyn,
++    is_tensor_getset_descriptor,
+     is_wrapper_or_member_descriptor,
+     istype,
+     numpy_operator_wrapper,
+@@ -1942,6 +1943,9 @@ class BuiltinVariable(VariableTracker):
+                     for tf in to_remove:
+                         tx.output.tracked_fakes.remove(tf)
+ 
++                elif is_tensor_getset_descriptor(getattr(torch.Tensor, name, None)):
++                    return obj.call_method(tx, "__setattr__", [name_var, val], {})
++
+                     # Step 1 - disable grads
+                     with dynamo_disable_grad(tx), torch.no_grad():
+                         # Step 2 - call `set_`

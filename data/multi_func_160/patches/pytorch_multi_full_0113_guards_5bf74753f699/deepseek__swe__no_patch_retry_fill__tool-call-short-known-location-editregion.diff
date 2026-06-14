@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/source.py b/torch/_dynamo/source.py
+index b5b73c0c684..1c73d0b4bae 100644
+--- a/torch/_dynamo/source.py
++++ b/torch/_dynamo/source.py
+@@ -881,6 +881,16 @@ def get_global_source_name(source: Source) -> Optional[str]:
+     return source.global_name
+ 
+ 
++def get_local_source_name(source: Source) -> Optional[str]:
++    if isinstance(source, ChainedSource):
++        return get_local_source_name(source.base)
++    if not isinstance(source, LocalSource):
++        return None
++    return source.local_name
++
++    return source.global_name
++
++
+ def is_from_nonlocal_source(source: Source):
+     if isinstance(source, ChainedSource):
+         return is_from_nonlocal_source(source.base)

@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/pgo.py b/torch/_dynamo/pgo.py
+index 23ae3b545e9..f317dc03a49 100644
+--- a/torch/_dynamo/pgo.py
++++ b/torch/_dynamo/pgo.py
+@@ -240,6 +240,8 @@ class FrameStateSizeEntry:
+     def make_tensor(
+         size: Tuple[int, ...], stride: Tuple[int, ...]
+     ) -> FrameStateSizeEntry:
++        size = tuple(int(s) for s in size)
++        stride = tuple(int(s) for s in stride)
+         return FrameStateSizeEntry(scalar=auto_dynamic, size=size, stride=stride)
+ 
+     @staticmethod

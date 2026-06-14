@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index f20b32b0da9..6026ba062be 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -1577,7 +1577,8 @@ class AutogradFunctionApplyVariable(VariableTracker):
+         else:
+             unimplemented("non-function or method")
+ 
+-        with tx.output.subtracer(fwd_fn, fwd_tracer):
++        with tx.output.subtracer(fwd_fn, fwd_tracer, graph_break_on_strides=True):
++
+             (bwd_out, _), bwd_graph, bwd_freevars = speculate_subgraph(
+                 tx,
+                 bwd_fn,

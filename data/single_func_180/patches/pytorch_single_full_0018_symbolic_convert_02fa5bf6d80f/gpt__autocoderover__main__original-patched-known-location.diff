@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 73b55f3f432..c4ac30236ab 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1251,7 +1251,12 @@ class InstructionTranslatorBase(
+             inner_fn = fn.fn
+         if inner_fn and callable(inner_fn) and is_forbidden(inner_fn):
+             raise AssertionError(f"Attempt to trace forbidden callable {inner_fn}")
+-        self.push(fn.call_function(self, args, kwargs))  # type: ignore[arg-type]
++        result = fn.call_function(self, args, kwargs)  # type: ignore[arg-type]
++        if isinstance(result, VariableTracker):
++            self.push(result)
++        else:
++            self.push(VariableTracker(result))
++
+ 
+     def inline_generator_function(
+         self, fn: VariableTracker, args: Sequence[Any], kwargs: dict[str, Any]

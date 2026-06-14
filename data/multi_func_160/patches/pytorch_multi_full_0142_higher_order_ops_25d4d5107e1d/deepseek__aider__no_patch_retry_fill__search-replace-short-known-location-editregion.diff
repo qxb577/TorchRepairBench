@@ -1,0 +1,49 @@
+diff --git a/torch/_dynamo/variables/higher_order_ops.py b/torch/_dynamo/variables/higher_order_ops.py
+index 5a7d06734da..530b8c420a8 100644
+--- a/torch/_dynamo/variables/higher_order_ops.py
++++ b/torch/_dynamo/variables/higher_order_ops.py
+@@ -3593,11 +3593,39 @@ class LocalMapWrappedHigherOrderVariable(WrapHigherOrderVariable):
+         assert len(body_gmod.graph.find_nodes(op="output")) == 1
+         actual_num_outputs = len(body_gmod.graph.find_nodes(op="output")[0].args[0])
+ 
+-        template = (
+-            "Expecting {expected} {inputs_or_outputs} to local_map function based on placements"
+-            ", but found {actual}. If the count matches for eager, "
+-            "Dynamo may have flattened {inputs_or_outputs} to the function or found additional "
+-            "tensors used via closures. "
++        # Fix: map local shapes in example_value back to global shapes to prevent leakage
++        # of local shapes into the outer graph.
++        if out_placements is not None and device_mesh is not None:
++            placements_list = out_placements.value
++            mesh = device_mesh.value
++
++            def compute_global_shape(local_tensor, placements, mesh):
++                shape = list(local_tensor.shape)
++                for dim, placement in enumerate(placements):
++                    if placement.is_shard():
++                        shape[placement.dim] *= mesh.size(dim)
++                return tuple(shape)
++
++            def adjust_example_value(ev):
++                if isinstance(ev, (list, tuple)):
++                    adjusted = []
++                    for i, t in enumerate(ev):
++                        if isinstance(t, torch.Tensor):
++                            global_shape = compute_global_shape(t, placements_list[i], mesh)
++                            adjusted.append(
++                                torch.empty(
++                                    global_shape,
++                                    dtype=t.dtype,
++                                    device='meta',
++                                    requires_grad=t.requires_grad,
++                                )
++                            )
++                        else:
++                            adjusted.append(t)
++                    return type(ev)(adjusted)
++                elif isinstance(ev, torch.Tensor):
++                    if len(placements_list) == 1:
++                        global_shape = compute
+             "Please adjust the input placements to match what the traced graph sees: \n{gm_str}."
+         )
+ 

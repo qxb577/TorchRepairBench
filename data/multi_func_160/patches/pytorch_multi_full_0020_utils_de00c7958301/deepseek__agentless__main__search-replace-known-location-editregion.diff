@@ -1,0 +1,18 @@
+diff --git a/torch/_guards.py b/torch/_guards.py
+index d4d1d6bb6a7..b0739d93ec1 100644
+--- a/torch/_guards.py
++++ b/torch/_guards.py
+@@ -124,12 +124,7 @@ class GuardSource(enum.Enum):
+         )
+ 
+     def is_local(self):
+-        return self in (
+-            GuardSource.LOCAL,
+-            GuardSource.LOCAL_SPECIALIZED_NN_MODULE,
+-            GuardSource.LOCAL_FSDP_MODULE,
+-            GuardSource.LOCAL_UNSPECIALIZED_NN_MODULE,
+-        )
++        return
+ 
+ 
+ """

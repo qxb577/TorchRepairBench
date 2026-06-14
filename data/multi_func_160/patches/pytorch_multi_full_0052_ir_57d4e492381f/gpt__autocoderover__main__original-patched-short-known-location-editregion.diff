@@ -1,0 +1,15 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index d13182e7174..a83cbde421c 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7437,7 +7437,9 @@ class DeviceCopy(ExternKernelOut):
+         V.graph.add_device_info(device)
+         x_device = x.get_device()
+         assert x_device is not None
+-        V.graph.add_device_info(x_device)
++        if x_device != device:
++            V.graph.add_device_info(x_device)
++
+ 
+         developer_warning("DeviceCopy in input program")
+         constant_args = (non_blocking,)

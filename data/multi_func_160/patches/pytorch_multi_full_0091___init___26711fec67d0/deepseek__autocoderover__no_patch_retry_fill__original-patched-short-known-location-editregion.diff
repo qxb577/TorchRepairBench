@@ -1,0 +1,35 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index 81c17e41cb6..74b7ac98c2b 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -639,10 +639,21 @@ def _compute_stride(
+ def _view_has_unbacked_input(
+     a: FakeTensor, shape: ShapeType | tuple[ShapeType]
+ ) -> bool:
+-    from torch.fx.experimental.symbolic_shapes import has_hint
++    from torch.fx.experimental.symbolic_shapes import free_unbacked_symbols, has_hint
+ 
+     shape = utils.extract_shape_from_varargs(shape, validate=False)
+ 
++    # Check for unbacked symints in size, stride, or shape.
++    all_syms = set()
++    for s in a.size():
++        all_syms |= free_unbacked_symbols(s)
++    for s in a.stride():
++        all_syms |= free_unbacked_symbols(s)
++    for s in shape:
++        all_syms |= free_unbacked_symbols(s)
++    if all_syms:
++        return True
++
+     return (
+         any(not has_hint(s) for s in a.size())
+         or any(not has_hint(s) for s in a.stride())
+@@ -650,6 +661,7 @@ def _view_has_unbacked_input(
+     )
+ 
+ 
++
+ def _view_unbacked_meta(
+     a: FakeTensor,
+     shape: ShapeType | tuple[ShapeType],

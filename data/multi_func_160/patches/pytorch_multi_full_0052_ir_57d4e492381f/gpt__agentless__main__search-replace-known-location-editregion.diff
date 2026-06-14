@@ -1,0 +1,21 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index d13182e7174..10356b5e392 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7427,12 +7427,11 @@ class IndexPutFallback(ExternKernel):
+ class DeviceCopy(ExternKernelOut):
+     @classmethod
+     def create(cls, x: IRNode, device: torch.device, non_blocking: bool) -> IRNode:
+-        if (
+-            not x.is_extern()
+-            and all(r in V.graph.constants for r in x.get_read_names())
+-            and not config.aot_inductor.use_runtime_constant_folding
++        if not x.is_extern() and all(
++            r in V.graph.constants for r in x.get_read_names()
+         ):
+-            return x.constant_to_device(device)
++            if not config.aot_inductor.use_runtime_constant_folding:
++                return x.constant_to_device(device)
+ 
+         V.graph.add_device_info(device)
+         x_device = x.get_device()

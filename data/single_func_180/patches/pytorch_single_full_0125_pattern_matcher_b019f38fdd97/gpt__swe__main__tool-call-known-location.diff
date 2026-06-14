@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/pattern_matcher.py b/torch/_inductor/pattern_matcher.py
+index db96c45c4a8..6c64177cf95 100644
+--- a/torch/_inductor/pattern_matcher.py
++++ b/torch/_inductor/pattern_matcher.py
+@@ -187,7 +187,8 @@ class Match:
+             for key in set(self.kwargs.keys()) & set(other.kwargs.keys()):
+                 if self.kwargs[key] != other.kwargs[key]:
+                     raise FailedMatch("kwarg mismatch: {}", key)
+-        self.args.extend(other.args)
++        self.args.append(other.args)
++
+         self.nodes.extend(other.nodes)
+         self.kwargs.update(other.kwargs)
+         self.targets.update(other.targets)

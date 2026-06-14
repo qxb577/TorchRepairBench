@@ -1,0 +1,44 @@
+diff --git a/torch/_higher_order_ops/cond.py b/torch/_higher_order_ops/cond.py
+index f0a260de406..31203fd5083 100644
+--- a/torch/_higher_order_ops/cond.py
++++ b/torch/_higher_order_ops/cond.py
+@@ -55,14 +55,14 @@ class CondOp(HigherOrderOperator):
+         super().__init__("cond")
+ 
+     def __call__(self, pred, true_fn, false_fn, operands):
+-        return super().__call__(pred, true_fn, false_fn, operands)
++        return super().__call__(pred, true_fn, false_fn, operands or ())
+ 
+ 
+ cond_op = CondOp()
+ 
+ 
+ @exposed_in("torch")
+-def cond(pred, true_fn, false_fn, operands):
++def cond(pred, true_fn, false_fn, operands=()):
+     r"""
+     Conditionally applies `true_fn` or `false_fn`.
+ 
+diff --git a/torch/_higher_order_ops/while_loop.py b/torch/_higher_order_ops/while_loop.py
+index f14321842f4..e8528643f96 100644
+--- a/torch/_higher_order_ops/while_loop.py
++++ b/torch/_higher_order_ops/while_loop.py
+@@ -131,7 +131,7 @@ def while_loop(cond_fn, body_fn, carried_inputs):
+         if not callable(cond_fn) or not callable(body_fn):
+             raise RuntimeError("Expect cond_fn and body_fn to be callbale.")
+ 
+-        if not isinstance(carried_inputs, (tuple, list)) or pytree.tree_any(
++        if carried_inputs is not None and (not isinstance(carried_inputs, (tuple, list)) or pytree.tree_any(
+             lambda t: not isinstance(t, torch.Tensor), carried_inputs
+         ):
+             raise RuntimeError(
+@@ -139,7 +139,8 @@ def while_loop(cond_fn, body_fn, carried_inputs):
+                 f"consists of tensor leaves, but got {carried_inputs}."
+             )
+ 
+-    _validate_input(cond_fn, body_fn, carried_inputs)
++    if carried_inputs is not None:
++        _validate_input(cond_fn, body_fn, carried_inputs)
+ 
+     # Dynamo is expecting a callable with "__code__" attribute.
+     # We cannot directly pass cond_op to it. So we wrap it in a dummy function.

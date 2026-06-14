@@ -1,0 +1,16 @@
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 1a78724ec06..e89f60e5fbd 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -2158,9 +2158,10 @@ class MutableMappingVariable(UserDefinedObjectVariable):
+         super().__init__(value, **kwargs)
+         self.generic_dict_vt = variables.ConstDictVariable({})
+         self.mutation_type = (
+-            AttributeMutationExisting() if self.source else AttributeMutationNew()
++            ValueMutationExisting(source=self.source) if self.source else ValueMutationNew()
+         )
+ 
++
+     def var_getattr(self, tx: "InstructionTranslator", name: str) -> "VariableTracker":
+         # A common pattern in the init code of MutableMapping objects is to
+         # update the __dict__ attribute. To prevent graph break, we directly

@@ -1,0 +1,13 @@
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index b369673d921..a4e908a2c18 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -1203,6 +1203,8 @@ def make_opaque_unary_fn(name):
+             return None
+ 
+     OpaqueUnaryFn.__name__ = "OpaqueUnaryFn_" + name
++    OpaqueUnaryFn.__module__ = __name__
++    OpaqueUnaryFn.__qualname__ = "OpaqueUnaryFn_" + name
+ 
+     return OpaqueUnaryFn
+ 

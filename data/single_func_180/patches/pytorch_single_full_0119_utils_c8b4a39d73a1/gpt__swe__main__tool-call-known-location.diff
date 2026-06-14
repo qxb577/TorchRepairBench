@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/utils.py b/torch/_inductor/utils.py
+index d48206f091f..928b5848201 100644
+--- a/torch/_inductor/utils.py
++++ b/torch/_inductor/utils.py
+@@ -801,7 +801,11 @@ def sympy_str(expr: sympy.Expr) -> str:
+     if isinstance(expr, sympy.Add):
+         return " + ".join(map(sympy_str, expr.args))
+     if isinstance(expr, sympy.Mul):
+-        return " * ".join(map(sympy_str, expr.args))
++        args = expr.args
++        if len(args) > 1 and isinstance(args[0], sympy.Add):
++            return f"({sympy_str(args[0])}) * " + " * ".join(map(sympy_str, args[1:]))
++        return " * ".join(map(sympy_str, args))
++
+ 
+     if isinstance(expr, (ModularIndexing, CleanDiv, FloorDiv, Identity)):
+         return f"{expr.func.__name__}({', '.join(map(sympy_str, expr.args))})"

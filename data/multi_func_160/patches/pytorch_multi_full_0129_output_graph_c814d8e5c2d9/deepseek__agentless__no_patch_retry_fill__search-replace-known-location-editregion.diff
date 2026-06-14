@@ -1,0 +1,25 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 646405ff60b..16abc269d88 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -344,6 +344,7 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+         self.cleanups: List[CleanupHook] = []
+         self.should_exit = False
+         self.random_values_var = None
++        self.random_calls = []
+         self.unspec_variable_map: Dict[str, UnspecializedPythonVariable] = {}
+         self.torch_function_enabled = torch._C._is_torch_function_enabled()
+         # Tracks if the output graph has a user defined allowed function in the
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 3e16c7a6008..6dcf55de3a4 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1975,7 +1975,7 @@ class InstructionTranslatorBase(Checkpointable[InstructionTranslatorGraphState])
+         self.export = export
+ 
+         self.current_speculation = None
+-        self.random_calls = []
++        self.random_calls = output.random_calls
+ 
+         self.strict_checks_enabled = False
+ 

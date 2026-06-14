@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/standalone_compile.py b/torch/_inductor/standalone_compile.py
+index 1ea0f271671..c668677e52b 100644
+--- a/torch/_inductor/standalone_compile.py
++++ b/torch/_inductor/standalone_compile.py
+@@ -88,13 +88,14 @@ class CompiledArtifact:
+                     file.write(writer.to_bytes())
+             else:
+                 assert format == "unpacked"
+-                assert os.path.isdir(path)
++                assert not os.path.isfile(path)
+                 shutil.rmtree(path, ignore_errors=True)
+ 
+                 with temporary_cache_dir(path):
+                     # This function unpacks the cache artifacts to disk
+                     torch.compiler.load_cache_artifacts(artifact_bytes)
+ 
++
+     @staticmethod
+     def load(
+         *, path: str, format: Literal["binary", "unpacked"] = "binary"

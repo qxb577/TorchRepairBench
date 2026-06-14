@@ -1,0 +1,48 @@
+diff --git a/torch/_inductor/index_propagation.py b/torch/_inductor/index_propagation.py
+index 16d5770a36a..82670a5abe7 100644
+--- a/torch/_inductor/index_propagation.py
++++ b/torch/_inductor/index_propagation.py
+@@ -324,12 +324,16 @@ class IndexPropagation:
+                 for k, v in self.indirect_var_ranges.items()
+             ),
+         )
+-        evaluated = self.shape_env._maybe_evaluate_static(
+-            e,
+-            axioms=self.axioms,
+-            var_to_range=var_to_range,
+-        )
+-        return bool(evaluated)
++        try:
++            evaluated = self.shape_env._maybe_evaluate_static(
++                e,
++                axioms=self.axioms,
++                var_to_range=var_to_range,
++            )
++            return bool(evaluated)
++        except Exception:
++            return False
++
+ 
+     def indirect_indexing(
+         self,
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 8d744e37009..1515d56f732 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -316,12 +316,16 @@ class SizeVarAllocator:
+             return bool(expr)
+ 
+         try:
++            try:
+             simplified = self.shape_env._maybe_evaluate_static(expr)
+             if simplified is not None:
+                 return bool(simplified)
+         except Exception:
+             log.debug("Could not simplify %s", expr)
+ 
++        except Exception:
++            log.debug("Could not simplify %s", expr)
++
+         return False
+ 
+     def statically_known_equals(

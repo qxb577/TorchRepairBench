@@ -1,0 +1,53 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index 24de4ae373a..eba747a98e8 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -3617,15 +3617,13 @@ class AlgorithmSelectorCache(PersistentCache):
+         # So we need call as_strided in the end to 'view' the tensor with the correct
+         # sizes/strides
+         return AlgorithmSelectorCache.generate_example_value(
+-            V.graph.sizevars.size_hints(
++            V.graph.sizevars.atomically_apply_size_hint(
+                 node.get_size(),
+                 fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
+             ),
+-            V.graph.sizevars.size_hints(
++            V.graph.sizevars.atomically_apply_size_hint(
+                 node.get_stride(),
+                 fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
+             ),
+             node.get_device(),
+             node.get_dtype(),
+@@ -3673,11 +3671,11 @@ class AlgorithmSelectorCache(PersistentCache):
+         return (
+             node.get_device().type,
+             str(node.get_dtype()),
+-            *sizevars.size_hints(
++            *sizevars.atomically_apply_size_hint(
+                 node.get_size(),
+                 fallback=config.unbacked_symint_fallback,
+             ),
+-            *sizevars.size_hints(
++            *sizevars.atomically_apply_size_hint(
+                 node.get_stride(),
+                 fallback=config.unbacked_symint_fallback,
+             ),
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 44689734d80..746c78022a3 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -913,10 +913,8 @@ class SizeVarAllocator:
+         if isinstance(expr, (int, sympy.Integer)):
+             return int(expr)
+ 
+-        if has_free_unbacked_symbols(expr):
+-            # Make sure to substitute with the factored version
+-            # e.g. 10*(s0 + u0) instead of 10*s0 + 10*u0
+-            expr = self._sub_unbacked_exprs(sympy.factor(expr))
++        if has_free_unbacked_symbols(expr) and fallback is not None:
++            expr = expr.subs({s: fallback for s in expr.free_symbols})
+ 
+         # For multiple expressions that depend on an unbacked symint,
+         # we want to compute them consistently for a size hint we have chosen.

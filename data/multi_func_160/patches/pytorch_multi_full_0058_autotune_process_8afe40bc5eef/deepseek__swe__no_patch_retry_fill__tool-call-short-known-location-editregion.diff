@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/autotune_process.py b/torch/_inductor/autotune_process.py
+index 1a417117f4a..79fec9a1ada 100644
+--- a/torch/_inductor/autotune_process.py
++++ b/torch/_inductor/autotune_process.py
+@@ -597,6 +597,8 @@ class TritonBenchmarkRequest(BenchmarkRequest):
+         self.kpack = kpack
+         self.workspace_arg = workspace_arg
+ 
++        self.workspace_arg = workspace_arg
++
+     def make_run_fn(
+         self, *input_tensors: torch.Tensor, output_tensor: torch.Tensor
+     ) -> Callable[[], None]:

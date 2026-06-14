@@ -1,0 +1,25 @@
+diff --git a/torch/distributed/checkpoint/_dedup_save_plans.py b/torch/distributed/checkpoint/_dedup_save_plans.py
+index e416030a816..98a2f5c7a05 100644
+--- a/torch/distributed/checkpoint/_dedup_save_plans.py
++++ b/torch/distributed/checkpoint/_dedup_save_plans.py
+@@ -55,6 +55,6 @@ def dedup_save_plans(
+             for write_item in all_plans[plan_idx].items
+             if write_item.index not in remove_set
+         ]
+-        all_plans[plan_idx] = dataclasses.replace(all_plans[plan_idx], items=new_items)
++        all_plans[plan_idx] = dataclasses.replace(all_plans[plan_idx], items=new_items, planner_data=None, storage_data=None)
+ 
+     return all_plans
+diff --git a/torch/distributed/checkpoint/default_planner.py b/torch/distributed/checkpoint/default_planner.py
+index ffeb5a01ec7..346f892cc88 100644
+--- a/torch/distributed/checkpoint/default_planner.py
++++ b/torch/distributed/checkpoint/default_planner.py
+@@ -129,7 +129,7 @@ class DefaultSavePlanner(SavePlanner):
+     def _create_global_plan(
+         self, all_plans: list[SavePlan]
+     ) -> tuple[list[SavePlan], Metadata]:
+-        all_plans = dedup_save_plans(all_plans, self.dedup_save_to_lowest_rank)
++        all_plans = dedup_save_plans(copy.deepcopy(all_plans), self.dedup_save_to_lowest_rank)
+ 
+         global_plan, metadata = create_default_global_save_plan(all_plans)
+ 

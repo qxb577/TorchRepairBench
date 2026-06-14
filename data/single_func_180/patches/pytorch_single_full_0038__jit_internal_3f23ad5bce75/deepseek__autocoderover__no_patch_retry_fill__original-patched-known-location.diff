@@ -1,0 +1,17 @@
+diff --git a/torch/_jit_internal.py b/torch/_jit_internal.py
+index f4dabcbf97d..d2685930f60 100644
+--- a/torch/_jit_internal.py
++++ b/torch/_jit_internal.py
+@@ -602,10 +602,11 @@ def module_has_exports(mod):
+     for name in dir(mod):
+         item = getattr(mod, name)
+         if callable(item):
+-            if get_torchscript_modifier(item) is FunctionModifiers.EXPORT:
++            if get_torchscript_modifier(item) in (FunctionModifiers.EXPORT, FunctionModifiers.COPY_TO_SCRIPT_WRAPPER):
+                 return True
+     return False
+ 
++
+ def should_drop(fn):
+     attr = get_torchscript_modifier(fn)
+     if attr is None:

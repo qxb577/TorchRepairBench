@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index d13182e7174..27fd78b9808 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -7431,6 +7431,7 @@ class DeviceCopy(ExternKernelOut):
+             not x.is_extern()
+             and all(r in V.graph.constants for r in x.get_read_names())
+             and not config.aot_inductor.use_runtime_constant_folding
++            and all(not V.graph.is_buffer_mutated(r) for r in x.get_read_names())
+         ):
+             return x.constant_to_device(device)
+ 
+@@ -7440,6 +7441,7 @@ class DeviceCopy(ExternKernelOut):
+         V.graph.add_device_info(x_device)
+ 
+         developer_warning("DeviceCopy in input program")
++
+         constant_args = (non_blocking,)
+         # Device Copy should keep the same layout as input
+         x = ExternKernel.require_contiguous(x)

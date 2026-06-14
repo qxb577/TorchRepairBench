@@ -1,0 +1,9 @@
+model,agent,strategy,bug_units,patch_generated_bugs,no_patch_bugs,main_patch_bugs,retry_fill_patch_bugs,patch_generation_rate,total_tokens,avg_elapsed_seconds
+deepseek,agentless,search-replace-known-location-editregion,160,114,46,24,90,0.7125,1107461,122.378
+deepseek,aider,search-replace-short-known-location-editregion,160,66,94,24,42,0.4125,623066,74.901
+deepseek,autocoderover,original-patched-short-known-location-editregion,160,123,37,26,97,0.7688,1226692,138.995
+deepseek,swe,tool-call-short-known-location-editregion,160,119,41,29,90,0.7438,1068337,123.414
+gpt,agentless,search-replace-known-location-editregion,160,157,3,157,0,0.9812,249958,7.431
+gpt,aider,search-replace-short-known-location-editregion,160,94,66,79,15,0.5875,240658,7.621
+gpt,autocoderover,original-patched-short-known-location-editregion,160,158,2,133,25,0.9875,238948,8.103
+gpt,swe,tool-call-short-known-location-editregion,160,146,14,146,0,0.9125,230877,6.927

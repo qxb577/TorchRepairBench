@@ -1,0 +1,14 @@
+diff --git a/torch/profiler/profiler.py b/torch/profiler/profiler.py
+index 81f1d2c2f1e..6ac6741447d 100644
+--- a/torch/profiler/profiler.py
++++ b/torch/profiler/profiler.py
+@@ -222,6 +222,9 @@ class _KinetoProfile:
+         else:
+             return self.profiler.export_chrome_trace(path)
+ 
++        else:
++            return self.profiler.export_chrome_trace(path)
++
+     def export_stacks(self, path: str, metric: str = "self_cpu_time_total"):
+         """Save stack traces to a file
+ 

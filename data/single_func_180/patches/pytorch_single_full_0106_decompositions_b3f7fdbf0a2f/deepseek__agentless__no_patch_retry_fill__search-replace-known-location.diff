@@ -1,0 +1,13 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 2d30d42dafa..0acd73a6ab8 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -2275,7 +2275,7 @@ def _index_add(
+     # Treat scalars as elements of \R^1
+     zero_dim = x.ndim == 0
+     x1 = x.unsqueeze(0) if zero_dim else x
+-    idx = (None,) * dim + (index,)
++    idx = (None,) * dim + (index,) + (None,) * (x1.ndim - dim - 1)
+     index_put = aten.index_put_ if inplace else aten.index_put
+     out = index_put(x1, idx, tensor, accumulate=True)
+     if inplace:

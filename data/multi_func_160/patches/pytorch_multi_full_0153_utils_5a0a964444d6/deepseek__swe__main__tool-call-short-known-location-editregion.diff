@@ -1,0 +1,18 @@
+diff --git a/torch/_dynamo/variables/builder.py b/torch/_dynamo/variables/builder.py
+index c5744d8b43f..9b5b1882e8c 100644
+--- a/torch/_dynamo/variables/builder.py
++++ b/torch/_dynamo/variables/builder.py
+@@ -709,10 +709,11 @@ class VariableBuilder:
+             self.install_guards(GuardBuilder.FUNCTION_MATCH)
+             return TorchCtxManagerClassVariable(value, source=self.source)
+         elif is_function_or_wrapper(value):
+-            value = unwrap_if_wrapper(value)
+-            return trace_rules.lookup(value).create_with_source(
++            unwrapped = unwrap_if_wrapper(value)
++            return trace_rules.lookup(unwrapped).create_with_source(
+                 value, source=self.source
+             )
++
+         # Don't use istype, since some python modules are not subclasses of types.ModuleType directly.
+         # E.g, type(torch.ops) -> <class 'torch._ops._Ops'>,
+         # type(torch.backends.cudnn) -> <class 'torch.backends.cudnn.CudnnModule'>

@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/kernel/flex/flex_flash_attention.py b/torch/_inductor/kernel/flex/flex_flash_attention.py
+index bcb235bd29d..814b00675bc 100644
+--- a/torch/_inductor/kernel/flex/flex_flash_attention.py
++++ b/torch/_inductor/kernel/flex/flex_flash_attention.py
+@@ -49,11 +49,12 @@ def input_buffers_require_grads(graph_module):
+     if len(inputs) <= 5:
+         return False
+     for n in inputs[5:]:
+-        if n.meta["tensor_meta"].requires_grad:
++        if n.meta.get("tensor_meta") is None or n.meta["tensor_meta"].requires_grad:
+             return True
+     return False
+ 
+ 
++
+ def is_trivial_graph(graph_module: GraphModule, is_score_graph: bool):
+     """Check if the flex graphs are compatible with Flash Attention."""
+     graph = graph_module.graph

@@ -1,0 +1,27 @@
+diff --git a/torch/_inductor/fx_passes/joint_graph.py b/torch/_inductor/fx_passes/joint_graph.py
+index dd3610bb9db..ccfadc4586a 100644
+--- a/torch/_inductor/fx_passes/joint_graph.py
++++ b/torch/_inductor/fx_passes/joint_graph.py
+@@ -314,6 +314,14 @@ class UniformValueConstantFolder(ConstantFolder):
+         # TODO: cat, more indexing
+         # TODO - do on cpu to avoid syncs
+ 
++        if node.target == aten.view.dtype:
++            arg0 = node.args[0]
++            if isinstance(arg0, torch.fx.Node) and arg0.meta.get("val") is not None:
++                input_val = arg0.meta["val"]
++                target_val = node.meta.get("val")
++                if target_val is not None and input_val.ndim == 0 and input_val.element_size() != target_val.element_size():
++                    return self.unknown_value
++
+         # single-elem attrs
+         if node.op == "get_attr" or (
+             node.op == "call_function"
+@@ -328,6 +336,7 @@ class UniformValueConstantFolder(ConstantFolder):
+             return super(ConstantFolder, self).run_node(node)
+ 
+         # constructors ops
++
+         if (
+             node.op == "call_function"
+             and node.target is aten.full.default

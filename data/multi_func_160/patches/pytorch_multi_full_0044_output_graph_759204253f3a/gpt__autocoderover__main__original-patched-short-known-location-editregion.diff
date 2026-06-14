@@ -1,0 +1,27 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index 152a9736923..7f0cd246654 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1431,19 +1431,17 @@ class OutputGraph(Checkpointable[OutputGraphState]):
+                             res = sympy_interp(
+                                 PythonReferenceAnalysis, symbol_to_proxy, ra.expr
+                             ).node
+-                            res2 = self.graph.call_function(
+-                                torch.ops.aten.scalar_tensor.default, (res,)
+-                            )
+                             self.graph.call_function(
+-                                torch.ops.aten._assert_async.msg,
++                                torch.ops.aten._functional_assert_async.msg,
+                                 # TODO: use ra.msg here, but it's pretty
+                                 # useless right now
+                                 (
+-                                    res2,
++                                    res,
+                                     f"Deferred runtime assertion failed {ra.expr}",
+                                 ),
+                             )
+ 
++
+     def add_output_instructions(self, prefix: List[Instruction]) -> None:
+         """
+         We call this on the creation of a new compiled subgraph that is inserted

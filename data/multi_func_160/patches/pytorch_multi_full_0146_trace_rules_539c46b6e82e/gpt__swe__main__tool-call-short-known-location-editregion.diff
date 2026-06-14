@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/trace_rules.py b/torch/_dynamo/trace_rules.py
+index 5aae67640cd..61bd57fc9d1 100644
+--- a/torch/_dynamo/trace_rules.py
++++ b/torch/_dynamo/trace_rules.py
+@@ -2926,7 +2926,8 @@ def get_tensor_method():
+             s.add(method)
+ 
+     # mlazos: this is a function which we handle specially in TensorVariable
+-    s.add(torch.Tensor.__contains__)  # type: ignore[arg-type]
++    s.add(torch.Tensor.__contains__)  # type: ignore[arg-type]\ns.add(torch.Tensor.register_hook)
++
+     return frozenset(s)
+ 
+ 

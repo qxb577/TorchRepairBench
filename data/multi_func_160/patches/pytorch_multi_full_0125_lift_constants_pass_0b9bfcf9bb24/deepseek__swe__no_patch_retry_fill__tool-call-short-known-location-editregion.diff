@@ -1,0 +1,29 @@
+diff --git a/torch/_export/passes/lift_constants_pass.py b/torch/_export/passes/lift_constants_pass.py
+index 27313a71382..068ea3046a2 100644
+--- a/torch/_export/passes/lift_constants_pass.py
++++ b/torch/_export/passes/lift_constants_pass.py
+@@ -103,9 +103,6 @@ def lift_constants_pass(
+     """
+     all_constants: Dict[str, Union[torch.Tensor, torch._C.ScriptObject]] = {}
+ 
+-    if len([node for node in gm.graph.nodes if node.op == "placeholder"]) == 0:
+-        return {}
+-
+     inputs = graph_signature.input_specs
+     num_custom_obj = sum(
+         input_specs.kind == InputKind.CUSTOM_OBJ for input_specs in inputs
+@@ -114,10 +111,14 @@ def lift_constants_pass(
+         input_specs.kind == InputKind.CONSTANT_TENSOR for input_specs in inputs
+     )
+ 
++    if len([node for node in gm.graph.nodes if node.op == "placeholder"]) == 0 and num_custom_obj == 0 and num_tensor_constants == 0:
++        return {}
++
+     fake_mode = detect_fake_mode(
+         tuple(node.meta["val"] for node in gm.graph.nodes if node.op == "placeholder")
+     )
+ 
++
+     first_user_input_loc, first_user_input = 0, None
+     for node in gm.graph.nodes:
+         if node.op == "placeholder" and node.name in graph_signature.user_inputs:

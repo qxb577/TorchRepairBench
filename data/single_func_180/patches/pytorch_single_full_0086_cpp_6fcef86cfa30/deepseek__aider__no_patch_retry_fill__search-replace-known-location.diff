@@ -1,0 +1,37 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 84bfdefa40a..c46e47f717f 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -3965,16 +3965,25 @@ class CppScheduling(BaseScheduling):
+                         _, body, _ = comp_buffer.get_default_sizes_body()
+                         return body.var_ranges, list(body.indexing_exprs.values())
+ 
+-                node_to_recomp = node1 if len(vars1) < len(vars2) else node2
+-                assert isinstance(node_to_recomp, SchedulerNode)
+-
+-                ref_node = node2 if len(vars1) < len(vars2) else node1
++                if len(vars1) < len(vars2):
++                    node_to_recomp = node1
++                    ref_node = node2
++                else:
++                    node_to_recomp = node2
++                    ref_node = node1
+ 
+                 extra_indexing_constraints = get_indexing_ranges_exprs(ref_node)
+ 
+-                node_to_recomp.recompute_size_and_body(
+-                    extra_indexing_constraints=extra_indexing_constraints
+-                )
++                if isinstance(node_to_recomp, SchedulerNode):
++                    node_to_recomp.recompute_size_and_body(
++                        extra_indexing_constraints=extra_indexing_constraints
++                    )
++                else:
++                    assert isinstance(node_to_recomp, FusedSchedulerNode)
++                    for snode in node_to_recomp.snodes:
++                        snode.recompute_size_and_body(
++                            extra_indexing_constraints=extra_indexing_constraints
++                        )
+ 
+                 _, (vars1, _) = node1.group
+                 _, (vars2, _) = node2.group

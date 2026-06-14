@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/kernel/conv.py b/torch/_inductor/kernel/conv.py
+index d6e802d00aa..619e3056ef4 100644
+--- a/torch/_inductor/kernel/conv.py
++++ b/torch/_inductor/kernel/conv.py
+@@ -592,7 +592,7 @@ def convolution(
+         conv_configs = V.choices.get_conv_configs(device_type)
+ 
+         for cfg in conv_configs(
+-            sympy_product([x.get_size()[0], *x.get_size()[2:]]),
++            sympy_product([x.get_size()[1], *x.get_size()[2:]]),
+             out_chan,
+             in_chan,
+         ):
+diff --git a/torch/_inductor/template_heuristics/triton.py b/torch/_inductor/template_heuristics/triton.py
+index f4c836247df..aae08ee7109 100644
+--- a/torch/_inductor/template_heuristics/triton.py
++++ b/torch/_inductor/template_heuristics/triton.py
+@@ -1105,7 +1105,7 @@ class ROCmConfigHeuristic(BaseConfigHeuristic):
+             for BLOCK1 in [16, 32, 64]
+             for BLOCK2 in [32, 64, 128]
+             for w in ([4, 8] if BLOCK1 >= 128 or BLOCK2 >= 128 else [4])
+-            for mfma in [0, 16]
++            for mfma in [0, 1]
+             if BLOCK2 % BLOCK1 == 0
+         ]
+ 

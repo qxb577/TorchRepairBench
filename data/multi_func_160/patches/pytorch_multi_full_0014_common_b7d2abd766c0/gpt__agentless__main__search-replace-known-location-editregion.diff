@@ -1,0 +1,26 @@
+diff --git a/torch/_inductor/codegen/common.py b/torch/_inductor/codegen/common.py
+index 85b85b38be2..231cb5da8a8 100644
+--- a/torch/_inductor/codegen/common.py
++++ b/torch/_inductor/codegen/common.py
+@@ -1738,7 +1738,7 @@ class Kernel(CodeGen):
+         assert isinstance(var, str)
+         assert lower is None or isinstance(lower, str)
+         assert upper is None or isinstance(upper, str)
+-        if lower and upper:
++        if lower and upper and mask is None:
+             # The conditions need to be in parens because of Python's operator precedence.
+             # It'd be less error-prone to use and/or/not, which is suported by triton
+             cond = f"({lower} <= {var}) & ({var} < {upper})"
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index b2829e3be41..9fb5a04fa6f 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -2607,7 +2607,7 @@ class CppVecKernel(CppKernel):
+             lower = f"{self._get_vec_type(var.dtype)}({lower})"
+         if upper:
+             upper = f"{self._get_vec_type(var.dtype)}({upper})"
+-        if lower and upper:
++        if lower and upper and mask is None:
+             cond = f"({lower} <= {var}) & ({var} < {upper})"
+             cond_print = f"{lower_scalar} <= {var} < {upper_scalar}"
+         elif lower:

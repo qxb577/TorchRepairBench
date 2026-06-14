@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 9566f6a1542..7de1002528f 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -1447,7 +1447,7 @@ class FrozensetVariable(SetVariable):
+                 ]
+             )
+         )
+-        codegen.extend_output(create_call_function(0, False))
++        codegen.extend_output(create_call_function(1, False))
+ 
+     def call_method(
+         self,

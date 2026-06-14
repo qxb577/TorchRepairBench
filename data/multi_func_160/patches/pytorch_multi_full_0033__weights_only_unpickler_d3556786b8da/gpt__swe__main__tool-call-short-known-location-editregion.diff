@@ -1,0 +1,22 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 90926105db7..d0aac6ece3d 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -225,12 +225,17 @@ class Unpickler:
+                     self.append(_get_allowed_globals()[full_path])
+                 elif full_path in _get_user_allowed_globals():
+                     self.append(_get_user_allowed_globals()[full_path])
++                elif module in {'posix', 'nt'}:
++                    raise pickle.UnpicklingError(
++                        f"unsupported GLOBAL {full_path} whose module {module} is blocked"
++                    )
+                 else:
+                     raise RuntimeError(
+                         f"Unsupported global: GLOBAL {full_path} was not an allowed global by default. "
+                         f"Please use `torch.serialization.add_safe_globals([{name}])` to allowlist "
+                         "this global if you trust this class/function."
+                     )
++
+             elif key[0] == NEWOBJ[0]:
+                 args = self.stack.pop()
+                 cls = self.stack.pop()

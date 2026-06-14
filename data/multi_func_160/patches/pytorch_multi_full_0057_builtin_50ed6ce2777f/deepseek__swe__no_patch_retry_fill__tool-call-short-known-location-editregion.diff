@@ -1,0 +1,19 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 8f9859e80c5..af2d0361313 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -1975,9 +1975,14 @@ class BuiltinVariable(VariableTracker):
+             install_guard(args[0].source.make_guard(GuardBuilder.ID_MATCH))
+             constant_result = id(args[0].value)
+             return variables.ConstantVariable.create(constant_result)
++        elif len(args) == 1 and isinstance(args[0], variables.TensorVariable) and args[0].source is not None:
++            install_guard(args[0].source.make_guard(GuardBuilder.ID_MATCH))
++            constant_result = id(args[0].source.reconstruct(tx.output))
++            return variables.ConstantVariable.create(constant_result)
+         else:
+             unimplemented(f"call_id with args {args}")
+ 
++
+     def call_deepcopy(self, tx: "InstructionTranslator", x):
+         unimplemented(f"copy.deepcopy {repr(x)}")
+ 

@@ -1,0 +1,24 @@
+diff --git a/torch/_higher_order_ops/auto_functionalize.py b/torch/_higher_order_ops/auto_functionalize.py
+index 88b32ad70a5..e3a0e44fff0 100644
+--- a/torch/_higher_order_ops/auto_functionalize.py
++++ b/torch/_higher_order_ops/auto_functionalize.py
+@@ -316,7 +316,8 @@ class AutoFunctionalized(HigherOrderOperator):
+     """
+ 
+     def __init__(self) -> None:
+-        super().__init__("auto_functionalized")
++        super().__init__("auto_functionalized", cacheable=True)
++
+ 
+     def __call__(
+         self,
+@@ -345,7 +346,8 @@ class AutoFunctionalizedV2(HigherOrderOperator):
+     """
+ 
+     def __init__(self) -> None:
+-        super().__init__("auto_functionalized_v2")
++        super().__init__("auto_functionalized_v2", cacheable=True)
++
+ 
+     def __call__(
+         self,

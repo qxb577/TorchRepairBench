@@ -1,0 +1,14 @@
+diff --git a/torch/distributed/_serialization.py b/torch/distributed/_serialization.py
+index 2aa9786c0e4..eade0be3e5e 100644
+--- a/torch/distributed/_serialization.py
++++ b/torch/distributed/_serialization.py
+@@ -47,7 +47,8 @@ class _PseudoZipFile:
+             elif isinstance(data, str):
+                 f.write(data.encode("utf-8"))
+             elif isinstance(data, torch.UntypedStorage):
+-                data._write_file(f, False, False, 1)
++                if length > 0:
++                    data._write_file(f, False, False, 1)
+             else:
+                 raise TypeError(f"unknown type: {type(data)}")
+ 

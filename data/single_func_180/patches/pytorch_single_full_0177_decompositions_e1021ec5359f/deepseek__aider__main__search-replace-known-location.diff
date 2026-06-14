@@ -1,0 +1,13 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index c43f31de7a9..d9e98be47ed 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -132,7 +132,7 @@ def elu_backward(
+         return torch.where(
+             self_or_result <= 0,
+             grad_output * negiptcoef * (self_or_result + negcoef),
+-            self_or_result * poscoef,
++            grad_output * poscoef,
+         )
+     else:
+         return torch.where(

@@ -1,0 +1,21 @@
+diff --git a/torch/autograd/gradcheck.py b/torch/autograd/gradcheck.py
+index bb08382608b..43b1f93e932 100644
+--- a/torch/autograd/gradcheck.py
++++ b/torch/autograd/gradcheck.py
+@@ -1748,13 +1748,9 @@ def _adjusted_atol(atol, u, v):
+     # q2 = v^T B u, we must allow |q1 - q2| < v^T E u + rtol * v^T B u, where E is
+     # the correctly sized matrix in which each entry is atol.
+     #
+-    # We see that atol needs to be scaled by v^T M u (where M is an all-ones M x N
+-    # matrix): v^T M u = \sum_{i} \sum_{j} u_i * v_j = (\sum_{i} u_i)(\sum_{i} v_i)
+-    # TODO: properly handle case when u is tuple instead of only taking first element
+-    u = u[0] if isinstance(u, tuple) else u
+-    sum_u = u.sum()
+-    sum_v = 1.0 if v is None else v.sum()
+-    return atol * float(sum_u) * float(sum_v)
++    # We see that atol needs to be scaled by |v|^T M |u| (where M is an all-ones M x N
++    # matrix): |v|^T M |u| = \sum_{i} \sum_{j} |u
++
+ 
+ 
+ FAST_FAIL_SLOW_OK_MSG = """

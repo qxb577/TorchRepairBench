@@ -1,0 +1,44 @@
+diff --git a/torch/_dynamo/pgo.py b/torch/_dynamo/pgo.py
+index 23ae3b545e9..ce181004556 100644
+--- a/torch/_dynamo/pgo.py
++++ b/torch/_dynamo/pgo.py
+@@ -231,16 +231,29 @@ class FrameStateSizeEntry:
+             return False
+         return self.stride[dim] is auto_dynamic
+ 
++    @staticmethod
++    def _munge_symint(x):
++        if isinstance(x, int):
++            return x
++        try:
++            return int(x)
++        except Exception:
++            return auto_dynamic
++
+     @staticmethod
+     def make_scalar(x: int) -> FrameStateSizeEntry:
+-        return FrameStateSizeEntry(scalar=x, size=auto_dynamic, stride=auto_dynamic)
++        return FrameStateSizeEntry(scalar=FrameStateSizeEntry._munge_symint(x), size=auto_dynamic, stride=auto_dynamic)
+ 
+     # NB: steals the inputs
+     @staticmethod
+     def make_tensor(
+         size: Tuple[int, ...], stride: Tuple[int, ...]
+     ) -> FrameStateSizeEntry:
+-        return FrameStateSizeEntry(scalar=auto_dynamic, size=size, stride=stride)
++        return FrameStateSizeEntry(
++            scalar=auto_dynamic,
++            size=tuple(FrameStateSizeEntry._munge_symint(s) for s in size),
++            stride=tuple(FrameStateSizeEntry._munge_symint(s) for s in stride),
++        )
+ 
+     @staticmethod
+     def _merge_atom(x: _T, y: _T) -> Union[AutoDynamic, _T]:
+@@ -252,6 +265,7 @@ class FrameStateSizeEntry:
+             return auto_dynamic
+         return x
+ 
++
+     @classmethod
+     def _merge_atom_tup(
+         cls,

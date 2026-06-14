@@ -1,0 +1,29 @@
+diff --git a/torch/_utils.py b/torch/_utils.py
+index 3315d6548d1..a9c1912fb93 100644
+--- a/torch/_utils.py
++++ b/torch/_utils.py
+@@ -177,7 +177,10 @@ def _get_async_or_non_blocking(function_name, non_blocking, kwargs):
+ # be a TypedStorage
+ def _rebuild_tensor(storage, storage_offset, size, stride):
+     # first construct a tensor with the correct dtype/device
+-    t = torch.tensor([], dtype=storage.dtype, device=storage._untyped_storage.device)
++    if isinstance(storage, torch._subclasses.FakeTensor):
++        t = torch._subclasses.FakeTensor(storage.fake_mode, torch.empty(0, dtype=storage.dtype, device=storage.device))
++    else:
++        t = torch.tensor([], dtype=storage.dtype, device=storage._untyped_storage.device)
+     return t.set_(storage._untyped_storage, storage_offset, size, stride)
+ 
+ 
+diff --git a/torch/serialization.py b/torch/serialization.py
+index 4d1f016bfcd..d904742e18a 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -1395,7 +1395,7 @@ def _load(zip_file, map_location, pickle_module, pickle_file='data.pkl', overall
+         assert typename == 'storage', \
+             f"Unknown typename for persistent_load, expected 'storage' but got '{typename}'"
+         storage_type, key, location, numel = data
+-        if storage_type is torch.UntypedStorage:
++        if storage_type is torch.UntypedStorage or storage_type is torch._subclasses.FakeTensor:
+             dtype = torch.uint8
+         else:
+             dtype = storage_type.dtype

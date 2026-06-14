@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 73b55f3f432..cfa3403d3b6 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1236,6 +1236,8 @@ class InstructionTranslatorBase(
+         fn: VariableTracker,
+         args: list[VariableTracker],
+         kwargs: dict[str, VariableTracker],
++        *,
++        allow_graph_break: bool = False
+     ) -> None:
+         assert isinstance(fn, VariableTracker)
+         assert isinstance(args, list)

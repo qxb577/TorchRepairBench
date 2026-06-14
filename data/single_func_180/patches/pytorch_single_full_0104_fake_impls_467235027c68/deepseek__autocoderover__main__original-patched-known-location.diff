@@ -1,0 +1,14 @@
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index f8a4da69970..1d1cc73eead 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -631,7 +631,8 @@ def is_builtin(op):
+ 
+ 
+ def has_meta(func):
+-    return torch._C._dispatch_has_computed_kernel_for_dispatch_key(func.name(), "Meta")
++    return torch._C._dispatch_has_computed_kernel_for_dispatch_key(func, "Meta")
++
+ 
+ 
+ @register_op_impl(

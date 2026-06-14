@@ -1,0 +1,21 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 38186fd49f2..aba2fa58e20 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -216,15 +216,7 @@ def bind_args_cached(
+             # Maybe override pos-defaults applied above
+             ba[name] = wrap_bound_arg(tx, rem_kw.pop(name))
+         elif name not in ba:
+-            raise_observed_exception(
+-                TypeError,
+-                tx,
+-                args=[
+-                    ConstantVariable.create(
+-                        f"Missing required positional argument: {name}"
+-                    )
+-                ],
+-            )
++            raise TypeError(f"Missing required positional argument: {name}")
+ 
+     # 2) *args
+     extra = args[len(spec.all_pos_names) :]

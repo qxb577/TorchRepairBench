@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/torch.py b/torch/_dynamo/variables/torch.py
+index 3d0541dacfd..d43b01ddb52 100644
+--- a/torch/_dynamo/variables/torch.py
++++ b/torch/_dynamo/variables/torch.py
+@@ -42,7 +42,7 @@ import torch.fx
+ import torch.nn
+ from torch._guards import TracingContext
+ from torch._logging import warning_once
+-from torch.utils._python_dispatch import is_traceable_wrapper_subclass_type
++from torch.utils._python_dispatch import is_traceable_wrapper_subclass_type, is_contiguous_or_false
+ 
+ from .. import config, graph_break_hints, polyfills, variables
+ from ..codegen import PyCodegen

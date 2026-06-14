@@ -1,0 +1,46 @@
+diff --git a/torch/testing/_internal/common_utils.py b/torch/testing/_internal/common_utils.py
+index 13a28c5d7eb..dc8ac2c0382 100644
+--- a/torch/testing/_internal/common_utils.py
++++ b/torch/testing/_internal/common_utils.py
+@@ -2062,6 +2062,8 @@ class TestCase(expecttest.TestCase):
+ 
+     def __init__(self, method_name='runTest'):
+         super().__init__(method_name)
++        self._unraisablehook_installed = False
++
+ 
+         test_method = getattr(self, method_name, None)
+         if test_method is not None:
+@@ -2115,10 +2117,32 @@ class TestCase(expecttest.TestCase):
+         #       call in try-finally and always do the check.
+         @wraps(method)
+         def wrapper(self, *args, **kwargs):
++            if not self._unraisablehook_installed:
++                self._install_unraisablehook()
+             with policy():
+                 method(*args, **kwargs)
+         return types.MethodType(wrapper, self)
+ 
++    def _install_unraisablehook(self):
++        import sys
++        self._original_unraisablehook = sys.unraisablehook
++        sys.unraisablehook = self._unraisablehook
++        self._unraisablehook_installed = True
++
++    def _unraisablehook(self, unraisable):
++        if not hasattr(self, '_unraisable_exceptions'):
++            self._unraisable_exceptions = []
++        self._unraisable_exceptions.append(unraisable.exc_value)
++
++    def assertNoUnraisable(self, func):
++        import sys
++        if not self._unraisablehook_installed:
++            self._install_unraisablehook()
++        func()
++        if hasattr(self, '_unraisable_exceptions') and self._unraisable_exceptions:
++            raise AssertionError(f"Unraisable exceptions occurred: {self._unraisable_exceptions}")
++
++
+     def wrap_with_cuda_memory_check(self, method):
+         return self.wrap_method_with_policy(method, self.assertLeaksNoCudaTensors)
+ 

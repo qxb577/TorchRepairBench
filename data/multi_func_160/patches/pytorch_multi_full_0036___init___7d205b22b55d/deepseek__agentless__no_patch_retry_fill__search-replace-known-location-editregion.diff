@@ -1,0 +1,32 @@
+diff --git a/torch/__init__.py b/torch/__init__.py
+index 9235fc45199..9d69b7cd6d8 100644
+--- a/torch/__init__.py
++++ b/torch/__init__.py
+@@ -2302,7 +2302,9 @@ class _TorchCompileInductorWrapper:
+         self.apply_options(CompilerBisector.get_config_change("inductor"))
+ 
+         if self.config.get("triton.cudagraphs", False):
+-            os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
++            cuda_ver = torch.version.cuda
++            if cuda_ver is not None and tuple(int(x) for x in cuda_ver.split(".")) < (12, 6):
++                os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
+             # FIXME: CUDA Graph does not work well with CUPTI teardown.
+             #   1) crashes on 1st lazy CUPTI re-init after teardown (CUDA 11)
+             #   2) crashes on 2nd non-lazy CUPTI re-init after teardown (CUDA 12)
+diff --git a/torch/profiler/profiler.py b/torch/profiler/profiler.py
+index ecc848c20e7..d791abb441f 100644
+--- a/torch/profiler/profiler.py
++++ b/torch/profiler/profiler.py
+@@ -224,8 +224,10 @@ class _KinetoProfile:
+                 import torch._inductor.config as inductor_config
+ 
+                 if inductor_config.triton.cudagraphs:
+-                    os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
+-                    self.add_metadata_json("DISABLE_CUPTI_LAZY_REINIT", "1")
++                    cuda_ver = torch.version.cuda
++                    if cuda_ver is not None and tuple(int(x) for x in cuda_ver.split(".")) < (12, 6):
++                        os.environ["DISABLE_CUPTI_LAZY_REINIT"] = "1"
++                        self.add_metadata_json("DISABLE_CUPTI_LAZY_REINIT", "1")
+                     # FIXME: CUDA Graph does not work well with CUPTI teardown.
+                     #   1) crashes on 1st lazy CUPTI re-init after teardown (CUDA 11)
+                     #   2) crashes on 2nd non-lazy CUPTI re-init after teardown (CUDA 12)

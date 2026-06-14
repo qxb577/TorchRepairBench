@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index 37279cd1030..3a1de2ac0d9 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -1325,7 +1325,7 @@ def select(x, dim, idx):
+ @register_lowering(aten.split, type_promotion_kind=None)
+ def split(x, sizes, dim=0, clamp=True):
+     dim = _validate_dim(x, dim, 0)
+-    x_size = V.graph.sizevars.evaluate_static_shape(x.get_size()[dim])
++    x_size = V.graph.sizevars.evaluate_static_shape(x.get_size()[dim]).item()
+     if isinstance(sizes, sympy.Expr):
+         # TODO: We don't have to guard on sizes per se, but the number
+         # of splits must stay constant

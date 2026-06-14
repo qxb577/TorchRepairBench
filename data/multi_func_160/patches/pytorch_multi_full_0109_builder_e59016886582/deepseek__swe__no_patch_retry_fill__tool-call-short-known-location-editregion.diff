@@ -1,0 +1,14 @@
+diff --git a/torch/multiprocessing/reductions.py b/torch/multiprocessing/reductions.py
+index 727b4f3fc37..4e5d45217a9 100644
+--- a/torch/multiprocessing/reductions.py
++++ b/torch/multiprocessing/reductions.py
+@@ -352,7 +352,8 @@ def reduce_tensor(tensor):
+         tensor.stride(),
+         tensor.requires_grad,
+     )
+-    return (rebuild_tensor, (type(tensor), storage, metadata))
++    if tensor.device.type == 'meta':\n        return (rebuild_meta_tensor, (type(tensor), tensor.size(), tensor.stride(), tensor.dtype, tensor.requires_grad))\n    return (rebuild_tensor, (type(tensor), storage, metadata))
++
+ 
+ 
+ def rebuild_nested_tensor(

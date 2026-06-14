@@ -1,0 +1,18 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 16976db91ba..e35801ea8bb 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -201,11 +201,12 @@ def hardswish(self: Tensor) -> Tensor:
+ def hardswish_backward(grad_output: Tensor, self: Tensor) -> Tensor:
+     return torch.where(
+         self < -3,
+-        0.0,
++        torch.zeros_like(grad_output),
+         torch.where(self <= 3, grad_output * ((self / 3) + 0.5), grad_output),
+     )
+ 
+ 
++
+ @register_decomposition(aten.threshold_backward)
+ @out_wrapper("grad_input")
+ def threshold_backward(grad_output: Tensor, self: Tensor, threshold: float):

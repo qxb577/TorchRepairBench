@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index acdb05c9ee8..d9be207cf29 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -996,7 +996,7 @@ class CppVecOverrides(CppOverrides):
+                     # 3. int32 and fp32 in test_torchinductor_dynamic_shapes.py::test_avg_pool2d8_dynamic_shapes_cpu
+                     if len(new_args) == 2:
+                         new_args = promote_args(new_args)
+-                    elif func == CppVecOverrides.where:
++                    elif func == CppVecOverrides.where and not all(arg.dtype == torch.bool for arg in new_args):
+                         new_args[1:] = promote_args(new_args[1:])
+ 
+                 # Broadcast scalar args to vector

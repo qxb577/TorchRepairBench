@@ -1,0 +1,38 @@
+diff --git a/torch/_subclasses/functional_tensor.py b/torch/_subclasses/functional_tensor.py
+index f1cbc4c93a5..b492c6e9ebe 100644
+--- a/torch/_subclasses/functional_tensor.py
++++ b/torch/_subclasses/functional_tensor.py
+@@ -509,7 +509,7 @@ class FunctionalTensorMode(TorchDispatchMode):
+                 if func in FunctionalTensor.metadata_fns:
+                     outs_unwrapped = func(*args_unwrapped, **kwargs_unwrapped)
+                     outs_wrapped = pytree.tree_map_only(
+-                        torch.Tensor, wrap, outs_unwrapped
++                        torch.Tensor, lambda t: wrap(t, meta=current_meta), outs_unwrapped
+                     )
+                 else:
+                     # When we dispatch to the C++ functionalization kernel, we might need to jump back to the
+diff --git a/torch/fx/proxy.py b/torch/fx/proxy.py
+index 9b359d78d6d..b0a4e251400 100644
+--- a/torch/fx/proxy.py
++++ b/torch/fx/proxy.py
+@@ -208,6 +208,7 @@ class TracerBase:
+                 new_seq_nr = current_meta["grad_fn_seq_nr"][-1]
+             annotation_log.debug("Assigning new_seq_nr %s to %s", new_seq_nr, node.name)
+             node.meta["seq_nr"] = new_seq_nr
++            node.meta.update(current_meta)
+ 
+         elif self.module_stack:
+             node.meta["nn_module_stack"] = copy.copy(self.module_stack)
+diff --git a/torch/fx/traceback.py b/torch/fx/traceback.py
+index 2774c76850a..9f18152fddd 100644
+--- a/torch/fx/traceback.py
++++ b/torch/fx/traceback.py
+@@ -32,7 +32,7 @@ __all__ = [
+     "get_graph_provenance_json",
+ ]
+ 
+-current_meta: dict[str, Any] = {}
++current_meta: dict[str, Any] = {"stack_trace": None, "seq_nr": None}
+ should_preserve_node_meta = False
+ 
+ 

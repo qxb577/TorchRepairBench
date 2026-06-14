@@ -1,0 +1,14 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index 2798e177e6e..c118bcf570a 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -698,7 +698,8 @@ class AutogradFunctionApply(HigherOrderOperator):
+ 
+             @staticmethod
+             def backward(ctx, *grad):
+-                return bwd(None, *grad, *saved_values)
++                return bwd(None, *grad, *saved_values, *args)
++
+ 
+         return ApplyTemplate.apply(*fwd_args)
+ 

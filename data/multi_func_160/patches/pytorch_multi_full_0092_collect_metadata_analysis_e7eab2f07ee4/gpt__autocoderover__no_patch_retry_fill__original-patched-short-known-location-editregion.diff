@@ -1,0 +1,14 @@
+diff --git a/torch/utils/_python_dispatch.py b/torch/utils/_python_dispatch.py
+index 434a88ab292..b32aefaa291 100644
+--- a/torch/utils/_python_dispatch.py
++++ b/torch/utils/_python_dispatch.py
+@@ -268,7 +268,8 @@ and output of type {type(ret)}. But expected types to match."""
+ 
+                 if isinstance(ret, list):
+                     for r in ret:
+-                        torch.ops.aten.set_.source_Storage_storage_offset(r, arg.untyped_storage(), r.storage_offset(), r.shape)
++                        torch.ops.aten.set_.source_Storage_storage_offset(r, arg.untyped_storage(), r.storage_offset(), r.shape, r.stride())
++
+                 else:
+                     assert isinstance(ret, torch.Tensor), f"type: {type(ret)}"
+                     torch.ops.aten.set_.source_Storage_storage_offset(

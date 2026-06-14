@@ -1,0 +1,19 @@
+diff --git a/torch/nested/_internal/ops.py b/torch/nested/_internal/ops.py
+index 8cec2634a30..61b4e7b8046 100644
+--- a/torch/nested/_internal/ops.py
++++ b/torch/nested/_internal/ops.py
+@@ -377,9 +377,14 @@ def jagged_torch_function(func, *args, **kwargs):
+         func(args[0]._values, *args[1:], **kwargs)
+         return args[0]
+ 
++    if func.__name__ == "share_memory_":
++        args[0]._values.share_memory_()
++        return args[0]
++
+     # Handle flatten() here because it's CompositeImplicit.
+     if func.__name__ == "flatten":
+ 
++
+         def _flatten_sig(input, start_dim=0, end_dim=-1):
+             pass
+ 

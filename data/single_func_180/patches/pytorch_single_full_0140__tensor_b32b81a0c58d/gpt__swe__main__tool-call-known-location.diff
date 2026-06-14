@@ -1,0 +1,14 @@
+diff --git a/torch/_tensor.py b/torch/_tensor.py
+index 2c47e6f53de..7b93fce4293 100644
+--- a/torch/_tensor.py
++++ b/torch/_tensor.py
+@@ -777,7 +777,8 @@ class Tensor(torch._C._TensorBase):
+ 
+         return Resize.apply(self, tensor.size())
+ 
+-    def split(self, split_size, dim=0):
++    def split(self, split_size: 'SymInt', dim=0):
++
+         r"""See :func:`torch.split`"""
+         if has_torch_function_unary(self):
+             return handle_torch_function(

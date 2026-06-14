@@ -1,0 +1,14 @@
+diff --git a/torch/autograd/graph.py b/torch/autograd/graph.py
+index d2312331663..40c84eb1818 100644
+--- a/torch/autograd/graph.py
++++ b/torch/autograd/graph.py
+@@ -663,7 +663,8 @@ class _CloneArgBeforeMutateMode(TorchDispatchMode):
+ 
+         for idx, arg in enumerate(func._schema.arguments):
+             if arg.alias_info is not None and arg.alias_info.is_write:
+-                t = kwargs["out"] if arg.is_out else args[idx]
++                t = kwargs["out"] if arg.is_out and "out" in kwargs else args[idx]
++
+                 tid = _get_tid(t)
+                 sid = _get_sid(t)
+                 ctx = self.ctx

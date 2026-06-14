@@ -1,0 +1,18 @@
+diff --git a/torch/_numpy/_dtypes.py b/torch/_numpy/_dtypes.py
+index e002db2c0a4..fe6b6a2abf2 100644
+--- a/torch/_numpy/_dtypes.py
++++ b/torch/_numpy/_dtypes.py
+@@ -16,6 +16,13 @@ class generic:
+     def name(self):
+         return self.__class__.__name__
+ 
++    @classmethod
++    def __subclasshook__(cls, subclass):
++        if cls is generic:
++            return any("torch_dtype" in B.__dict__ for B in subclass.__mro__)
++        return NotImplemented
++
++
+     def __new__(cls, value):
+         # NumPy scalars are modelled as 0-D arrays
+         # so a call to np.float32(4) produces a 0-D array.

@@ -1,0 +1,16 @@
+diff --git a/torch/package/package_exporter.py b/torch/package/package_exporter.py
+index a7240b2e2c3..9802193de33 100644
+--- a/torch/package/package_exporter.py
++++ b/torch/package/package_exporter.py
+@@ -186,7 +186,10 @@ class PackageExporter:
+         else:  # is a byte buffer
+             self.buffer = f
+ 
+-        self.zip_file = torch._C.PyTorchFileWriter(f)
++        try:
++            self.zip_file = torch._C.PyTorchFileWriter(f)
++        except ImportError as e:
++            raise PackagingError(f"Dependency resolution failed.\n    {e.name}\n      Context: {e.msg}")
+         self.zip_file.set_min_version(6)
+         self.serialized_reduces: Dict[int, Any] = {}
+         self.serialized_storages: Set[str] = set()

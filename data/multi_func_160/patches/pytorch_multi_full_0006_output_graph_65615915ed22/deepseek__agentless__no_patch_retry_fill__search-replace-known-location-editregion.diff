@@ -1,0 +1,37 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index b3de2e0c2a5..a426996029a 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1148,7 +1148,6 @@ class OutputGraph:
+                 cg(val)
+                 cg.append_output(cg.create_load(self.backward_state_var))
+                 cg.store_attr(name)
+-        self.side_effects.codegen_hooks(cg)
+         self.side_effects.codegen_save_tempvars(cg)
+ 
+         # Return variables used for logging at the end
+@@ -1161,6 +1160,7 @@ class OutputGraph:
+ 
+         cg.restore_stack(stack_values, value_from_source=not tx.export)
+         self.side_effects.codegen_update_mutated(cg)
++        self.side_effects.codegen_hooks(cg)
+ 
+     def cleanup_graph(self):
+         """
+diff --git a/torch/_dynamo/side_effects.py b/torch/_dynamo/side_effects.py
+index aeb03a96b39..f77164d09a3 100644
+--- a/torch/_dynamo/side_effects.py
++++ b/torch/_dynamo/side_effects.py
+@@ -381,9 +381,10 @@ class SideEffects:
+         ]
+ 
+         # The only live side effects come from returns (tx.stack), any intermediates
+-        # during a graph break (tx.symbolic_locals), and mutation on pre-existing variables.
++        # during a graph break (tx.symbolic_locals), mutation on pre-existing variables,
++        # and any side effect hooks.
+         # Recursively visit Variables and see if any of them have been mutated.
+-        VariableTracker.visit(visit, (tx.stack, tx.symbolic_locals, pre_existing_vars))
++        VariableTracker.visit(visit, (tx.stack, tx.symbolic_locals, pre_existing_vars, self.hooks))
+         # Manually release the self-referential function, which indirectly
+         # captures certain `VariableTracker` and affects parts of PT test/logic
+         # that are sensitive to when certain objects get released.

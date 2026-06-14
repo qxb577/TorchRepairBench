@@ -1,0 +1,14 @@
+diff --git a/torch/fx/graph.py b/torch/fx/graph.py
+index 60c864b43b7..67a29759e07 100644
+--- a/torch/fx/graph.py
++++ b/torch/fx/graph.py
+@@ -378,7 +378,8 @@ class CodeGen:
+         self, nodes, root_module: str, namespace: _Namespace, *,
+         verbose: bool = False, include_stride: bool = False, include_device: bool = False, colored: bool = False
+     ) -> PythonCode:
+-        free_vars: List[str] = []
++        used_vars: Set[str] = set()
++        free_vars: List[str] = [node.name for node in nodes if node.name in used_vars]
+         body: List[str] = []
+         globals_: Dict[str, Any] = {}
+         wrapped_fns: Dict[str, None] = {}

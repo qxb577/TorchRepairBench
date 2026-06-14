@@ -1,0 +1,17 @@
+diff --git a/torch/fx/experimental/normalize.py b/torch/fx/experimental/normalize.py
+index d7bd2c11468..ca36428f957 100644
+--- a/torch/fx/experimental/normalize.py
++++ b/torch/fx/experimental/normalize.py
+@@ -45,10 +45,11 @@ class NormalizeArgs(Transformer):
+ 
+         def get_type(arg):
+             if isinstance(arg, fx.Node):
+-                return n.meta["type"] if "type" in n.meta else None
++                return arg.meta["type"] if "type" in arg.meta else None
+             return type(arg)
+ 
+         arg_types = map_aggregate(n.args, get_type)
++
+         assert isinstance(arg_types, tuple)
+         arg_types = tuple([create_type_hint(i) for i in arg_types])
+         kwarg_types = {k: get_type(v) for k, v in kwargs.items()}

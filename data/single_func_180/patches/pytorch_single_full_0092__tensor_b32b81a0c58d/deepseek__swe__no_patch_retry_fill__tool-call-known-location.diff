@@ -1,0 +1,14 @@
+diff --git a/torch/_tensor.py b/torch/_tensor.py
+index 2c47e6f53de..abf52cff28f 100644
+--- a/torch/_tensor.py
++++ b/torch/_tensor.py
+@@ -785,7 +785,8 @@ class Tensor(torch._C._TensorBase):
+             )
+         if isinstance(split_size, Tensor):
+             try:
+-                split_size = int(split_size)
++                split_size = split_size
++
+             except ValueError:
+                 pass
+ 

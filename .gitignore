@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.pyc
+*.log
+*.tmp
+*.local
+agent_env.local
+.env
+.env.*
+!.env.example

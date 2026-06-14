@@ -1,0 +1,18 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 3fb4206b60e..412c12cc82a 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -2972,11 +2972,13 @@ class CppVecKernelChecker(CppVecKernel):
+                                 torch.float16,
+                                 torch.bfloat16,
+                                 torch.float,
++                                torch.float64,
+                                 torch.uint8,
+                                 torch.int8,
+                                 torch.int32,
+                                 torch.int64,
+                             ]:
++
+                                 # Convert from dtype to torch.float
+                                 pass
+                             else:

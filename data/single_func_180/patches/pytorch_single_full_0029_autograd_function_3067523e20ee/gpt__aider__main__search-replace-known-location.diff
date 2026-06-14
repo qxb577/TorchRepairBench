@@ -1,0 +1,13 @@
+diff --git a/torch/_functorch/autograd_function.py b/torch/_functorch/autograd_function.py
+index ec3a3f528ab..bc400157695 100644
+--- a/torch/_functorch/autograd_function.py
++++ b/torch/_functorch/autograd_function.py
+@@ -826,7 +826,7 @@ class AutogradFunctionApply(HigherOrderOperator):
+                 # The Interpreter here is required to propagate metadata
+                 # from the dynamo graph body to the local_map graph body.
+                 # This is required for fx_traceback.annotate for work.
+-                output, saved_values = torch.fx.Interpreter(fwd).run(*args)
++                output, saved_values = torch.fx.Interpreter(fwd).run(*args, **kwargs)
+ 
+                 # See Note [Activations with no version counter checks in eager]
+                 # Mark tensors that came from ctx.save_for_backward with metadata.

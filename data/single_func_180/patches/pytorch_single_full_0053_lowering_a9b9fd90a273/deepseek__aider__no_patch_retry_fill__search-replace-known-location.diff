@@ -1,0 +1,20 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index b520869d632..08d158bec1e 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2034,7 +2034,14 @@ def index_put_as_masked_fill(self, indices, value, accumulate):
+         value = to_device(value, self.get_device())
+     if accumulate:
+         value = add(self, value)
+-    return mutate_to(self, where(indices[0], value, self))
++    mask = indices[0]
++    # unsqueeze mask to be broadcastable with self (#97105)
++    self_shape = self.get_size()
++    mask_shape = mask.get_size()
++    if len(mask_shape) < len(self_shape):
++        extra_dims = len(self_shape) - len(mask_shape)
++        mask = view(mask, list(mask_shape) + [1] * extra_dims)
++    return mutate_to(self, where(mask, value, self))
+ 
+ 
+ def index_put_fallback(self, indices, values, accumulate):

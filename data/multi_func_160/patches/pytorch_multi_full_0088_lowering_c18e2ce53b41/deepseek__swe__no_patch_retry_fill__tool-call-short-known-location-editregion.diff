@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/scheduler.py b/torch/_inductor/scheduler.py
+index 66f6b08c9c4..e906cb59e82 100644
+--- a/torch/_inductor/scheduler.py
++++ b/torch/_inductor/scheduler.py
+@@ -4394,9 +4394,10 @@ class Scheduler:
+ 
+             if not isinstance(node, NopKernelSchedulerNode):
+                 device = node.get_device()
+-                if device is not None and self.get_backend(device).ready_to_flush():
++                if device is not None and device.type != "meta" and self.get_backend(device).ready_to_flush():
+                     self.flush()
+ 
++
+         if self.current_device and device_need_guard(self.current_device.type):
+             # exit the outermost CUDA device guard. this is
+             # important for nested indentation codegen-ing.

@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 9d4b644543c..05c05e88d39 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -3275,7 +3275,7 @@ class InliningInstructionTranslator(InstructionTranslatorBase):
+         if name in self.closure_cells:
+             return self.closure_cells[name]
+         else:
+-            return InlinedClosureVariable(name=name)
++            return InlinedClosureVariable(name=name, closure_cells=self.closure_cells)
+ 
+     def check_replace_is_safe(self, oldvar):
+         if not is_side_effect_safe(oldvar.mutable_local):
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 33c56e69933..7327542a6d6 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -567,14 +567,17 @@ class NestedUserFunctionVariable(BaseUserFunctionVariable):
+                 # InliningInstructionTranslator that traces `func`) handles
+                 # the cell correctly - that is, the cell's contents are treated as if they
+                 # are local variables, like in UserFunctionVariable's bind_args for freevars.
+-                cand = parent
+-                while cand and name not in cand.symbolic_locals:
+-                    cand = cand.parent
+-                if cand is None:
+-                    raise RuntimeError(
+-                        f"Couldn't find {name} in the symbolic_locals of the inline interpreter stack"
+-                    )
+-                result[name] = cand.symbolic_locals[name]
++                if name in parent.closure_cells:
++                    result[name] = parent.closure_cells[name]
++                else:
++                    cand = parent
++                    while cand and name not in cand.symbolic_locals:
++                        cand = cand.parent
++                    if cand is None:
++                        raise RuntimeError(
++                            f"Couldn't find {name} in the symbolic_locals of the inline interpreter stack"
++                        )
++                    result[name] = cand.symbolic_locals[name]
+             else:
+                 closure_cells[name] = self.closure.items[idx]
+ 
+diff --git a/torch/_dynamo/variables/misc.py b/torch/_dynamo/variables/misc.py
+index 54b57348351..61565bb005d 100644
+--- a/torch/_dynamo/variables/misc.py
++++ b/torch/_dynamo/variables/misc.py
+@@ -341,7 +341,7 @@ class ClosureVariable(UnknownVariable):
+         *UnknownVariable._nonvar_fields,
+     }
+ 
+-    def __init__(self, name, **kwargs) -> None:
++    def __init__(self, name, closure_cells=None, **kwargs) -> None:
+         super().__init__(**kwargs)
+         self.name = name
+ 

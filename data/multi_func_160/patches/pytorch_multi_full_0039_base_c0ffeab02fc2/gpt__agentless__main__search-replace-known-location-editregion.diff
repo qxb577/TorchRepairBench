@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 0c92bf30180..e3e91da45e9 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -57,7 +57,7 @@ if TYPE_CHECKING:
+ _F = TypeVar("_F", bound=Callable)
+ 
+ 
+-def wrap_bound_arg(tx: "InstructionTranslator", val, source=None):
++def wrap_bound_arg(tx: "InstructionTranslator", val, source=None, *, wraps=None):
+     # Source propagation is best effort since not every object we encounter has a source to begin with.
+     if isinstance(val, VariableTracker):
+         return val

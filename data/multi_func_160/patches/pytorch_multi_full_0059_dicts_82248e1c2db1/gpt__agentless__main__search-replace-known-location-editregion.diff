@@ -1,0 +1,53 @@
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index c7303513d6b..c07fb1038a6 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -700,7 +700,7 @@ class ConstDictVariable(VariableTracker):
+         elif name == "popitem" and self.is_mutable():
+             if (
+                 issubclass(self.user_cls, dict)
+-                and not issubclass(self.user_cls, collections.OrderedDict)
++                and not issubclass(self.user_cls, collections.abc.OrderedDict)
+                 and len(args)
+             ):
+                 raise_args_mismatch(tx, name)
+@@ -709,7 +709,7 @@ class ConstDictVariable(VariableTracker):
+                 msg = VariableTracker.build(tx, "popitem(): dictionary is empty")
+                 raise_observed_exception(KeyError, tx, args=[msg])
+ 
+-            if self.user_cls is collections.OrderedDict and (
++            if self.user_cls is collections.abc.OrderedDict and (
+                 len(args) == 1 or "last" in kwargs
+             ):
+                 if len(args) == 1 and args[0].is_python_constant():
+diff --git a/torch/_dynamo/variables/user_defined.py b/torch/_dynamo/variables/user_defined.py
+index 2264c960e7c..becc5d11bab 100644
+--- a/torch/_dynamo/variables/user_defined.py
++++ b/torch/_dynamo/variables/user_defined.py
+@@ -471,7 +471,7 @@ class UserDefinedClassVariable(UserDefinedVariable):
+             return variables.BuiltinVariable.call_custom_dict_fromkeys(
+                 tx, self.value, *args, **kwargs
+             )
+-        elif self.value is collections.OrderedDict and name == "move_to_end":
++        elif self.value is collections.abc.OrderedDict and name == "move_to_end":
+             return args[0].call_method(tx, name, [*args[1:]], kwargs)
+         elif name == "__eq__" and len(args) == 1 and hasattr(args[0], "value"):
+             return VariableTracker.build(tx, self.value == args[0].value)
+@@ -487,7 +487,7 @@ class UserDefinedClassVariable(UserDefinedVariable):
+             return SourcelessBuilder.create(tx, set).call_method(tx, name, args, kwargs)
+         elif (
+             name == "__new__"
+-            and self.value is collections.OrderedDict
++            and self.value is collections.abc.OrderedDict
+             and isinstance(args[0], UserDefinedClassVariable)
+             and args[0].value is collections.OrderedDict
+         ):
+@@ -2653,7 +2653,7 @@ class UserDefinedDictVariable(UserDefinedObjectVariable):
+                 "dict_vt must be constructed by builder.py when source is present"
+             )
+             self._dict_vt = ConstDictVariable(
+-                {}, type(value), mutation_type=ValueMutationNew()
++                {}, collections.OrderedDict, mutation_type=ValueMutationNew()
+             )
+         else:
+             self._dict_vt = dict_vt

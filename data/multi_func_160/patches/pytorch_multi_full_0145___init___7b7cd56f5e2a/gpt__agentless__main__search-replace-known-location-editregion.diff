@@ -1,0 +1,39 @@
+diff --git a/torch/_prims_common/__init__.py b/torch/_prims_common/__init__.py
+index b2721129cff..9e98c2afa95 100644
+--- a/torch/_prims_common/__init__.py
++++ b/torch/_prims_common/__init__.py
+@@ -452,7 +452,7 @@ def is_non_overlapping_and_dense(a: Tensor) -> bool:
+         return False
+ 
+     # Short-circuits if the tensor is already contiguous or channels-last contiguous
+-    if is_contiguous(a) or is_channels_last_contiguous(a):
++    if is_contiguous(a) or is_channels_last_contiguous(a) or a.is_empty():
+         return True
+ 
+     # The following is equivalent to compute_non_overlapping_and_dense in TensorImpl.cpp
+diff --git a/torch/_refs/__init__.py b/torch/_refs/__init__.py
+index e128a3b5f81..0aa6274c977 100644
+--- a/torch/_refs/__init__.py
++++ b/torch/_refs/__init__.py
+@@ -2975,7 +2975,7 @@ def contiguous(
+         lambda: "preserve memory format is unsupported by the contiguous operator",
+     )
+ 
+-    if utils.is_contiguous_for_memory_format(a, memory_format=memory_format):
++    if utils.is_contiguous_for_memory_format(a, memory_format=memory_format) or a.is_empty():
+         return a
+ 
+     return torch.clone(a, memory_format=memory_format)
+diff --git a/torch/_subclasses/fake_impls.py b/torch/_subclasses/fake_impls.py
+index db28aad88eb..1acbf19be66 100644
+--- a/torch/_subclasses/fake_impls.py
++++ b/torch/_subclasses/fake_impls.py
+@@ -1017,7 +1017,7 @@ def make_fast_binary_impl(
+         # compute_fast_setup_type
+         is_contiguous = True
+         is_channels_last = True
+-        # TODO: is_non-overlapping_and_dense (not bound from Python
++        is_non_overlapping_and_dense = True
+         # no inplace, no out, everything defined
+ 
+         if is_noncontiguous_supported(common_device):

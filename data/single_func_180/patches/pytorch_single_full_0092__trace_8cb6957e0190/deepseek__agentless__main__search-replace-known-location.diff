@@ -1,0 +1,12 @@
+diff --git a/torch/export/_trace.py b/torch/export/_trace.py
+index 3a721e639a8..815086aee64 100644
+--- a/torch/export/_trace.py
++++ b/torch/export/_trace.py
+@@ -1501,6 +1501,7 @@ def _export_to_aten_ir_make_fx(
+ 
+         named_parameters = dict(mod.named_parameters(remove_duplicate=False))
+         named_buffers = dict(mod.named_buffers(remove_duplicate=False))
++        named_buffers = {k: v for k, v in named_buffers.items() if v is not None}
+ 
+         params_and_buffers = {**named_parameters, **named_buffers}
+         params_and_buffers_flat, params_spec = pytree.tree_flatten(params_and_buffers)

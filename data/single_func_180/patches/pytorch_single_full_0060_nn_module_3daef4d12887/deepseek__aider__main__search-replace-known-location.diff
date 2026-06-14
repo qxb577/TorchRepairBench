@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 3ca91814b8a..5a20f63e856 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -908,8 +908,8 @@ class UnspecializedNNModuleVariable(UserDefinedObjectVariable):
+     @staticmethod
+     @functools.cache
+     def _nn_module_method_ids():
+-        # Allow __setattr__ to fall through to base class handler
+-        supported = {torch.nn.Module.__setattr__, torch.nn.Module.__init__}
++        # Allow __setattr__ and __delattr__ to fall through to base class handler
++        supported = {torch.nn.Module.__setattr__, torch.nn.Module.__init__, torch.nn.Module.__delattr__}
+         return {
+             id(x.__code__)
+             for x in torch.nn.Module.__dict__.values()

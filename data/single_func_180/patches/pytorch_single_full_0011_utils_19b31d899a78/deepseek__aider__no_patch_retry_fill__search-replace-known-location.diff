@@ -1,0 +1,23 @@
+diff --git a/torch/_dynamo/utils.py b/torch/_dynamo/utils.py
+index d98c090543b..1647e2b3a76 100644
+--- a/torch/_dynamo/utils.py
++++ b/torch/_dynamo/utils.py
+@@ -1943,7 +1943,17 @@ def get_real_value(node, tracer):
+         lambda n: get_real_value(n, tracer),
+     )
+ 
+-    if op == "call_module":
++    if op == "placeholder":
++        # Handle placeholder nodes to get the real value from the tracer's input.
++        from torch._subclasses.fake_tensor import is_fake
++        example_value = node.meta["example_value"]
++        if is_fake(example_value):
++            real_value = tracer.fake_mode.from_fake(example_value)
++        else:
++            real_value = example_value
++        cache[node] = real_value
++        return real_value
++    elif op == "call_module":
+         nn_module = tracer.output_graph.nn_modules[node.target]
+         if not is_lazy_module(nn_module):
+             nn_module = copy.deepcopy(nn_module)

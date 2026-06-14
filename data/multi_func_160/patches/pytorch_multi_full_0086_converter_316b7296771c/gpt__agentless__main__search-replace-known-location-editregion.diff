@@ -1,0 +1,35 @@
+diff --git a/torch/_export/converter.py b/torch/_export/converter.py
+index 568685f9759..dfa72b382f5 100644
+--- a/torch/_export/converter.py
++++ b/torch/_export/converter.py
+@@ -24,7 +24,7 @@ from torchgen.model import FunctionSchema
+ def inplace_optimize_sym_size_div(gm: torch.fx.GraphModule):
+     def pattern(im, dim, scale):
+         sym_size_int = torch.ops.aten.sym_size.int(im, dim)
+-        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int)
++        scalar_tensor = torch.ops.aten.scalar_tensor(sym_size_int, dtype=torch.int64)
+         div_scalar_mode = torch.ops.aten.div.Scalar_mode(
+             scalar_tensor, scale, rounding_mode="trunc"
+         )
+@@ -188,7 +188,7 @@ def get_block_to_lifted_attrs(graph: torch._C.Graph) -> Dict[torch._C.Block, Set
+ 
+ 
+ def get_op_overload(node: torch._C.Node):
+-    schema_str = node.schema()
++    schema_str = node.schema
+     schema = FunctionSchema.parse(schema_str)
+     ns, op_name = str(schema.name.name).split("::")
+     override = schema.name.overload_name
+diff --git a/torch/jit/_trace.py b/torch/jit/_trace.py
+index 7db85602428..5f85d3c5cfe 100644
+--- a/torch/jit/_trace.py
++++ b/torch/jit/_trace.py
+@@ -650,7 +650,7 @@ def analyze_ts_result_with_export_result(export, trace):
+         if orig.layout != loaded.layout:
+             return False
+         # mkldnn is not supported for torch.allclose
+-        if orig.layout == torch._mkldnn:  # type: ignore[attr-defined]
++        if orig.layout == torch._mkldnn_layout:  # type: ignore[attr-defined]
+             return True
+         if type(orig) != type(loaded):
+             return False

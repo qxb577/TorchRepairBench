@@ -1,0 +1,24 @@
+diff --git a/torch/ao/quantization/fx/_lower_to_native_backend.py b/torch/ao/quantization/fx/_lower_to_native_backend.py
+index aa71fafbf00..8ec67142651 100644
+--- a/torch/ao/quantization/fx/_lower_to_native_backend.py
++++ b/torch/ao/quantization/fx/_lower_to_native_backend.py
+@@ -107,9 +107,11 @@ def is_copy_node(node, modules):
+         torch.avg_pool1d,
+         torch._C._nn.avg_pool2d,
+         torch._C._nn.avg_pool3d,
++        torch.channel_shuffle,
+         torch.clamp,
+         torch.flatten,
+         torch.mean,
++        torch.nn.functional.channel_shuffle,
+         operator.floordiv,
+     ]
+     method_list = [
+@@ -125,6 +127,7 @@ def is_copy_node(node, modules):
+         torch.nn.AvgPool1d,
+         torch.nn.AvgPool2d,
+         torch.nn.AvgPool3d,
++        torch.nn.ChannelShuffle,
+         torch.nn.Hardtanh,
+         torch.nn.MaxPool1d,
+         torch.nn.MaxPool2d,

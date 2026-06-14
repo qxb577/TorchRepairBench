@@ -1,0 +1,30 @@
+diff --git a/torch/_functorch/compile_utils.py b/torch/_functorch/compile_utils.py
+index a5c3201c4ce..3cc67330e10 100644
+--- a/torch/_functorch/compile_utils.py
++++ b/torch/_functorch/compile_utils.py
+@@ -48,13 +48,22 @@ def fx_graph_cse(fx_g: torch.fx.graph.Graph):
+             args, args_spec = substitute(n.args)
+             kwargs, kwargs_spec = substitute(n.kwargs)
+ 
++            # To avoid collisions between different types of values (e.g., 1 and 1.0),
++            # we wrap non-Node constants with their types.
++            def _wrap_number(v):
++                if isinstance(v, (int, float, bool, complex)):
++                    return (type(v), v)
++                return v
++            wrapped_args = tuple(_wrap_number(a) for a in args)
++            wrapped_kwargs = {k: _wrap_number(v) for k, v in kwargs.items()}
++
+             # each token corresponds to a unique node
+             # nodes with the same token can be substituted
+-            token = {"target": n.target, "args": args, "args_spec": args_spec,
+-                     "kwargs": kwargs, "kwargs_spec": kwargs_spec}
++            token = {"target": n.target, "args": wrapped_args, "args_spec": args_spec,
++                     "kwargs": wrapped_kwargs, "kwargs_spec": kwargs_spec}
+ 
+             # hash substituted args to a number, do not hash specs because specs are not hashable
+-            hash_arg = hash((args, kwargs))
++            hash_arg = hash((wrapped_args, wrapped_kwargs))
+             hash_val = (n.target, hash_arg)
+ 
+             # check if a node has a substitute and can be eliminated

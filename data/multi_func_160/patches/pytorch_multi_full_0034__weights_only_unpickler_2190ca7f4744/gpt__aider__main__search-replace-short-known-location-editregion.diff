@@ -1,0 +1,26 @@
+diff --git a/torch/_weights_only_unpickler.py b/torch/_weights_only_unpickler.py
+index 3307052c91d..6322ab33ccc 100644
+--- a/torch/_weights_only_unpickler.py
++++ b/torch/_weights_only_unpickler.py
+@@ -141,7 +141,7 @@ def _get_user_allowed_globals():
+             f, name = f
+             rc[name] = f
+         else:
+-            module, name = f.__module__, f.__name__
++            module, name = f.__module__, f.__qualname__
+             rc[f"{module}.{name}"] = f
+     return rc
+ 
+diff --git a/torch/serialization.py b/torch/serialization.py
+index e578eb35434..eb278b6c812 100644
+--- a/torch/serialization.py
++++ b/torch/serialization.py
+@@ -274,7 +274,7 @@ def add_safe_globals(safe_globals: list[Union[Callable, tuple[Callable, str]]])
+     (function/class, string) where string is the full path of the function/class.
+ 
+     Within the serialized format, each function is identified with its full
+-    path as ``{__module__}.{__name__}``. When calling this API, you can provide this
++    path as ``{__module__}.{__qualname__}``. When calling this API, you can provide this
+     full path that should match the one in the checkpoint otherwise the default
+     ``{fn.__module__}.{fn.__name__}`` will be used.
+ 

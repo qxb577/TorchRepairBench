@@ -1,0 +1,26 @@
+diff --git a/torch/_meta_registrations.py b/torch/_meta_registrations.py
+index 3afe3a98d10..7f7b1b813cf 100644
+--- a/torch/_meta_registrations.py
++++ b/torch/_meta_registrations.py
+@@ -369,7 +369,7 @@ def meta_copy_(self, src, non_blocking=False):
+     # In theory, we should make this more robust by carefully
+     # auditing our C++ copy_() kernel and copying the checks here.
+ 
+-    if torch._debug_has_internal_overlap(self) == 1:  # 1 == MemOverlap::Yes
++    if torch._debug_has_internal_overlap(self) != 0:  # 0 == MemOverlap::No
+         raise RuntimeError(
+             "more than one element of the written-to tensor refers to a single memory location"
+         )
+diff --git a/torch/utils/_sympy/functions.py b/torch/utils/_sympy/functions.py
+index 0d7c5a784c6..95eed0913ed 100644
+--- a/torch/utils/_sympy/functions.py
++++ b/torch/utils/_sympy/functions.py
+@@ -586,7 +586,7 @@ class IsNonOverlappingAndDenseIndicator(sympy.Function):
+         # tensor with non-0/1 sizes but strides (0, 1) is definitely
+         # false, because we know its numel > 1 but it's broadcasted
+         # in dim 0.
+-        if all(isinstance(a, sympy.Integer) for a in args):
++        if all(isinstance(a, (sympy.Integer, sympy.Symbol)) for a in args):
+             # sym_node imported in torch.__init__. Local import to avoid an import cycle
+             from torch.fx.experimental.symbolic_shapes import (
+                 eval_is_non_overlapping_and_dense,

@@ -1,0 +1,15 @@
+diff --git a/torch/nn/utils/stateless.py b/torch/nn/utils/stateless.py
+index ae7ebcdf3df..9ef3c154124 100644
+--- a/torch/nn/utils/stateless.py
++++ b/torch/nn/utils/stateless.py
+@@ -136,8 +136,9 @@ def _reparametrize_module(
+         parameters_and_buffers.update(
+             {
+                 k: new_parameters_and_buffers[k]
+-                for k in parameters_and_buffers
++                for k in untied_parameters_and_buffers
+                 if k in new_parameters_and_buffers
++
+             }
+         )
+ 

@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/tensor.py b/torch/_dynamo/variables/tensor.py
+index bf5e7ddfbea..449f90d2c20 100644
+--- a/torch/_dynamo/variables/tensor.py
++++ b/torch/_dynamo/variables/tensor.py
+@@ -245,7 +245,7 @@ class TensorVariable(VariableTracker):
+                 return VariableTracker.build(tx, example_value)
+ 
+         if not (self.source and self.source.subguards_allowed()):
+-            raise NotImplementedError
++            return VariableTracker.build(tx, real_value, AttrSource(self.source, name))
+ 
+         # For local source, we associate the real value. We use this real value
+         # for implementing getattr fallthrough on the variable tracker base class.

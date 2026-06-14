@@ -1,0 +1,15 @@
+diff --git a/torch/_dynamo/output_graph.py b/torch/_dynamo/output_graph.py
+index b3de2e0c2a5..f8600c7e235 100644
+--- a/torch/_dynamo/output_graph.py
++++ b/torch/_dynamo/output_graph.py
+@@ -1148,8 +1148,9 @@ class OutputGraph:
+                 cg(val)
+                 cg.append_output(cg.create_load(self.backward_state_var))
+                 cg.store_attr(name)
+-        self.side_effects.codegen_hooks(cg)
+         self.side_effects.codegen_save_tempvars(cg)
++        self.side_effects.codegen_hooks(cg)
++
+ 
+         # Return variables used for logging at the end
+         for debug_var, args in tx.debug_locals:

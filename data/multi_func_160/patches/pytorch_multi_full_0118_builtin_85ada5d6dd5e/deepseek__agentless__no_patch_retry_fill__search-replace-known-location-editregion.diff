@@ -1,0 +1,56 @@
+diff --git a/torch/_dynamo/variables/builtin.py b/torch/_dynamo/variables/builtin.py
+index 5a19e707689..5d6b81b98eb 100644
+--- a/torch/_dynamo/variables/builtin.py
++++ b/torch/_dynamo/variables/builtin.py
+@@ -2272,10 +2272,19 @@ class BuiltinVariable(VariableTracker):
+             )
+         if hasattr(a, "set_items") and hasattr(b, "set_items"):
+             return SetVariable(list(a.set_items | b.set_items))
++        if isinstance(a, ConstDictVariable) and isinstance(b, ConstDictVariable):
++            new_items = {**a.items, **b.items}
++            return ConstDictVariable(new_items, user_cls=a.user_cls)
+         # None no-ops this handler and lets the driving function proceed
+         return None
+ 
+-    call_ior = call_or_
++    def call_ior_(self, tx: "InstructionTranslator", a, b):
++        if isinstance(a, ConstDictVariable) and isinstance(b, ConstDictVariable):
++            a.install_dict_keys_match_guard()
++            tx.output.side_effects.mutation(a)
++            a.items.update(b.items)
++            return a
++        return self.call_or_(tx, a, b)
+ 
+     def call_not_(self, tx: "InstructionTranslator", a):
+         if isinstance(a, SymNodeVariable):
+diff --git a/torch/_dynamo/variables/dicts.py b/torch/_dynamo/variables/dicts.py
+index 2703d8c4eb7..8d334ba7430 100644
+--- a/torch/_dynamo/variables/dicts.py
++++ b/torch/_dynamo/variables/dicts.py
+@@ -534,6 +534,26 @@ class ConstDictVariable(VariableTracker):
+             self.items.pop(key)
+             self.items[key] = val
+             return ConstantVariable.create(None)
++        elif name == "__or__":
++            assert not kwargs and len(args) == 1
++            other = args[0]
++            assert isinstance(other, ConstDictVariable), "unsupported type for __or__"
++            new_items = {**self.items, **other.items}
++            return ConstDictVariable(new_items, user_cls=self.user_cls)
++        elif name == "__ror__":
++            assert not kwargs and len(args) == 1
++            other = args[0]
++            assert isinstance(other, ConstDictVariable), "unsupported type for __ror__"
++            new_items = {**other.items, **self.items}
++            return ConstDictVariable(new_items, user_cls=other.user_cls)
++        elif name == "__ior__":
++            assert not kwargs and len(args) == 1
++            other = args[0]
++            assert isinstance(other, ConstDictVariable), "unsupported type for __ior__"
++            self.install_dict_keys_match_guard()
++            tx.output.side_effects.mutation(self)
++            self.items.update(other.items)
++            return self
+         else:
+             return super().call_method(tx, name, args, kwargs)
+ 

@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/variables/functions.py b/torch/_dynamo/variables/functions.py
+index 0c92bf30180..5fea05b5015 100644
+--- a/torch/_dynamo/variables/functions.py
++++ b/torch/_dynamo/variables/functions.py
+@@ -17,7 +17,8 @@ from typing import (
+     TypeVar,
+     Union,
+ )
+-from typing_extensions import Never
++from typing import Any, Callable, Dict, List, Optional, Tuple, TypeVar, Union
++
+ 
+ import torch
+ 

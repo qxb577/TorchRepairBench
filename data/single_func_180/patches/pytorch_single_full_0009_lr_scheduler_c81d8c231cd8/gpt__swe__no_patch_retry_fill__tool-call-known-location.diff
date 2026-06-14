@@ -1,0 +1,14 @@
+diff --git a/torch/optim/lr_scheduler.py b/torch/optim/lr_scheduler.py
+index 9800a04ec1e..1c6a6eb6b61 100644
+--- a/torch/optim/lr_scheduler.py
++++ b/torch/optim/lr_scheduler.py
+@@ -1788,7 +1788,8 @@ class CosineAnnealingWarmRestarts(LRScheduler):
+             epoch = self.last_epoch + 1
+             self.T_cur = self.T_cur + 1
+             if self.T_cur >= self.T_i:
+-                self.T_cur = self.T_cur - self.T_i
++                self.T_cur = self.T_cur % self.T_i
++
+                 self.T_i = self.T_i * self.T_mult
+         else:
+             if epoch < 0:

@@ -1,0 +1,59 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index 24de4ae373a..61f7e5fd221 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -3617,15 +3617,13 @@ class AlgorithmSelectorCache(PersistentCache):
+         # So we need call as_strided in the end to 'view' the tensor with the correct
+         # sizes/strides
+         return AlgorithmSelectorCache.generate_example_value(
+-            V.graph.sizevars.size_hints(
++            V.graph.sizevars.atomically_apply_size_hint(
+                 node.get_size(),
+-                fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
++                fallback=config.unbacked_symint_fallback
+             ),
+-            V.graph.sizevars.size_hints(
++            V.graph.sizevars.atomically_apply_size_hint(
+                 node.get_stride(),
+-                fallback=config.unbacked_symint_fallback,
+-                hint_override=hint_override,
++                fallback=config.unbacked_symint_fallback
+             ),
+             node.get_device(),
+             node.get_dtype(),
+@@ -3673,13 +3671,13 @@ class AlgorithmSelectorCache(PersistentCache):
+         return (
+             node.get_device().type,
+             str(node.get_dtype()),
+-            *sizevars.size_hints(
++            *sizevars.atomically_apply_size_hint(
+                 node.get_size(),
+-                fallback=config.unbacked_symint_fallback,
++                fallback=config.unbacked_symint_fallback
+             ),
+-            *sizevars.size_hints(
++            *sizevars.atomically_apply_size_hint(
+                 node.get_stride(),
+-                fallback=config.unbacked_symint_fallback,
++                fallback=config.unbacked_symint_fallback
+             ),
+             sizevars.size_hint(
+                 node.get_layout().offset,
+diff --git a/torch/_inductor/sizevars.py b/torch/_inductor/sizevars.py
+index 44689734d80..409aa7bdf2c 100644
+--- a/torch/_inductor/sizevars.py
++++ b/torch/_inductor/sizevars.py
+@@ -913,10 +913,8 @@ class SizeVarAllocator:
+         if isinstance(expr, (int, sympy.Integer)):
+             return int(expr)
+ 
+-        if has_free_unbacked_symbols(expr):
+-            # Make sure to substitute with the factored version
+-            # e.g. 10*(s0 + u0) instead of 10*s0 + 10*u0
+-            expr = self._sub_unbacked_exprs(sympy.factor(expr))
++        if has_free_unbacked_symbols(expr) or isinstance(expr, sympy.Expr):
++            expr = sympy.factor(expr)
+ 
+         # For multiple expressions that depend on an unbacked symint,
+         # we want to compute them consistently for a size hint we have chosen.

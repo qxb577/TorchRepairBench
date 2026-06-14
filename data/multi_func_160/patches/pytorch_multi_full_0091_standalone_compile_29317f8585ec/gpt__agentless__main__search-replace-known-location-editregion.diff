@@ -1,0 +1,13 @@
+diff --git a/torch/_inductor/standalone_compile.py b/torch/_inductor/standalone_compile.py
+index 6a1d17dbe9a..0ba9e6d9e02 100644
+--- a/torch/_inductor/standalone_compile.py
++++ b/torch/_inductor/standalone_compile.py
+@@ -11,7 +11,7 @@ from torch._dynamo.utils import dynamo_timed
+ from torch._inductor.cudagraph_utils import BoxedDeviceIndex
+ from torch._inductor.runtime.cache_dir_utils import temporary_cache_dir
+ from torch._inductor.utils import BoxedBool, InputType
+-from torch._subclasses import FakeTensorMode
++from torch._subclasses.fake_tensor import FakeTensorMode
+ from torch.fx.experimental.symbolic_shapes import ShapeEnv
+ 
+ from . import config

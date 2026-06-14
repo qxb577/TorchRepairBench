@@ -1,0 +1,20 @@
+diff --git a/torch/_decomp/decompositions.py b/torch/_decomp/decompositions.py
+index 2d30d42dafa..84fccf2bfdb 100644
+--- a/torch/_decomp/decompositions.py
++++ b/torch/_decomp/decompositions.py
+@@ -2233,6 +2233,7 @@ def index_add_(
+ 
+ @register_decomposition(aten.index_add)
+ @out_wrapper()
++@register_decomposition(aten.pad_sequence)
+ def index_add(
+     x: TensorLike,
+     dim: int,
+@@ -2244,6 +2245,7 @@ def index_add(
+     return _index_add(x, dim, index, tensor, inplace=False, alpha=alpha)
+ 
+ 
++
+ def _index_add(
+     x: TensorLike,
+     dim: int,

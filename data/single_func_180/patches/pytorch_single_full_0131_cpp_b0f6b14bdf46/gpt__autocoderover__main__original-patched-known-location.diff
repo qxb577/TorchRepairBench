@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index e82229540a0..55f1e42a79f 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -1205,7 +1205,8 @@ class CppVecOverrides(CppOverrides):
+                     ]
+ 
+                 if vectors:
+-                    return func(*new_args, **kwargs)
++                    return func(*new_args, **{k: v for k, v in kwargs.items() if k != 'use_compute_types'})
++
+                 else:
+                     # fallback to scalar ops
+                     scalar_ops = super(CppVecOverrides, self)

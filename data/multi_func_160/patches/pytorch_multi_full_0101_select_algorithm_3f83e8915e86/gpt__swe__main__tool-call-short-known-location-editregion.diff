@@ -1,0 +1,14 @@
+diff --git a/torch/_inductor/select_algorithm.py b/torch/_inductor/select_algorithm.py
+index 24de4ae373a..930a9ebde88 100644
+--- a/torch/_inductor/select_algorithm.py
++++ b/torch/_inductor/select_algorithm.py
+@@ -3159,7 +3159,8 @@ class AlgorithmSelectorCache(PersistentCache):
+                         hint_override=hint_override,
+                     ),
+                     V.graph.sizevars.size_hints(
+-                        input_node.get_stride(),
++                        input_node.get_stride() or (0,),
++
+                         fallback=config.unbacked_symint_fallback,
+                         hint_override=hint_override,
+                     ),

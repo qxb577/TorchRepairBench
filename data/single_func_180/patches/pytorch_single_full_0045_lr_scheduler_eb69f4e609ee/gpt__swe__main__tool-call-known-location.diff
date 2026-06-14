@@ -1,0 +1,18 @@
+diff --git a/torch/optim/lr_scheduler.py b/torch/optim/lr_scheduler.py
+index 06ae24ef08d..58e8329d80c 100644
+--- a/torch/optim/lr_scheduler.py
++++ b/torch/optim/lr_scheduler.py
+@@ -289,9 +289,13 @@ class LambdaLR(LRScheduler):
+         lr_lambda: Union[Callable[[int], float], list[Callable[[int], float]]],
+         last_epoch: int = -1,
+     ) -> None:  # noqa: D107
++        if not callable(lr_lambda) and not all(callable(fn) for fn in lr_lambda):
++            raise TypeError("lr_lambda should be a function or a list of functions")
++
+         self.optimizer = optimizer
+ 
+         self.lr_lambdas: list[Callable[[int], float]]
++
+         if not isinstance(lr_lambda, list) and not isinstance(lr_lambda, tuple):
+             self.lr_lambdas = [lr_lambda] * len(optimizer.param_groups)
+         else:

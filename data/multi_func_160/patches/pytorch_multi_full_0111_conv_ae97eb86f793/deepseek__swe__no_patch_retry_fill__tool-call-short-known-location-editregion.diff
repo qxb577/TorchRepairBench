@@ -1,0 +1,17 @@
+diff --git a/torch/_inductor/template_heuristics/triton.py b/torch/_inductor/template_heuristics/triton.py
+index f4c836247df..b4b91093626 100644
+--- a/torch/_inductor/template_heuristics/triton.py
++++ b/torch/_inductor/template_heuristics/triton.py
+@@ -1153,9 +1153,11 @@ class ROCmConfigHeuristic(BaseConfigHeuristic):
+         ROCm specific filtering
+         """
+         for c in configs:
+-            c.num_stages = self.default_num_stages
++            if self.search_space != "exhaustive":
++                c.num_stages = self.default_num_stages
+         return super()._filter_configs(configs)
+ 
++
+     def _finalize_mm_configs(
+         self,
+         configs: list[BaseConfig],

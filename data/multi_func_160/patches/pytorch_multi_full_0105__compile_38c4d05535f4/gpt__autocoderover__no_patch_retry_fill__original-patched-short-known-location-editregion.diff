@@ -1,0 +1,14 @@
+diff --git a/torch/_dynamo/decorators.py b/torch/_dynamo/decorators.py
+index ff1156b04b6..824c9d88250 100644
+--- a/torch/_dynamo/decorators.py
++++ b/torch/_dynamo/decorators.py
+@@ -94,7 +94,8 @@ def disable(fn=None, recursive=True, *, reason=None):
+             assert callable(fn)
+ 
+             nonrecursive_disable_wrapper = get_nonrecursive_disable_wrapper(fn)
+-            nonrecursive_disable_wrapper._torchdynamo_disable = True  # type: ignore[attr-defined]
++            nonrecursive_disable_wrapper._torchdynamo_disable = False  # type: ignore[attr-defined]
++
+             nonrecursive_disable_wrapper._torchdynamo_disable_msg = reason  # type: ignore[attr-defined]
+             nonrecursive_disable_wrapper._torchdynamo_orig_callable = fn  # type: ignore[attr-defined]
+             return nonrecursive_disable_wrapper

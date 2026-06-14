@@ -1,0 +1,13 @@
+diff --git a/torch/_dynamo/variables/nn_module.py b/torch/_dynamo/variables/nn_module.py
+index 8378ad83926..00fa90c307c 100644
+--- a/torch/_dynamo/variables/nn_module.py
++++ b/torch/_dynamo/variables/nn_module.py
+@@ -187,7 +187,7 @@ class NNModuleVariable(VariableTracker):
+ 
+     def __init__(
+         self, module_type: type, module_key: str, value: torch.nn.Module, **kwargs: Any
+-    ) -> None:
++    ) -> VariableTracker:
+         super().__init__(**kwargs)
+         self.module_type = module_type
+         self.module_key = module_key

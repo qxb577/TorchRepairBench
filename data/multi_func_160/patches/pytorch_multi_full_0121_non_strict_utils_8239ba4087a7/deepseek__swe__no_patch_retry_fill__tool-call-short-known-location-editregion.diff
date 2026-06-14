@@ -1,0 +1,32 @@
+diff --git a/torch/_export/non_strict_utils.py b/torch/_export/non_strict_utils.py
+index fffe85beb46..328656e8e20 100644
+--- a/torch/_export/non_strict_utils.py
++++ b/torch/_export/non_strict_utils.py
+@@ -213,13 +213,17 @@ def fakify(
+             constraint_sizes[i] = RelaxedUnspecConstraint(warn_only=False)  # type: ignore[call-overload]
+         else:
+             dynamic_sizes.append(DimDynamic.STATIC)
+-    symbolic_context: StatelessSymbolicContext = (  # make mypy happy
++    t_id = id(t)
++    if t_id in t_constraints:
++        for i, constraint in t_constraints[t_id].items():
++            if dynamic_sizes[i] == DimDynamic.STATIC:
++                dynamic_sizes[i] = DimDynamic.DYNAMIC
++    symbolic_context: StatelessSymbolicContext = (
+         StatelessSymbolicContext(
+             dynamic_sizes=dynamic_sizes,
+             constraint_sizes=constraint_sizes,  # type: ignore[arg-type]
+         )
+     )
+-    t_id = id(t)
+     assert mode.shape_env is not None
+     if t_id in t_constraints:
+         for i, constraint in t_constraints[t_id].items():
+@@ -229,6 +233,7 @@ def fakify(
+                 continue
+             symbolic_context.constraint_sizes[i] = constraint.constraint_range
+             mode.shape_env.source_name_to_debug_name[src.name()] = constraint.name  # type: ignore[assignment]
++
+     fake = mode.from_tensor(t, source=source, symbolic_context=symbolic_context)
+     mode.shape_env.tracked_fakes.append(TrackedFake(fake, source, symbolic_context))  # type: ignore[union-attr]
+     return fake

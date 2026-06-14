@@ -1,0 +1,13 @@
+diff --git a/torch/utils/cpp_extension.py b/torch/utils/cpp_extension.py
+index d3d264d6172..758f2b21a80 100644
+--- a/torch/utils/cpp_extension.py
++++ b/torch/utils/cpp_extension.py
+@@ -2187,7 +2187,7 @@ def _write_ninja_file_to_build_library(path,
+ 
+     common_cflags += [f"{x}" for x in _get_pybind11_abi_build_flags()]
+ 
+-    common_cflags += [f'-I{include}' for include in user_includes]
++    common_cflags += [f'-I"{include}"' for include in user_includes]
+     common_cflags += [f'-isystem {include}' for include in system_includes]
+ 
+     common_cflags += [f"{x}" for x in _get_glibcxx_abi_build_flags()]

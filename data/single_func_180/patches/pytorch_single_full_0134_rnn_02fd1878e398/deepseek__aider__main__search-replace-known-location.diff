@@ -1,0 +1,13 @@
+diff --git a/torch/nn/modules/rnn.py b/torch/nn/modules/rnn.py
+index 5d705e293a3..f2c6f70c241 100644
+--- a/torch/nn/modules/rnn.py
++++ b/torch/nn/modules/rnn.py
+@@ -38,7 +38,7 @@ class RNNBase(Module):
+         self.num_layers = num_layers
+         self.bias = bias
+         self.batch_first = batch_first
+-        self.dropout = dropout
++        self.dropout = float(dropout)
+         self.bidirectional = bidirectional
+         num_directions = 2 if bidirectional else 1
+ 

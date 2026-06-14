@@ -1,0 +1,16 @@
+diff --git a/torch/_inductor/lowering.py b/torch/_inductor/lowering.py
+index b520869d632..c38fb37e405 100644
+--- a/torch/_inductor/lowering.py
++++ b/torch/_inductor/lowering.py
+@@ -2044,7 +2044,10 @@ def index_put_fallback(self, indices, values, accumulate):
+ 
+ @register_lowering(aten.index_put_, type_promotion_kind=None)
+ def index_put_(self, indices, values, accumulate=False):
+-    # Dispatch to masked fill for single boolean index with single value
++    # Unsqueeze indices[0] if self and indices[0] are not broadcastable
++    if len(indices) == 1 and not self.get_size().is_broadcastable(indices[0].get_size()):
++        indices[0] = indices[0].unsqueeze(0)
++
+     if (
+         values.get_numel() == 1
+         and len(indices) == 1

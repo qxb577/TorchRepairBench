@@ -1,0 +1,22 @@
+diff --git a/torch/_inductor/ir.py b/torch/_inductor/ir.py
+index 386734212f3..168f8ad828e 100644
+--- a/torch/_inductor/ir.py
++++ b/torch/_inductor/ir.py
+@@ -3003,15 +3003,9 @@ class SliceView(View):
+         sizevars = V.graph.sizevars
+         dim_size = x.get_size()[dim]
+ 
+-        if any(free_unbacked_symbols(x) for x in (start, end, dim_size)):
++        def clamp(x, lower, upper):  # type: ignore[no-untyped-def]
++            return sizevars.evaluate_min(sizevars.evaluate_max(x, lower), upper)
+ 
+-            def clamp(x, lower, upper):  # type: ignore[no-untyped-def]
+-                return sympy.Min(sympy.Max(x, lower), upper)
+-
+-        else:
+-
+-            def clamp(x, lower, upper):  # type: ignore[no-untyped-def]
+-                return sizevars.evaluate_min(sizevars.evaluate_max(x, lower), upper)
+ 
+         def clamp_wrap(val, lower, upper, default):  # type: ignore[no-untyped-def]
+             if val is None:

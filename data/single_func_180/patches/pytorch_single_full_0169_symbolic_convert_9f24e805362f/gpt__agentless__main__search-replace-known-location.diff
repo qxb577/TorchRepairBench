@@ -1,0 +1,23 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index 580bc77d4cc..b6b3f73250b 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1205,15 +1205,14 @@ class InstructionTranslatorBase(
+             self._cell_and_freevars = self.cellvars() + self.freevars()
+         return self._cell_and_freevars
+ 
+-    def prune_dead_locals(self) -> None:
+-        # keep cell and freevar references alive
++    def prune_dead_locals(self, reads=None) -> None:
++        if reads is None:
++            reads = livevars_analysis(self.instructions, self.current_instruction)
+         self.post_prune_cell_and_freevars = {
+             k: v
+             for k, v in self.symbolic_locals.items()
+             if k in self.cell_and_freevars()
+         }
+-        # Only keep the locals that must remain on the stack.
+-        reads = livevars_analysis(self.instructions, self.current_instruction)
+         self.symbolic_locals = {
+             k: v for k, v in self.symbolic_locals.items() if k in reads
+         }

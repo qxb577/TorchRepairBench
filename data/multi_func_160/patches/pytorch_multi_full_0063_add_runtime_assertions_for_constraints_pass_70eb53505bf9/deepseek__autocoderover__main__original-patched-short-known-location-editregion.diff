@@ -1,0 +1,14 @@
+diff --git a/torch/export/exported_program.py b/torch/export/exported_program.py
+index 5e893316550..f5aa063bbe3 100644
+--- a/torch/export/exported_program.py
++++ b/torch/export/exported_program.py
+@@ -621,7 +621,8 @@ def _get_updated_range_constraints(
+         return {}
+     range_constraints = {
+         k: v
+-        for k, v in shape_env.var_to_range.items()
++        for k, v in shape_env.runtime_var_to_range.items()
+         if k not in shape_env.replacements
+     }
++
+     return range_constraints

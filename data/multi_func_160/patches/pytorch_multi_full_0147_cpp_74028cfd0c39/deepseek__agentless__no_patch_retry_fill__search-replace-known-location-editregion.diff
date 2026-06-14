@@ -1,0 +1,32 @@
+diff --git a/torch/_inductor/codegen/cpp.py b/torch/_inductor/codegen/cpp.py
+index 878fa06e292..6412a615d76 100644
+--- a/torch/_inductor/codegen/cpp.py
++++ b/torch/_inductor/codegen/cpp.py
+@@ -850,6 +850,8 @@ class CppOverrides(OpOverrides):
+         code = BracesBuffer()
+         exponent = V.kernel.cse.newvar()
+         mantissa = V.kernel.cse.newvar()
++        exponent.dtype = torch.int32
++        mantissa.dtype = x.dtype
+         code.writeline(f"int32_t {exponent};")
+         code.writeline(f"auto {mantissa} = std::frexp({x}, &{exponent});")
+         V.kernel.compute.splice(code)
+diff --git a/torch/_inductor/codegen/cpp_utils.py b/torch/_inductor/codegen/cpp_utils.py
+index 0d89b73997b..35c580e16a0 100644
+--- a/torch/_inductor/codegen/cpp_utils.py
++++ b/torch/_inductor/codegen/cpp_utils.py
+@@ -212,7 +212,13 @@ class CppCSEVariable(CSEVariable):
+                 self.is_vec = True
+         # NOTE [Deduce dtype of CppCSEVariable at runtime]
+         self.dtype = deduce_dtype_for_cpp_cse_variable(name, *args, **kwargs)
+-        assert self.dtype is not None
++        if self.dtype is None:
++            for arg in args:
++                if isinstance(arg, CppCSEVariable) and arg.dtype is not None:
++                    self.dtype = arg.dtype
++                    break
++            else:
++                self.dtype = torch.float32
+ 
+     def _set_dependent_itervars(self, index: sympy.Expr):
+         """

@@ -1,0 +1,30 @@
+diff --git a/torch/_dynamo/symbolic_convert.py b/torch/_dynamo/symbolic_convert.py
+index c1bc2ae9607..2898802e9c7 100644
+--- a/torch/_dynamo/symbolic_convert.py
++++ b/torch/_dynamo/symbolic_convert.py
+@@ -1590,11 +1590,25 @@ class InstructionTranslatorBase(
+         ) and argsvars.has_force_unpack_var_sequence(self):
+             argsvars = TupleVariable(argsvars.force_unpack_var_sequence(self))
+ 
++        # Convert MutableMapping kwargs to ConstDictVariable
++        from collections.abc import MutableMapping
++        if isinstance(kwargsvars, variables.UserDefinedObjectVariable) and isinstance(
++            kwargsvars.value, MutableMapping
++        ):
++            items_out = self.inline_user_function_return(
++                kwargsvars.var_getattr(self, "items"), [], {}
++            )
++            if isinstance(items_out, ConstDictVariable):
++                kwargsvars = items_out
++            else:
++                kwargsvars = BuiltinVariable.call_custom_dict(self, dict, kwargsvars)
++
+         if not isinstance(argsvars, BaseListVariable) or not isinstance(
+             kwargsvars, ConstDictVariable
+         ):
+             unimplemented(f"non-static call {typestr(argsvars)} {typestr(kwargsvars)}")
+ 
++
+         # Map to a dictionary of str -> VariableTracker
+         kwargsvars = kwargsvars.keys_as_python_constant()
+         self.call_function(fn, argsvars.items, kwargsvars)
