@@ -1,0 +1,9 @@
+dataset,model,agent,attempts,generated,generated_rate,applied,applied_rate,passed,repair_rate,failed_test,not_applicable,unvalidated_generated
+multi,deepseek,agentless,160,114,0.7125,113,0.7063,47,0.2938,66,1,0
+multi,deepseek,aider,160,66,0.4125,65,0.4062,22,0.1375,43,1,0
+multi,deepseek,autocoderover,160,123,0.7688,118,0.7375,45,0.2812,73,5,0
+multi,deepseek,swe,160,119,0.7438,114,0.7125,39,0.2437,75,5,0
+multi,gpt,agentless,160,157,0.9812,153,0.9563,44,0.2750,109,4,0
+multi,gpt,aider,160,94,0.5875,94,0.5875,27,0.1688,67,0,0
+multi,gpt,autocoderover,160,158,0.9875,157,0.9812,49,0.3063,108,1,0
+multi,gpt,swe,160,146,0.9125,144,0.9000,37,0.2313,107,2,0

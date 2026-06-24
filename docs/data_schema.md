@@ -39,6 +39,29 @@ Each row is one executable validation result for an applicable canonical patch.
 - `elapsed_seconds`: validation time.
 - `notes`: short failure or environment note.
 
+## `repair_rate_by_model_agent.csv`
+
+Summarizes canonical repair outcomes by dataset, model, and agent.
+
+- `attempts`: number of bug-level model-agent repair units.
+- `generated`: number of units that produced a patch.
+- `generated_rate`: patch generation rate over all attempts.
+- `applied`: number of generated patches that were applicable.
+- `applied_rate`: applicable-patch rate over all attempts.
+- `passed`: number of patches that passed executable bug-revealing tests.
+- `repair_rate`: test-passing repair rate over all attempts.
+- `failed_test`, `not_applicable`, `unvalidated_generated`: remaining outcome counts.
+
+## `data/semantic_review/*.csv`
+
+These files provide an author-perspective semantic review of test-passing patches.
+
+- `*_author_review.csv`: patch-level semantic review records.
+- `*_agent_summary.csv`: confirmed bug-fix counts grouped by dataset, model, and agent.
+- `*_dataset_summary.csv`: dataset-level confirmed bug-fix summary.
+- `confirmed_bug_fix`: number of test-passing patches judged to repair the underlying bug.
+- `not_confirmed` or `not_confirmed_bug_fix`: test-passing patches not confirmed as real bug fixes.
+
 ## `data/raw_index/candidate_filter_flow.csv`
 
 Summarizes the data construction pipeline from raw PyTorch keyword commits to final benchmark tasks.

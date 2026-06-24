@@ -1,0 +1,3 @@
+dataset,test_passing_patches,confirmed_bug_fix,not_confirmed_bug_fix,confirmed_fix_rate_among_test_passing
+single,370,350,20,94.6%
+multi,310,216,94,0.6968

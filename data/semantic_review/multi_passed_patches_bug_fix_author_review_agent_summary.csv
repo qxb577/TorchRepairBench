@@ -1,0 +1,9 @@
+dataset,model,agent,test_passed_patches,confirmed_bug_fix,not_confirmed,confirmed_among_pass_rate
+multi,deepseek,agentless,47,37,10,0.7872
+multi,deepseek,aider,22,16,6,0.7273
+multi,deepseek,autocoderover,45,37,8,0.8222
+multi,deepseek,swe,39,29,10,0.7436
+multi,gpt,agentless,44,32,12,0.7273
+multi,gpt,aider,27,21,6,0.7778
+multi,gpt,autocoderover,49,30,19,0.6122
+multi,gpt,swe,37,14,23,0.3784

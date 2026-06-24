@@ -1,0 +1,2 @@
+dataset,test_passing_patches,confirmed_bug_fix,not_bug_fix,confirmed_fix_rate_among_test_passing,newly_confirmed_from_plausible,newly_rejected_from_plausible
+single,370,350,20,94.6%,79,19

@@ -6,8 +6,8 @@ runs, generated patches, and executable validation results.
 
 ## Contents
 
-- `single_func_180`: tasks=180, canonical repair rows=1435, validation rows=1441, copied patch files=1108, validation source=`benchmark_pilot/single_func_180/allruns_patch_test_validation_corrected562.csv`
-- `multi_func_160`: tasks=160, canonical repair rows=1280, validation rows=89, copied patch files=958, validation source=`benchmark_pilot/multi_func_160/allruns_multi_patch_test_validation_corrected22.csv`
+- `single_func_180`: tasks=180, canonical repair rows=1435, validation rows=1441, copied patch files=1108, validation source=`data/single_func_180/validation_results.csv`
+- `multi_func_160`: tasks=160, canonical repair rows=1280, validation rows=977, copied patch files=958, validation source=`data/multi_func_160/validation_results.csv`
 
 ## Directory Layout
 
@@ -15,6 +15,7 @@ runs, generated patches, and executable validation results.
 - `data/multi_func_160/`: multi-function PyTorch bug tasks and current validation results.
 - `data/*/patches/`: canonical generated patches selected for public release.
 - `data/raw_index/`: lightweight raw commit index and filtering-flow statistics.
+- `data/semantic_review/`: author-perspective semantic review of test-passing patches.
 - `scripts/`: helper scripts used to construct canonical tables and summarize validation progress.
 - `docs/`: schema and protocol documentation.
 
@@ -26,5 +27,7 @@ are validated by rebuilding the target PyTorch version and running bug-revealing
 
 ## Note
 
-The single-function validation is complete. The multi-function validation files reflect the current
-validated state at release-package generation time and can be updated as additional builds finish.
+The released validation tables contain the complete canonical executable validation results for the
+180 single-function tasks and 160 multi-function tasks. Semantic review tables distinguish
+test-passing patches from patches that are confirmed as real bug fixes under an author-review
+criterion.

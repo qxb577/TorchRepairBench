@@ -10,6 +10,9 @@ The benchmark contains:
 - 160 multi-function PyTorch bug commits.
 - Canonical repair runs for DeepSeek and GPT backends paired with four repair agents:
   Agentless, Aider, AutoCodeRover, and SWE-agent.
+- Complete executable validation results for canonical applicable patches.
+- Author-perspective semantic review records for test-passing patches, separating patches that
+  merely pass bug-revealing tests from patches confirmed to repair the underlying bug.
 
 The dataset is intended for research on automated program repair, LLM agent evaluation,
 patch generation, patch applicability, executable validation, and repair failure analysis.
