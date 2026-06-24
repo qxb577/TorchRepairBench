@@ -27,10 +27,10 @@
     "private paper/reference PDFs"
   ],
   "semantic_review": {
-    "single_test_passing_patch_review_rows": 370,
+    "single_test_passing_patch_review_rows": 359,
     "multi_test_passing_patch_review_rows": 310,
     "combined_agent_summary": "data/semantic_review/passed_patches_bug_fix_author_review_agent_summary.csv",
     "combined_dataset_summary": "data/semantic_review/passed_patches_bug_fix_author_review_dataset_summary.csv",
-    "note": "Author-perspective semantic review of test-passing patches; distinguishes test-passing patches from confirmed bug fixes."
+    "note": "Author-perspective semantic review of canonical test-passing patches; distinguishes test-passing patches from confirmed bug fixes."
   }
 }
