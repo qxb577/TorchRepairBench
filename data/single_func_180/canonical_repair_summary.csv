@@ -5,5 +5,5 @@ deepseek,autocoderover,original-patched-known-location,180,127,87,93,855690,118.
 deepseek,swe,tool-call-known-location,180,114,62,118,898585,131.159
 gpt,agentless,search-replace-known-location,180,159,180,0,256527,6.912
 gpt,aider,search-replace-known-location,180,159,179,1,257403,5.751
-gpt,autocoderover,original-patched-known-location,175,155,170,5,266459,7.637
+gpt,autocoderover,original-patched-known-location,180,159,170,10,275578,7.609
 gpt,swe,tool-call-known-location,180,151,170,10,280670,7.682

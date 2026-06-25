@@ -4,17 +4,17 @@
   "datasets": [
     {
       "dataset": "single_func_180",
-      "canonical_rows": 1435,
+      "canonical_rows": 1440,
       "tasks": 180,
-      "validation_rows": 1441,
+      "validation_rows": 1445,
       "copied_patch_files": 1108,
-      "validation_source": "benchmark_pilot/single_func_180/allruns_patch_test_validation_corrected562.csv"
+      "validation_source": "benchmark_pilot/single_func_180/allruns_patch_test_validation_corrected566.csv"
     },
     {
       "dataset": "multi_func_160",
       "canonical_rows": 1280,
       "tasks": 160,
-      "validation_rows": 89,
+      "validation_rows": 977,
       "copied_patch_files": 958,
       "validation_source": "benchmark_pilot/multi_func_160/allruns_multi_patch_test_validation_corrected22.csv"
     }
@@ -31,6 +31,8 @@
     "multi_test_passing_patch_review_rows": 310,
     "combined_agent_summary": "data/semantic_review/passed_patches_bug_fix_author_review_agent_summary.csv",
     "combined_dataset_summary": "data/semantic_review/passed_patches_bug_fix_author_review_dataset_summary.csv",
-    "note": "Author-perspective semantic review of canonical test-passing patches; distinguishes test-passing patches from confirmed bug fixes."
+    "single_agent_summary": "data/single_func_180/semantic_review/confirmed_repair_rate_by_model_agent.csv",
+    "single_dataset_summary": "data/single_func_180/semantic_review/confirmed_repair_rate_dataset_summary.csv",
+    "note": "Author-perspective semantic review covers only canonical test-passing patches; test-failed patches are not included in the manual semantic-review denominator."
   }
 }

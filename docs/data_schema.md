@@ -49,18 +49,21 @@ Summarizes canonical repair outcomes by dataset, model, and agent.
 - `applied`: number of generated patches that were applicable.
 - `applied_rate`: applicable-patch rate over all attempts.
 - `passed`: number of patches that passed executable bug-revealing tests.
-- `repair_rate`: test-passing repair rate over all attempts.
+- `test_passing_repair_rate` or `repair_rate`: test-passing repair rate over all attempts.
 - `failed_test`, `not_applicable`, `unvalidated_generated`: remaining outcome counts.
 
-## `data/semantic_review/*.csv`
+## `data/semantic_review/*.csv` and `data/single_func_180/semantic_review/*.csv`
 
-These files provide an author-perspective semantic review of test-passing patches.
+These files provide an author-perspective semantic review of test-passing patches. Test-failed
+patches are not included in the manual semantic-review denominator.
 
 - `*_author_review.csv`: patch-level semantic review records.
 - `*_agent_summary.csv`: confirmed bug-fix counts grouped by dataset, model, and agent.
 - `*_dataset_summary.csv`: dataset-level confirmed bug-fix summary.
 - `confirmed_bug_fix`: number of test-passing patches judged to repair the underlying bug.
 - `not_confirmed` or `not_confirmed_bug_fix`: test-passing patches not confirmed as real bug fixes.
+- `confirmed_repair_rate_by_model_agent.csv`: final single-function model-agent confirmed fix summary.
+- `confirmed_repair_rate_dataset_summary.csv`: final single-function dataset-level confirmed fix summary.
 
 ## `data/raw_index/candidate_filter_flow.csv`
 

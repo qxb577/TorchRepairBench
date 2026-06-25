@@ -66,7 +66,10 @@ CONFIGS = [
         "model": "gpt",
         "agent": "autocoderover",
         "main": ["autocoderover_openai_gpt4o_acrpatch_10000_remaining_from11_records.jsonl"],
-        "retry": ["autocoderover_repair_only_openai_gpt4o_acrpatch_10000_first10_nopatch_retry2_run_records.jsonl"],
+        "retry": [
+            "autocoderover_repair_only_openai_gpt4o_acrpatch_10000_first10_nopatch_retry2_run_records.jsonl",
+            "autocoderover_openai_gpt4o_acrpatch_10000_missing5_records.jsonl",
+        ],
         "strategy": "original-patched-known-location",
     },
     {
